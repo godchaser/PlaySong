@@ -11,6 +11,9 @@
         <li>
             @song.songName
 
+            @form(routes.Application.getSong(song.id)) {
+                <input type="submit" value="Show">
+            }
             @form(routes.Application.deleteSong(song.id)) {
                 <input type="submit" value="Delete">
                 }
@@ -20,12 +23,11 @@
 
     <h2>Add a new song</h2>
 
-    @form(routes.Application.newSong()) {
-
-        @inputText(songForm("songName"))
-
+    @helper.form(action = routes.Application.newSong()) {
+        @helper.inputText(songForm("songName"))
+        @helper.inputText(songForm("songAuthor"))
+        @helper.textarea(field = songForm("songLyrics"), args = 'rows -> 20, 'cols -> 40)
         <input type="submit" value="Create">
-
     }
 
 }
