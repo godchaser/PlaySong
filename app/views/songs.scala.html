@@ -1,0 +1,31 @@
+@(songs: List[Song], songForm: Form[Song])
+
+@import helper._
+
+@main("Song list") {
+
+    <h1>@songs.size() songs(s)</h1>
+
+    <ul>
+    @for(song <- songs) {
+        <li>
+            @song.songName
+
+            @form(routes.Application.deleteSong(song.id)) {
+                <input type="submit" value="Delete">
+                }
+        </li>
+    }
+    </ul>
+
+    <h2>Add a new song</h2>
+
+    @form(routes.Application.newSong()) {
+
+        @inputText(songForm("songName"))
+
+        <input type="submit" value="Create">
+
+    }
+
+}
