@@ -2,6 +2,6 @@ language: scala
 env:
   - PLAY_VERSION=1.2.12
 before_script:
-  - wget http://downloads.typesafe.com/typesafe-activator/${PLAY_VERSION}/typesafe-activator-${PLAY_VERSION}-minimal.zip
-  - unzip -q typesafe-activator-${PLAY_VERSION}-minimal.zip
-script: activator-${PLAY_VERSION}-minimal/activator test
+  - wget http://downloads.typesafe.com/typesafe-activator/1.2.12/typesafe-activator-1.2.12-minimal.zip
+  - unzip -q typesafe-activator-1.2.12-minimal.zip
+script: activator-1.2.12-minimal/activator test
