@@ -48,6 +48,18 @@ public class Song extends Model {
         song.save();
     }
 
+    public static List<Song> searchLyrics(){
+        // More complex song query
+        /*
+        List<Song> songs= find.where()
+                .ilike("name", "%coco%")
+                .orderBy("dueDate asc")
+                .findPagingList(25)
+                .getPage(1);
+        */
+        return songs;
+    }
+
     public static void delete(Long id) {
         find.ref(id).delete();
     }
