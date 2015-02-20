@@ -47,7 +47,7 @@ public class Song extends Model {
     public static void create(Song song) {
         song.save();
     }
-
+    /*
     public static List<Song> searchLyrics(){
         // More complex song query
         /*
@@ -56,10 +56,10 @@ public class Song extends Model {
                 .orderBy("dueDate asc")
                 .findPagingList(25)
                 .getPage(1);
-        */
+
         return songs;
     }
-
+    */
     public static void delete(Long id) {
         find.ref(id).delete();
     }
