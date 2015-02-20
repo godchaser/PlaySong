@@ -1,4 +1,5 @@
 language: scala
+before_install: unset SBT_OPTS JVM_OPTS
 env:
   - PLAY_VERSION=1.2.12
 before_script:
