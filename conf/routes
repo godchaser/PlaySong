@@ -16,6 +16,8 @@ POST        /songs                   controllers.Application.newSong()
 POST        /songs/:id/delete        controllers.Application.deleteSong(id: Long)
 GET         /songs/:id               controllers.Application.getSong(id: Long)
 
+GET         /init                   controllers.Application.init()
+
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file            controllers.Assets.at(path="/public", file)
 

@@ -75,4 +75,18 @@ public class Application extends Controller {
         }
     }
 
+    public static Result init(){
+        try {
+            //SongImporter.exportFolder();
+            SongImporter.importFromDb();
+        }
+        catch (Exception e){
+            Logger.error("Exception occured during init" + e.getStackTrace());
+            e.printStackTrace();
+            System.out.print(e.getStackTrace());
+            System.out.print(e.getMessage());
+        }
+        return redirect(routes.Application.songs());
+    }
+
 }

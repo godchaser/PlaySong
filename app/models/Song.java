@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Column;
 
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
@@ -22,6 +23,7 @@ public class Song extends Model {
 
     public String songAuthor;
 
+    @Column(columnDefinition = "TEXT")
     public String songLyrics;
 
     public static List<Song> all() {
