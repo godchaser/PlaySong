@@ -12,6 +12,7 @@ GET         /songtable               controllers.Application.songTable()
 POST        /songs                   controllers.Application.newSong()
 POST        /songs/:id/delete        controllers.Application.deleteSong(id: Long)
 GET         /songs/:id               controllers.Application.getSong(id: Long)
+GET         /songjson/:id            controllers.Application.getSongJson(id: Long)
 
 GET         /init                    controllers.Application.init()
 

@@ -35,3 +35,16 @@ span.c {
     background: #2159D6;
     color: #FFF;
 }
+
+#song_database {
+    width:auto;
+    clear:both;
+}
+
+#song_table {
+    float:left !important;
+    margin-right:10px !important;
+}
+#song_section {
+    float:left !important;
+}

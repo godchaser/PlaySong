@@ -10,12 +10,6 @@ import views.html.songs;
 import views.html.song;
 import views.html.songtable;
 
-
-//import org.codehaus.jackson.JsonNode;
-//import org.codehaus.jackson.node.ArrayNode;
-//import org.codehaus.jackson.node.ObjectNode;
-
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -29,7 +23,7 @@ public class Application extends Controller {
    // SONGS IMPLEMENTATION
 
     public static Result index() {
-        return redirect(routes.Application.songs());
+        return redirect(routes.Application.songTable());
     }
 
     static Form<Song> songForm = Form.form(Song.class);
@@ -48,6 +42,15 @@ public class Application extends Controller {
 
     public static Result getSong(Long id) {
         return ok(song.render(Song.getSong(id)));
+    }
+
+    public static Result getSongJson(Long id) {
+        ObjectNode songJson = Json.newObject();
+        Song s = Song.getSong(id);
+        songJson.put("songName", s.songName);
+        songJson.put("songAuthor", s.songAuthor);
+        songJson.put("songLyrics", s.songLyrics);
+        return ok(songJson);
     }
 
     public static Result deleteSong(Long id) {
