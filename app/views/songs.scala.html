@@ -61,44 +61,50 @@
     </div>
 
 
-    <script src="http://twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.min.js"></script>
+    <script src="http://twitter.github.com/typeahead.js/releases/latest/typeahead.bundle.js"></script>
     <script type="text/javascript">
-    var songNames =[ ] ;
-        @for(song <- songs) {
-            songNames.push ( " @song.songName ");
-        }
+    <div id="remote">
+    <input class="typeahead" type="text" placeholder="Oscar winners for Best Picture">
+    </div>
 
-    var substringMatcher = function ( strs ) {
-    return function findMatches ( q, cb ) {
-    var matches, substrRegex ;
+        <script>
 
-    // an array that will be populated with substring matches
-    matches =[ ] ;
 
-    // regex used to determine if a string contains the substring `q`
-    substrRegex = new RegExp ( q, 'i' ) ;
-
-    // iterate through the pool of strings and for any string that
-    // contains the substring `q`, add it to the `matches` array
-    $.each ( strs, function ( i, str ) {
-    if ( substrRegex.test ( str ) ) {
-    // the typeahead jQuery plugin expects suggestions to a
-    // JavaScript object, refer to typeahead docs for more info
-    matches.push ( { value : str } ) ;
+    // instantiate the bloodhound suggestion engine
+    var songs = new Bloodhound({
+    datumTokenizer: function(songs) {
+    return Bloodhound.tokenizers.whitespace(songs.value);
+    },
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    prefetch: {
+    url: "@routes.Application.getSongs()",
+    filter: function(response) {
+    return response.songs;
     }
-    } ) ;
+    }
+    });
 
-    cb ( matches ) ;
-    } ;
-    } ;
+    // initialize the bloodhound suggestion engine
+    songs.initialize();
 
+    // instantiate the typeahead UI
+    $('.typeahead').typeahead(
+    { hint: true,
+    highlight: true,
+    minLength: 1
+    },
+    {
+    name: 'songs',
+    displayKey: function(songs) {
+    return songName;
+    },
+    source: songs.ttAdapter()
+    });
 
-    $ ( '#scrollable-dropdown-menu .typeahead' ).typeahead ( null, {
-    name : 'countries',
-    displayKey : 'name',
-    source : substringMatcher ( songNames )
-    } ) ;
     </script>
+
+
+
 
     <div class="container">
         <div class="jumbotron">
