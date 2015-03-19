@@ -6,6 +6,7 @@ import play.data.Form;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import views.html.admin;
 import views.html.songs;
 import views.html.song;
 import views.html.songtable;
@@ -13,6 +14,9 @@ import views.html.songtable;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.*;
 
 import com.avaje.ebean.Expr;
@@ -25,6 +29,8 @@ public class Application extends Controller {
     public static Result index() {
         return redirect(routes.Application.songTable());
     }
+
+    public static Result admin() {return ok(admin.render());}
 
     static Form<Song> songForm = Form.form(Song.class);
 
@@ -145,6 +151,26 @@ public class Application extends Controller {
         }
 
         return ok(result);
+    }
+
+    public static Result downloadAndDeleteFile() {
+
+        File tmpFile = new File("/path/to/your/generated.zip");
+
+        FileInputStream fin = null;
+        try {
+            fin = new FileInputStream(tmpFile);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        response().setHeader("Content-disposition", "attachment;filename=" + tmpFile.getName());
+        response().setHeader(CONTENT_TYPE, "application/zip");
+        response().setHeader(CONTENT_LENGTH, tmpFile.length() + "");
+
+        tmpFile.delete();
+
+        return ok(fin);
     }
 
 }
