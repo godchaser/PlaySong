@@ -2,23 +2,3 @@
     max-height: 150px;
     overflow-y: auto;
 }
-
-#song_database_div {
-    width:auto;
-    clear:both;
-    display: flex;
-}
-
-#song_table_div {
-    float:left !important;
-    margin-right:10px !important;
-    flex: 1;
-    padding: 1em;
-    border: solid;
-}
-#song_section_div {
-    float:left !important;
-    flex: 1;
-    padding: 1em;
-    border: solid;
-}

@@ -10,6 +10,7 @@ import views.html.admin;
 import views.html.songs;
 import views.html.song;
 import views.html.songtable;
+import views.html.table;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -22,15 +23,20 @@ import java.util.*;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.Page;
 
+import play.twirl.api.Html;
 public class Application extends Controller {
 
    // SONGS IMPLEMENTATION
+
 
     public static Result index() {
         return redirect(routes.Application.songTable());
     }
 
-    public static Result admin() {return ok(admin.render());}
+    public static Result admin() {
+        Html welcome = new Html("");
+        return ok(admin.render("",welcome));
+    }
 
     static Form<Song> songForm = Form.form(Song.class);
 
@@ -171,6 +177,10 @@ public class Application extends Controller {
         tmpFile.delete();
 
         return ok(fin);
+    }
+
+    public static Result table() {
+        return ok(table.render());
     }
 
 }

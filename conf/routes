@@ -18,6 +18,7 @@ GET         /init                    controllers.Application.init()
 
 GET         /list                    controllers.Application.list()
 GET         /admin                   controllers.Application.admin()
+GET         /table                   controllers.Application.table()
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file            controllers.Assets.at(path="/public", file)

@@ -1,0 +1,94 @@
+@admin("") {
+
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jquery-ui.css")">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jquery.dataTables.min.css")">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jquery.transposer.css")">
+    <script src="@routes.Assets.at("javascripts/jquery-2.1.3.min.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/jquery-ui.min.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/jquery.dataTables.min.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/jquery.transposer.js")" type="text/javascript"></script>
+
+    <script type="text/javascript">
+
+    /* Table initialisation */
+    $ ( document ).ready ( function ( ) {
+    // copy song table div to dynamic content div
+    $('#dynamiccontent').html($('#song_database_div' ).html())
+    // delete initial table div
+    $('#song_database_div' ).remove()
+    $ ( '#song_table' ).dataTable ( {
+    "bProcessing" : true,
+    "aaSorting" :[[ 0, "asc" ] ],
+    "bServerSide" : true,
+    "bJQueryUI" : true,
+    "sPaginationType" : "full_numbers",
+    "sAjaxSource" : " @routes.Application.list()"
+    } ) ;
+    } ) ;
+
+    $(document).ready(function() {
+    var table = $('#song_table').DataTable();
+    //var song_name;
+    $('#song_table tbody').on( 'click', 'tr', function () {
+    $('.transpose-keys').remove();
+    console.log('#song_section_div!!!!!!!!!!!!!!')
+    console.log($('#song_section_div'))
+    //document.getElementById('song_section_div').classList.remove('transpose-keys');
+    console.log($(this))
+    var data = table.row(this).data();
+    console.log(data)
+    console.log(data[2])
+    var songid= data[2]
+
+    var songJson;
+    $.getJSON("/songjson" + "/" + songid , function(json) {
+    songJson = json;
+    console.log(songJson)
+    document.getElementById("song_lyrics").innerHTML = songJson.songLyrics;
+    $(function() {
+    $("#song_lyrics").transpose({ key : 'C' });
+    });
+    });
+
+    if ( $(this).hasClass('selected') ) {
+    $(this).removeClass('selected');
+    }
+    else {
+    table.$('tr.selected').removeClass('selected');
+    $(this).addClass('selected');
+    }
+    } );
+
+    $('#test_button').click( function () {
+    table.row('.selected').remove().draw( false );
+    } );
+    } );
+
+    </script>
+
+    <div class="song_database_class" id="song_database_div">
+        <div id="song_table_div">
+            <table id="song_table" class='display'>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Author</th>
+                        <th>Id</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Row 1 Data 1</td>
+                        <td>Row 1 Data 2</td>
+                        <td>Row 1 Data 3</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="song_section_div">
+            <pre id="song_lyrics"></pre>
+        </div>
+    </div>
+
+}
