@@ -11,6 +11,7 @@ import views.html.songs;
 import views.html.song;
 import views.html.songtable;
 import views.html.table;
+import views.html.songbook;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -30,12 +31,17 @@ public class Application extends Controller {
 
 
     public static Result index() {
-        return redirect(routes.Application.songTable());
+        return redirect(routes.Application.admin());
     }
 
     public static Result admin() {
         Html welcome = new Html("");
         return ok(admin.render("",welcome));
+    }
+
+    public static Result songbook() {
+        Html welcome = new Html("");
+        return ok(songbook.render());
     }
 
     static Form<Song> songForm = Form.form(Song.class);
