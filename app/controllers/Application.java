@@ -165,6 +165,35 @@ public class Application extends Controller {
         return ok(result);
     }
 
+    public static Result songSuggestions() {
+        /**
+         * Get needed params
+         */
+        //TODO: check for null pointers
+        // dont send whole song object, only songname and id
+        Map<String, String[]> params = request().queryString();
+        String filter = params.get("q")[0];
+        Logger.info("Filter param" + filter);
+        /**
+         * Get sorting order and column
+         */
+        String sortBy = "songName";
+        List<Song> songs = Song.find.where(
+                Expr.or(
+                        Expr.ilike("songName", "%"+filter+"%"),
+                        Expr.or(
+                                Expr.ilike("songAuthor", "%"+filter+"%"),
+                                Expr.contains("songLyrics", "%" + filter + "%")
+                        )
+                )
+        ).findList();
+                //.orderBy(sortBy + " " + sortBy + ", id " + sortBy);
+                //.findPagingList(pageSize).setFetchAhead(false)
+                //.getPage(page);
+
+        return ok(Json.toJson(songs));
+    }
+
     public static Result downloadAndDeleteFile() {
 
         File tmpFile = new File("/path/to/your/generated.zip");
