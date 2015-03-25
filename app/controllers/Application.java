@@ -9,9 +9,9 @@ import play.mvc.Result;
 import views.html.admin;
 import views.html.songs;
 import views.html.song;
-import views.html.songtable;
 import views.html.table;
 import views.html.songbook;
+import views.html.songeditor;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -48,10 +48,6 @@ public class Application extends Controller {
 
     public static Result songs() {
         return ok(songs.render(Song.all(), songForm));
-    }
-
-    public static Result songTable() {
-        return ok(songtable.render(Song.all()));
     }
 
     public static Result getSongs() {
@@ -216,6 +212,10 @@ public class Application extends Controller {
 
     public static Result table() {
         return ok(table.render());
+    }
+
+    public static Result songeditor(Long id) {
+        return ok(songeditor.render(Song.getSong(id), songForm));
     }
 
 }
