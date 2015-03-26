@@ -21,7 +21,8 @@ GET         /list                    controllers.Application.list()
 GET         /admin                   controllers.Application.admin()
 GET         /table                   controllers.Application.table()
 GET         /songbook                controllers.Application.songbook()
-GET         /songeditor              controllers.Application.songeditor(id: Long)
+GET         /songeditor/:id          controllers.Application.songeditor(id: Long)
+GET         /newsongeditor           controllers.Application.newsongeditor()
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file            controllers.Assets.at(path="/public", file)

@@ -37,6 +37,7 @@
 
             <!-- Transfer  -->
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-transfer.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/typeahead.bootstrap.css")">
 
     </head>
     <body>
@@ -83,7 +84,7 @@
                                     <div class="input-group custom-search-form">
                                         <!--<input type="text" class="form-control" placeholder="Song name, lyrics, author...">-->
                                         <div id="scrollable-dropdown-menu">
-                                            <input class="typeahead" type="text" placeholder="Countries">
+                                            <input class="typeahead" type="text" placeholder="Songs">
                                         </div>
                                         <span class="input-group-btn">
                                             <button class="btn btn-default" type="button">
@@ -95,13 +96,13 @@
                                 </li>
 
                                 <li>
-                                    <a href="table"><i class="fa fa-table fa-fw"></i>Song database</a>
+                                    <a href="@routes.Application.table()"><i class="fa fa-table fa-fw"></i>Song database</a>
                                 </li>
                                 <li>
                                     <a href="songview.html"><i class="fa fa-music fa-fw"></i>Song viewer</a>
                                 </li>
                                 <li>
-                                    <a href="songeditor.html"><i class="fa fa-edit fa-fw"></i>Song editor</a>
+                                    <a href="@routes.Application.newsongeditor()"><i class="fa fa-edit fa-fw"></i>Song editor</a>
                                 </li>
                                 <li>
                                     <a href="songbook"><i class="fa fa-bookmark fa-fw"></i>Songbook manager</a>
@@ -181,7 +182,7 @@
 
             $('#scrollable-dropdown-menu .typeahead').typeahead(null, {
             name: 'songs',
-            displayKey: 'songName',
+            displayKey: 'value',
             minLength: '2',
             delay: '2',
             source: songList.ttAdapter()

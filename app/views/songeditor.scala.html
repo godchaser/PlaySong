@@ -1,4 +1,4 @@
-@(song: Song, songForm: Form[Song])
+@(id: Long, songForm: Form[Song])
 
 @import helper.twitterBootstrap._
 
@@ -8,9 +8,9 @@
     <div id="songEditor">
     <h2>Edit song</h2>
     @helper.form(action = routes.Application.newSong()) {
-        @helper.inputText(songForm("songName").copy(value=Some(song.songName)), args = '_label -> "Song name: ")
-        @helper.inputText(songForm("songAuthor").copy(value=Some(song.songAuthor)), args = '_label -> "Song author: ")
-        @helper.textarea(field = songForm("songLyrics").copy(value=Some(song.songLyrics)), args = '_label -> "Lyrics: ", 'rows -> 20, 'cols -> 40)
+        @helper.inputText(songForm("songName"), args = '_label -> "Song name: ")
+        @helper.inputText(songForm("songAuthor"), args = '_label -> "Song author: ")
+        @helper.textarea(field = songForm("songLyrics"), args = '_label -> "Lyrics: ", 'rows -> 20, 'cols -> 40)
         <input type="submit" value="Save">
     }
     </div>
@@ -18,8 +18,18 @@
     <script type="text/javascript">
 
     $ ( document ).ready ( function ( ) {
-    $('#dynamiccontent').html($('#songEditor').html())
-    $('#songEditor').remove()
+    $('#dynamiccontent').html($('#songEditor').html());
+    $('#songEditor').remove();
+        var id = @id;
+        console.log(id)
+        if (id > -1){
+            $.getJSON( "/songjson/"+id, function( json ) {
+                //console.log( "JSON Data: " + json.users[ 3 ].name );
+                $('#songName').attr("value", json.songName);
+                $('#songAuthor').attr("value", json.songAuthor);
+                $('#songLyrics').val(json.songLyrics);
+            });
+        }
     } ) ;
     </script>
 }

@@ -24,6 +24,8 @@ import java.util.*;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.Page;
 
+import java.util.AbstractMap.SimpleEntry;
+
 import play.twirl.api.Html;
 public class Application extends Controller {
 
@@ -59,12 +61,12 @@ public class Application extends Controller {
     }
 
     public static Result getSongJson(Long id) {
-        ObjectNode songJson = Json.newObject();
         Song s = Song.getSong(id);
-        songJson.put("songName", s.songName);
-        songJson.put("songAuthor", s.songAuthor);
-        songJson.put("songLyrics", s.songLyrics);
-        return ok(songJson);
+        //ObjectNode songJson = Json.newObject();
+        //songJson.put("songName", s.songName);
+        //songJson.put("songAuthor", s.songAuthor);
+        //songJson.put("songLyrics", s.songLyrics);
+        return ok(Json.toJson(s));
     }
 
     public static Result deleteSong(Long id) {
@@ -80,7 +82,7 @@ public class Application extends Controller {
             );
         } else {
             Song.create(filledForm.get());
-            return redirect(routes.Application.songs());
+            return redirect(routes.Application.table());
         }
     }
 
@@ -183,11 +185,16 @@ public class Application extends Controller {
                         )
                 )
         ).findList();
+
+        List<SimpleEntry> songSuggestionsList = new ArrayList<>();
+        for (Song song : songs) {
+            songSuggestionsList.add(new SimpleEntry(song.id, song.songName));
+        }
                 //.orderBy(sortBy + " " + sortBy + ", id " + sortBy);
                 //.findPagingList(pageSize).setFetchAhead(false)
                 //.getPage(page);
 
-        return ok(Json.toJson(songs));
+        return ok(Json.toJson(songSuggestionsList));
     }
 
     public static Result downloadAndDeleteFile() {
@@ -215,7 +222,12 @@ public class Application extends Controller {
     }
 
     public static Result songeditor(Long id) {
-        return ok(songeditor.render(Song.getSong(id), songForm));
+        return ok(songeditor.render(id, songForm));
+    }
+
+    public static Result newsongeditor() {
+        Long id = -1L;
+        return redirect(routes.Application.songeditor(id));
     }
 
 }

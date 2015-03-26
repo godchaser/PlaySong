@@ -15,9 +15,9 @@
     /* Table initialisation */
     $ ( document ).ready ( function ( ) {
     // copy song table div to dynamic content div
-    $('#dynamiccontent').html($('#song_div' ).html())
+    $('#dynamiccontent').html($('#song_table_wrapper' ).html())
     // delete initial table div
-    $('#song_div' ).remove()
+    $('#song_table_wrapper' ).remove()
     $ ( '#song_table' ).dataTable ( {
     responsive : true,
     "bProcessing" : true,
@@ -25,7 +25,11 @@
     "bServerSide" : true,
     "bJQueryUI" : true,
     "sPaginationType" : "full",
-    "sAjaxSource" : " @routes.Application.list()"
+    "sAjaxSource" : " @routes.Application.list()",
+    "dom": 'T<"clear">lfrtip',
+    "tableTools": {
+    "sRowSelect": "single"
+    }
     } );
     } );
 
@@ -34,7 +38,6 @@
     $('#song_table tbody').on( 'click', 'tr', function () {
     $('.transpose-keys').remove();
     var data = table.row(this).data();
-    console.log(data)
     console.log(data[2])
     songid= data[2]
     var songJson;
@@ -47,29 +50,45 @@
     });
     });
 
-    if ( $(this).hasClass('selected') ) {
-    $(this).removeClass('selected');
-    }
-    else {
-    table.$('tr.selected').removeClass('selected');
-    $(this).addClass('selected');
-    }
+
     } );
 
-    $('#test_button').click( function () {
-    table.row('.selected').remove().draw( false );
-    } );
     } );
 
-    function myFunction() {
-    window.location.href = "songeditor?id=" + songid;
+    function songActions(action) {
+        var xmlhttp;
+            if (window.XMLHttpRequest)
+                {// code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp=new XMLHttpRequest();
+                }
+            else
+                {// code for IE6, IE5
+                xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+                }
+        switch(action) {
+            // edit song
+            case 1:
+                window.location.href = "songeditor/" + songid;
+                break;
+            //add new song
+            case 2:
+                window.location.href = "newsongeditor";
+                break;
+            //delete song
+            case 3:
+                xmlhttp.open("POST","/songs/"+songid+"/delete",true);
+                xmlhttp.send();
+                $('#song_table').DataTable().ajax.reload();
+                break;
+        }
     }
 
     </script>
 
-    <div id="song_div">
-        <button id="editor" onclick="myFunction()">Edit song</button>
-
+    <div id="song_table_wrapper">
+        <div class="col-lg-12"  id="song_table_header">
+            <h2>Song database</h2>
+        </div>
         <div class="col-lg-6"  id="song_table_div">
             <table id="song_table" class="table table-striped table-hover dt-responsive" width="100%" cellspacing="0">
                 <thead>
@@ -90,8 +109,16 @@
         </div>
 
         <div class="col-lg-6" id="song_section_div">
+            <div class="row">
+            <button id="editsongbutton" onclick="songActions(1)"><i class="glyphicon glyphicon-edit"></i>Edit song</button>
+            <button id="addsongbutton" onclick="songActions(2)"><i class="glyphicon glyphicon-plus"></i>Add new song</button>
+            <button id="deletesongbutton" onclick="songActions(3)"><i class="glyphicon glyphicon-minus"></i>Delete song</button>
+            </div>
+            <div class="row">
             <pre id="song_lyrics"></pre>
+            </div>
         </div>
+
     </div>
 
 }
