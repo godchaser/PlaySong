@@ -44,7 +44,7 @@
     $.getJSON("/songjson" + "/" + songid , function(json) {
     songJson = json;
     console.log(songJson)
-    document.getElementById("song_lyrics").innerHTML = songJson.songLyrics;
+    $('#song_lyrics' ).html(songJson.songLyrics);
     $(function() {
     $("#song_lyrics").transpose({ key : 'C' });
     });
@@ -79,6 +79,7 @@
                 xmlhttp.open("POST","/songs/"+songid+"/delete",true);
                 xmlhttp.send();
                 $('#song_table').DataTable().ajax.reload();
+                $('#song_lyrics' ).html("");
                 break;
         }
     }
