@@ -1,0 +1,37 @@
+@(id: Long)
+
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jquery.transposer.css")">
+    <script src="@routes.Assets.at("javascripts/jquery-2.1.3.min.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/jquery.transposer.js")" type="text/javascript"></script>
+
+    <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+
+    <script type="text/javascript">
+    $ ( document ).ready ( function ( ) {
+    var id = @id;
+    if (id > -1){
+        jsRoutes.controllers.Application.getsongjson(id).ajax({
+        success: function(data) {
+            $('#songName').html(data.songName);
+            $('#songAuthor').html(data.songAuthor);
+            $('#songLyrics').html(data.songLyrics);
+            $(function() {
+            $("#songLyrics").transpose({ key : 'C' });
+            });
+        },
+        error: function() {
+            console.log("Error: ajax failure")
+        }
+    })
+
+    }
+    } ) ;
+    </script>
+
+    <div id="song_viewer_wrapper">
+        <div class="col-lg-12" id="song_viewer">
+            <h3 id="songName"></h3>
+            <p id="songAuthor"></p>
+            <pre id="songLyrics"></pre>
+        </div>
+    </div>

@@ -2,16 +2,12 @@ package controllers;
 
 import models.Song;
 import play.Logger;
+import play.Routes;
 import play.data.Form;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
-import views.html.admin;
-import views.html.songs;
-import views.html.song;
-import views.html.table;
-import views.html.songbook;
-import views.html.songeditor;
+import views.html.*;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -29,8 +25,19 @@ import java.util.AbstractMap.SimpleEntry;
 import play.twirl.api.Html;
 public class Application extends Controller {
 
-   // SONGS IMPLEMENTATION
+    static Form<Song> songForm = Form.form(Song.class);
 
+    public static Result javascriptRoutes() {
+        response().setContentType("text/javascript");
+        return ok(
+                Routes.javascriptRouter("jsRoutes",
+                        controllers.routes.javascript.Application.songview(),
+                        controllers.routes.javascript.Application.deletesong(),
+                        controllers.routes.javascript.Application.getsongjson(),
+                        controllers.routes.javascript.Application.songeditor()
+                )
+        );
+    }
 
     public static Result index() {
         return redirect(routes.Application.admin());
@@ -46,21 +53,11 @@ public class Application extends Controller {
         return ok(songbook.render());
     }
 
-    static Form<Song> songForm = Form.form(Song.class);
-
-    public static Result songs() {
-        return ok(songs.render(Song.all(), songForm));
-    }
-
-    public static Result getSongs() {
+    public static Result getsongs() {
         return ok(Json.toJson(Song.all()));
     }
 
-    public static Result getSong(Long id) {
-        return ok(song.render(Song.getSong(id)));
-    }
-
-    public static Result getSongJson(Long id) {
+    public static Result getsongjson(Long id) {
         Song s = Song.getSong(id);
         //ObjectNode songJson = Json.newObject();
         //songJson.put("songName", s.songName);
@@ -69,16 +66,16 @@ public class Application extends Controller {
         return ok(Json.toJson(s));
     }
 
-    public static Result deleteSong(Long id) {
+    public static Result deletesong(Long id) {
         Song.delete(id);
-        return redirect(routes.Application.songs());
+        return ok();
     }
 
-    public static Result newSong() {
+    public static Result newsong() {
         Form<Song> filledForm = songForm.bindFromRequest();
         if (filledForm.hasErrors()) {
             return badRequest(
-                    views.html.songs.render(Song.all(), filledForm)
+                    views.html.error.render()
             );
         } else {
             Song.create(filledForm.get());
@@ -97,10 +94,10 @@ public class Application extends Controller {
             System.out.print(e.getStackTrace());
             System.out.print(e.getMessage());
         }
-        return redirect(routes.Application.songs());
+        return redirect(routes.Application.index());
     }
 
-    public static Result list() {
+    public static Result getsongsdatatable() {
         /**
          * Get needed params
          */
@@ -163,7 +160,7 @@ public class Application extends Controller {
         return ok(result);
     }
 
-    public static Result songSuggestions() {
+    public static Result songsuggestions() {
         /**
          * Get needed params
          */
@@ -228,6 +225,10 @@ public class Application extends Controller {
     public static Result newsongeditor() {
         Long id = -1L;
         return redirect(routes.Application.songeditor(id));
+    }
+
+    public static Result songview(Long id) {
+        return ok(songviewer.render(id));
     }
 
 }

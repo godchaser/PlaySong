@@ -11,7 +11,7 @@
     <script src="@routes.Assets.at("javascripts/jquery.transposer.js")" type="text/javascript"></script>
 
     <script type="text/javascript">
-    var songid;
+    var id;
     /* Table initialisation */
     $ ( document ).ready ( function ( ) {
     // copy song table div to dynamic content div
@@ -25,22 +25,31 @@
     "bServerSide" : true,
     "bJQueryUI" : true,
     "sPaginationType" : "full",
-    "sAjaxSource" : " @routes.Application.list()",
+    "sAjaxSource" : " @routes.Application.getsongsdatatable()",
     "dom": 'T<"clear">lfrtip',
     "tableTools": {
     "sRowSelect": "single"
     }
     } );
-    } );
 
-    $ ( document ).ready ( function ( ) {
     var table = $('#song_table').DataTable();
     $('#song_table tbody').on( 'click', 'tr', function () {
     $('.transpose-keys').remove();
     var data = table.row(this).data();
-    console.log(data[2])
-    songid= data[2]
-    var songJson;
+    // this is selected song id
+    id = data[2]
+    jsRoutes.controllers.Application.getsongjson(id).ajax({
+    success: function(data) {
+    $('#songLyrics').html(data.songLyrics);
+    $(function() {
+    $("#songLyrics").transpose({ key : 'C' });
+    });
+    },
+    error: function() {
+    console.log("Error: ajax failure")
+    }
+    })
+    /*
     $.getJSON("/songjson" + "/" + songid , function(json) {
     songJson = json;
     console.log(songJson)
@@ -49,37 +58,64 @@
     $("#song_lyrics").transpose({ key : 'C' });
     });
     });
+    */
 
+    } );
 
     } );
 
-    } );
+    $('.alert .close').live("click", function(e) {
+    $(this).parent().hide();
+    });
+
+    function showAlert() {
+    $(".alert").addClass("in");
+    $("#cert-error").show();
+    }
+
+    function closeAlert() {
+    $("#cert-error").hide();
+    }
 
     function songActions(action) {
-        var xmlhttp;
-            if (window.XMLHttpRequest)
-                {// code for IE7+, Firefox, Chrome, Opera, Safari
-                xmlhttp=new XMLHttpRequest();
-                }
-            else
-                {// code for IE6, IE5
-                xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-                }
         switch(action) {
             // edit song
             case 1:
-                window.location.href = "songeditor/" + songid;
+                    jsRoutes.controllers.Application.songeditor(id).ajax({
+                    success: function(data) {
+                    $('#dynamiccontent').html(data);
+                    },
+                    error: function() {
+                    console.log("Error: ajax failure")
+                    }
+                    })
                 break;
             //add new song
             case 2:
-                window.location.href = "newsongeditor";
+                    jsRoutes.controllers.Application.newsongeditor(id).ajax({
+                    success: function(data) {
+                    $('#dynamiccontent').html(data);
+                    },
+                    error: function() {
+                    console.log("Error: ajax failure")
+                    }
+                    })
                 break;
             //delete song
             case 3:
-                xmlhttp.open("POST","/songs/"+songid+"/delete",true);
-                xmlhttp.send();
-                $('#song_table').DataTable().ajax.reload();
-                $('#song_lyrics' ).html("");
+                    jsRoutes.controllers.Application.deletesong(id).ajax({
+                    type: "POST",
+                    success: function(data) {
+                        showAlert();
+                        $('#song_table').DataTable().ajax.reload();
+                    },
+                    error: function() {
+                    console.log("Error: ajax failure")
+                    }
+                    })
+
+                    $('#song_table').DataTable().ajax.reload();
+                    $('#song_lyrics' ).html("");
                 break;
         }
     }
@@ -114,12 +150,26 @@
             <button id="editsongbutton" onclick="songActions(1)"><i class="glyphicon glyphicon-edit"></i>Edit song</button>
             <button id="addsongbutton" onclick="songActions(2)"><i class="glyphicon glyphicon-plus"></i>Add new song</button>
             <button id="deletesongbutton" onclick="songActions(3)"><i class="glyphicon glyphicon-minus"></i>Delete song</button>
+             <!--
+                <div id="deletenotification" hidden>
+                    <div class="alert alert-success">
+                        <a href="#" class="close">&times;</a>
+                        <strong>Delete success!</strong>
+                    </div>
+             </div>
+                -->
+                <div class="alert alert-block alert-error fade in" id="cert-error" style="display:none;">
+                    <button type="button" class="close" data-dismiss="alert">×</button>
+                    <h4 class="alert-heading">Delete success</h4>
+                </div>
+
             </div>
             <div class="row">
-            <pre id="song_lyrics"></pre>
+            <pre id="songLyrics"></pre>
             </div>
         </div>
 
     </div>
+
 
 }

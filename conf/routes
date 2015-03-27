@@ -3,28 +3,39 @@
 # ~~~~
 
 # Home page
-GET         /                        controllers.Application.index()
+GET         /                                 controllers.Application.index()
 
 # Songs
-GET         /songs                   controllers.Application.songs()
-GET         /getsongs                controllers.Application.getSongs()
-POST        /songs                   controllers.Application.newSong()
-POST        /songs/:id/delete        controllers.Application.deleteSong(id: Long)
-GET         /songs/:id               controllers.Application.getSong(id: Long)
-GET         /songjson/:id            controllers.Application.getSongJson(id: Long)
+# not used currently - sending all (unfiltered) songs as json
+GET         /getsongs                         controllers.Application.getsongs()
 
-GET         /songsuggestions         controllers.Application.songSuggestions()
+# add and deleting existing songs
+POST        /newsong                          controllers.Application.newsong()
+POST        /songs/:id/delete                 controllers.Application.deletesong(id: Long)
 
-GET         /init                    controllers.Application.init()
+# used for retrieving specific song info in json format
+GET         /songjson/:id                     controllers.Application.getsongjson(id: Long)
 
-GET         /list                    controllers.Application.list()
-GET         /admin                   controllers.Application.admin()
-GET         /table                   controllers.Application.table()
-GET         /songbook                controllers.Application.songbook()
-GET         /songeditor/:id          controllers.Application.songeditor(id: Long)
-GET         /newsongeditor           controllers.Application.newsongeditor()
+# used for dashboard search engine
+GET         /songsuggestions                  controllers.Application.songsuggestions()
 
+# used for db init
+GET         /init                             controllers.Application.init()
+
+# getting paginated data fost data table
+GET         /getsongsdatatable                controllers.Application.getsongsdatatable()
+GET         /admin                            controllers.Application.admin()
+
+# views
+GET         /table                            controllers.Application.table()
+GET         /songbook                         controllers.Application.songbook()
+GET         /songeditor/:id                   controllers.Application.songeditor(id: Long)
+GET         /newsongeditor                    controllers.Application.newsongeditor()
+GET         /songviewer/:id                   controllers.Application.songview(id: Long)
+
+GET         /assets/javascripts/routes        controllers.Application.javascriptRoutes()
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file            controllers.Assets.at(path="/public", file)
+GET         /assets/*file                     controllers.Assets.at(path="/public", file)
+
 
     
