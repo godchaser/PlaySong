@@ -28,7 +28,7 @@ import models.Song;
  */
 public class SongImporter  {
 
-    private static String opensongDirectory = "//home//samuel//git//opensongbook//test_data//opensong_data//";
+    private static String opensongDirectory = "test//test_data//opensong_data//";
     private static String dbPath = "//home//samuel//git//opensongbook//WebContent//WEB-INF//resources//opensongbook.sql";
     public static void exportFolder () throws IOException,
             ClassNotFoundException, ParserConfigurationException, SAXException {
