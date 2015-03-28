@@ -1,1 +1,1 @@
-web: target/start -Dhttp.port=${PORT} ${JAVA_OPTS}
+web: target/universal/stage/bin/playsong -Dhttp.port=${PORT} -DapplyEvolutions.default=true
