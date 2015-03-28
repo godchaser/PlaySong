@@ -29,7 +29,7 @@ import models.Song;
 public class SongImporter  {
 
     private static String opensongDirectory = "test//test_data//opensong_data//";
-    private static String dbPath = "//home//samuel//git//opensongbook//WebContent//WEB-INF//resources//opensongbook.sql";
+    private static String dbPath = "test//test_data//opensongbook//opensongbook.sql";
     public static void exportFolder () throws IOException,
             ClassNotFoundException, ParserConfigurationException, SAXException {
         File path = new File(opensongDirectory);
