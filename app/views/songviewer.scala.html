@@ -13,7 +13,9 @@
         jsRoutes.controllers.Application.getsongjson(id).ajax({
         success: function(data) {
             $('#songName').html(data.songName);
+            $('#songOriginalTitle').html(data.songOriginalTitle);
             $('#songAuthor').html(data.songAuthor);
+            $('#songLink').html(data.songLink);
             $('#songLyrics').html(data.songLyrics);
             $(function() {
             $("#songLyrics").transpose({ key : 'C' });

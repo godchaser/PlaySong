@@ -21,10 +21,15 @@ public class Song extends Model {
     @Required
     public String songName;
 
+    public String songOriginalTitle;
+
     public String songAuthor;
+
+    public String songLink;
 
     @Column(columnDefinition = "TEXT")
     public String songLyrics;
+
 
     public static List<Song> all() {
         return find.all();
@@ -44,6 +49,14 @@ public class Song extends Model {
 
     public static String getsongLyrics(Long id) {
         return find.ref(id).songLyrics;
+    }
+
+    public static String getsongOriginalTitle(Long id) {
+        return find.ref(id).songOriginalTitle;
+    }
+
+    public static String getsongLink(Long id) {
+        return find.ref(id).songLink;
     }
 
     public static void create(Song song) {

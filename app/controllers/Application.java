@@ -116,7 +116,8 @@ public class Application extends Controller {
 
         switch(Integer.valueOf(params.get("iSortCol_0")[0])) {
             case 0 : sortBy = "songName"; break;
-            case 1 : sortBy = "songAuthor"; break;
+            case 1 : sortBy = "songOriginalTitle"; break;
+            case 2 : sortBy = "songAuthor"; break;
         }
 
         /**
@@ -152,11 +153,12 @@ public class Application extends Controller {
         for(Song s : songPage.getList()) {
             ObjectNode row = Json.newObject();
             row.put("0", s.songName);
-            row.put("1", s.songAuthor);
-            row.put("2", s.id);
+            row.put("1", s.songOriginalTitle);
+            row.put("2", s.songAuthor);
+            row.put("3", s.songLink);
+            row.put("4", s.id);
             an.add(row);
         }
-
         return ok(result);
     }
 
