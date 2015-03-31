@@ -42,7 +42,7 @@ public class Application extends Controller {
     }
 
     public static Result index() {
-        return redirect(routes.Application.admin());
+        return redirect(routes.Application.table());
     }
 
     public static Result admin() {
@@ -63,10 +63,14 @@ public class Application extends Controller {
         Song s = Song.get(id);
 
         ObjectNode songObject = Json.newObject();
-        ObjectNode lyricsObject = Json.newObject();
+        ObjectNode songLyricsObject = Json.newObject();
+
         int i = 0;
         for (SongLyrics lyrics : s.songLyrics){
-            lyricsObject.put(String.valueOf(i), lyrics.getSongLyrics());
+            ObjectNode songLyricsObjectWithId = Json.newObject();
+            songLyricsObjectWithId.put(String.valueOf(i),lyrics.getSongLyricsId());
+            songLyricsObjectWithId.put(String.valueOf(i+1),lyrics.getSongLyrics());
+            songLyricsObject.put(String.valueOf(i), songLyricsObjectWithId);
             i++;
         }
 
@@ -74,7 +78,7 @@ public class Application extends Controller {
         songObject.put("songOriginalTitle", s.songOriginalTitle);
         songObject.put("songAuthor", s.songAuthor);
         songObject.put("songLink", s.songLink);
-        songObject.put("songLyrics", lyricsObject);
+        songObject.put("songLyrics", songLyricsObject);
 
         return ok(Json.toJson(songObject));
     }
@@ -91,6 +95,12 @@ public class Application extends Controller {
                     views.html.error.render()
             );
         } else {
+            Song song = filledForm.get();
+            System.out.println("-----------------");
+            for (SongLyrics lyrics : song.songLyrics) {
+                System.out.println("+++++++++++++++++++++++++++");
+                System.out.println(lyrics.getSongLyrics());
+            }
             Song.create(filledForm.get());
             return redirect(routes.Application.table());
         }
@@ -168,7 +178,10 @@ public class Application extends Controller {
 
             int i = 0;
             for (SongLyrics lyrics : s.songLyrics){
-                songLyricsObject.put(String.valueOf(i), lyrics.getSongLyrics());
+                ObjectNode songLyricsObjectWithId = Json.newObject();
+                songLyricsObjectWithId.put(String.valueOf(i),lyrics.getSongLyricsId());
+                songLyricsObjectWithId.put(String.valueOf(i+1),lyrics.getSongLyrics());
+                songLyricsObject.put(String.valueOf(i), songLyricsObjectWithId);
                 i++;
             }
 

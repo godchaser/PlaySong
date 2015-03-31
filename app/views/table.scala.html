@@ -28,8 +28,15 @@
     "dom": 'T<"clear">lfrtip',
     "tableTools": {
     "sRowSelect": "single"
+    },
+    "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+    sLinks = "";
+    $('td:eq(0)', nRow).html('<a href="#" id=' + aData[5][0][0] + '">' +
+    aData[0] + ' </a>' + '<a href="#" id=' + aData[5][0][0] + '">'+ 2 + '</a>');
+    return nRow;
     }
     } );
+    //todo: ADD CLICK EVENT HANDLER
 
     var table = $('#song_table').DataTable();
     $('#song_table tbody').on( 'click', 'tr', function () {
@@ -41,7 +48,7 @@
     id = data[4];
     jsRoutes.controllers.Application.getsongjson(id).ajax({
     success: function(data) {
-    $('#songLyrics').html(data.songLyrics[0]);
+    $('#songLyrics').html(data.songLyrics[0][1]);
     $(function() {
     $("#songLyrics").transpose({ key : 'C' });
     });

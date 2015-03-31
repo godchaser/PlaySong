@@ -29,7 +29,7 @@ public class Song extends Model {
     public String songLink;
 
     @OneToMany(mappedBy="song",cascade= CascadeType.ALL)
-    public Set<SongLyrics> songLyrics  = new HashSet<>();
+    public List<SongLyrics> songLyrics  = new ArrayList<>();
 
     public static List<Song> all() {
         return find.all();

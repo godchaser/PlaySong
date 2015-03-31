@@ -9,9 +9,11 @@
         @helper.inputText(songForm("songOriginalTitle"), args = '_label -> "Original title: ")
         @helper.inputText(songForm("songAuthor"), args = '_label -> "Author: ")
         @helper.inputText(songForm("songLink"), args = '_label -> "Link: ")
-        @helper.textarea(field = songForm("songLyrics"), args = '_label -> "Lyrics: ", 'rows -> 20, 'cols -> 40)
+        @helper.textarea(field = songForm("songLyrics[0].songLyrics"), args = '_label -> "Lyrics: ", 'rows -> 20, 'cols -> 40)
+        @helper.textarea(field = songForm("songLyrics[1].songLyrics"), args = 'style -> "display:none;", 'rows -> 20, 'cols -> 40)
         <input type="submit" value="Save">
     }
+        <button type="button" id="addadditionallyrics">Add additional lyrics</button>
     </div>
 
     <script type="text/javascript">
@@ -25,12 +27,22 @@
         $('#songOriginalTitle').attr("value", data.songOriginalTitle);
         $('#songAuthor').attr("value", data.songAuthor);
         $('#songLink').attr("value", data.songLink);
-        $('#songLyrics').val(data.songLyrics);
+        $('#songLyrics_0_songLyrics').val(data.songLyrics[0]);
+        var iLyricsCount = Object.keys(data.songLyrics).length;
+        if (iLyricsCount > 1) {
+            $('#songLyrics_1_songLyrics' ).attr("style", "display:block;");
+            $('#songLyrics_1_songLyrics').val(data.songLyrics[1]);
+            }
         },
         error: function() {
         console.log("Error: ajax failure")
         }
         })
         }
+
+        $( "#addadditionallyrics" ).click(function() {
+        $('#songLyrics_1_songLyrics' ).attr("style", "display:block;")
+        });
+
     } ) ;
     </script>

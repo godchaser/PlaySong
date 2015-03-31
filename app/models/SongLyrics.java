@@ -25,6 +25,10 @@ public class SongLyrics extends Model {
         return songLyrics;
     }
 
+    public Long getSongLyricsId() {
+        return id;
+    }
+
     public void setSongLyrics(String lyrics) {
         songLyrics = lyrics;
     }
