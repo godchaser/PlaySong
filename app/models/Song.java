@@ -1,10 +1,11 @@
 package models;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Column;
+import javax.persistence.*;
 
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
@@ -27,54 +28,21 @@ public class Song extends Model {
 
     public String songLink;
 
-    @Column(columnDefinition = "TEXT")
-    public String songLyrics;
-
+    @OneToMany(mappedBy="song",cascade= CascadeType.ALL)
+    public Set<SongLyrics> songLyrics  = new HashSet<>();
 
     public static List<Song> all() {
         return find.all();
     }
 
-    public static Song getSong(Long id){
+    public static Song get(Long id){
         return find.byId(id);
-    }
-
-    public static String getsongName(Long id) {
-        return find.ref(id).songName;
-    }
-
-    public static String getsongAuthor(Long id) {
-        return find.ref(id).songAuthor;
-    }
-
-    public static String getsongLyrics(Long id) {
-        return find.ref(id).songLyrics;
-    }
-
-    public static String getsongOriginalTitle(Long id) {
-        return find.ref(id).songOriginalTitle;
-    }
-
-    public static String getsongLink(Long id) {
-        return find.ref(id).songLink;
     }
 
     public static void create(Song song) {
         song.save();
     }
-    /*
-    public static List<Song> searchLyrics(){
-        // More complex song query
-        /*
-        List<Song> songs= find.where()
-                .ilike("name", "%coco%")
-                .orderBy("dueDate asc")
-                .findPagingList(25)
-                .getPage(1);
 
-        return songs;
-    }
-    */
     public static void delete(Long id) {
         find.ref(id).delete();
     }

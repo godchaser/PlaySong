@@ -1,6 +1,8 @@
 package controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import models.Song;
+import models.SongLyrics;
 import play.Logger;
 import play.Routes;
 import play.data.Form;
@@ -58,12 +60,23 @@ public class Application extends Controller {
     }
 
     public static Result getsongjson(Long id) {
-        Song s = Song.getSong(id);
-        //ObjectNode songJson = Json.newObject();
-        //songJson.put("songName", s.songName);
-        //songJson.put("songAuthor", s.songAuthor);
-        //songJson.put("songLyrics", s.songLyrics);
-        return ok(Json.toJson(s));
+        Song s = Song.get(id);
+
+        ObjectNode songObject = Json.newObject();
+        ObjectNode lyricsObject = Json.newObject();
+        int i = 0;
+        for (SongLyrics lyrics : s.songLyrics){
+            lyricsObject.put(String.valueOf(i), lyrics.getSongLyrics());
+            i++;
+        }
+
+        songObject.put("songName", s.songName);
+        songObject.put("songOriginalTitle", s.songOriginalTitle);
+        songObject.put("songAuthor", s.songAuthor);
+        songObject.put("songLink", s.songLink);
+        songObject.put("songLyrics", lyricsObject);
+
+        return ok(Json.toJson(songObject));
     }
 
     public static Result deletesong(Long id) {
@@ -129,14 +142,13 @@ public class Application extends Controller {
                         Expr.ilike("songName", "%"+filter+"%"),
                         Expr.or(
                                 Expr.ilike("songAuthor", "%"+filter+"%"),
-                                Expr.contains("songLyrics", "%" + filter + "%")
+                                Expr.contains("songLyrics.songLyrics", "%" + filter + "%")
                         )
                 )
         )
                 .orderBy(sortBy + " " + order + ", id " + order)
                 .findPagingList(pageSize).setFetchAhead(false)
                 .getPage(page);
-
         Integer iTotalDisplayRecords = songPage.getTotalRowCount();
 
         /**
@@ -151,13 +163,22 @@ public class Application extends Controller {
         ArrayNode an = result.putArray("aaData");
 
         for(Song s : songPage.getList()) {
-            ObjectNode row = Json.newObject();
-            row.put("0", s.songName);
-            row.put("1", s.songOriginalTitle);
-            row.put("2", s.songAuthor);
-            row.put("3", s.songLink);
-            row.put("4", s.id);
-            an.add(row);
+            ObjectNode songObject = Json.newObject();
+            ObjectNode songLyricsObject = Json.newObject();
+
+            int i = 0;
+            for (SongLyrics lyrics : s.songLyrics){
+                songLyricsObject.put(String.valueOf(i), lyrics.getSongLyrics());
+                i++;
+            }
+
+            songObject.put("0", s.songName);
+            songObject.put("1", s.songOriginalTitle);
+            songObject.put("2", s.songAuthor);
+            songObject.put("3", s.songLink);
+            songObject.put("4", s.id);
+            songObject.put("5", songLyricsObject);
+            an.add(songObject);
         }
         return ok(result);
     }

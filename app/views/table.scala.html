@@ -41,7 +41,7 @@
     id = data[4];
     jsRoutes.controllers.Application.getsongjson(id).ajax({
     success: function(data) {
-    $('#songLyrics').html(data.songLyrics);
+    $('#songLyrics').html(data.songLyrics[0]);
     $(function() {
     $("#songLyrics").transpose({ key : 'C' });
     });

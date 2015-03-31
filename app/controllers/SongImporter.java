@@ -4,6 +4,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import models.SongLyrics;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -99,7 +100,9 @@ public class SongImporter  {
         song.songName = name;
         song.songAuthor= author;
         //TODO: this is temp solution to clean all .
-        song.songLyrics= lyrics;
+        SongLyrics songLyrics = new SongLyrics();
+        songLyrics.setSongLyrics(lyrics);
+        song.songLyrics.add(songLyrics);
         Song.create(song);
     }
 }
