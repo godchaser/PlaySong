@@ -26,29 +26,39 @@
     "sPaginationType" : "full",
     "sAjaxSource" : " @routes.Application.getsongsdatatable()",
     "dom": 'T<"clear">lfrtip',
+    "columns": [
+    { "data": "songName" },
+    { "data": "songOriginalTitle" },
+    { "data": "songAuthor" },
+    { "data": "songLink" },
+    { "data": "songId" }
+    ],
     "tableTools": {
     "sRowSelect": "single"
     },
     "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-    sLinks = "";
-    $('td:eq(0)', nRow).html('<a href="#" id=' + aData[5][0][0] + '">' +
-    aData[0] + ' </a>' + '<a href="#" id=' + aData[5][0][0] + '">'+ 2 + '</a>');
+    var sLinks = '<a href="#" id=' + aData.songLyricsIDs[0] + '">' + aData.songName + '</a>';
+    var songIdCount = Object.keys(aData.songLyricsIDs).length
+    console.log(songIdCount);
+    if (songIdCount > 1){
+    var sLinks = sLinks.concat('<a href="#" id=' + aData.songLyricsIDs[1] + '"> | '+ 2 + '</a>');
+    }
+    console.log(sLinks);
+    $('td:eq(0)', nRow).html(sLinks);
     return nRow;
     }
     } );
     //todo: ADD CLICK EVENT HANDLER
 
+
     var table = $('#song_table').DataTable();
     $('#song_table tbody').on( 'click', 'tr', function () {
     $('.transpose-keys').remove();
-    var data = table.row(this).data();
-    //console.log("addClass");
-    //console.log(table.row(this);
-    // this is selected song id
-    id = data[4];
-    jsRoutes.controllers.Application.getsongjson(id).ajax({
+    var data = table.row(this).data( );
+    id = data.songId;
+    jsRoutes.controllers.Application.getsonglyricsjson(id).ajax({
     success: function(data) {
-    $('#songLyrics').html(data.songLyrics[0][1]);
+    $('#songLyrics').html(data);
     $(function() {
     $("#songLyrics").transpose({ key : 'C' });
     });

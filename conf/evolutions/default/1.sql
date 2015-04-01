@@ -9,6 +9,7 @@ create table song (
   song_original_title       varchar(255),
   song_author               varchar(255),
   song_link                 varchar(255),
+  song_importer             varchar(255),
   constraint pk_song primary key (id))
 ;
 

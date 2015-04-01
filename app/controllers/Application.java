@@ -1,6 +1,7 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import models.Song;
 import models.SongLyrics;
 import play.Logger;
@@ -36,7 +37,8 @@ public class Application extends Controller {
                         controllers.routes.javascript.Application.songview(),
                         controllers.routes.javascript.Application.deletesong(),
                         controllers.routes.javascript.Application.getsongjson(),
-                        controllers.routes.javascript.Application.songeditor()
+                        controllers.routes.javascript.Application.songeditor(),
+                        controllers.routes.javascript.Application.getsonglyricsjson()
                 )
         );
     }
@@ -61,26 +63,13 @@ public class Application extends Controller {
 
     public static Result getsongjson(Long id) {
         Song s = Song.get(id);
+        ObjectNode songJson = SongToJson.convert(s);
+        return ok(Json.toJson(songJson));
+    }
 
-        ObjectNode songObject = Json.newObject();
-        ObjectNode songLyricsObject = Json.newObject();
-
-        int i = 0;
-        for (SongLyrics lyrics : s.songLyrics){
-            ObjectNode songLyricsObjectWithId = Json.newObject();
-            songLyricsObjectWithId.put(String.valueOf(i),lyrics.getSongLyricsId());
-            songLyricsObjectWithId.put(String.valueOf(i+1),lyrics.getSongLyrics());
-            songLyricsObject.put(String.valueOf(i), songLyricsObjectWithId);
-            i++;
-        }
-
-        songObject.put("songName", s.songName);
-        songObject.put("songOriginalTitle", s.songOriginalTitle);
-        songObject.put("songAuthor", s.songAuthor);
-        songObject.put("songLink", s.songLink);
-        songObject.put("songLyrics", songLyricsObject);
-
-        return ok(Json.toJson(songObject));
+    public static Result getsonglyricsjson (Long id){
+        SongLyrics lyrics = SongLyrics.find.byId(id);
+        return ok(Json.toJson(lyrics.getSongLyrics()));
     }
 
     public static Result deletesong(Long id) {
@@ -96,11 +85,6 @@ public class Application extends Controller {
             );
         } else {
             Song song = filledForm.get();
-            System.out.println("-----------------");
-            for (SongLyrics lyrics : song.songLyrics) {
-                System.out.println("+++++++++++++++++++++++++++");
-                System.out.println(lyrics.getSongLyrics());
-            }
             Song.create(filledForm.get());
             return redirect(routes.Application.table());
         }
@@ -108,7 +92,6 @@ public class Application extends Controller {
 
     public static Result init(){
         try {
-            //SongImporter.exportFolder();
             SongImporter.importFromDb();
         }
         catch (Exception e){
@@ -173,25 +156,8 @@ public class Application extends Controller {
         ArrayNode an = result.putArray("aaData");
 
         for(Song s : songPage.getList()) {
-            ObjectNode songObject = Json.newObject();
-            ObjectNode songLyricsObject = Json.newObject();
-
-            int i = 0;
-            for (SongLyrics lyrics : s.songLyrics){
-                ObjectNode songLyricsObjectWithId = Json.newObject();
-                songLyricsObjectWithId.put(String.valueOf(i),lyrics.getSongLyricsId());
-                songLyricsObjectWithId.put(String.valueOf(i+1),lyrics.getSongLyrics());
-                songLyricsObject.put(String.valueOf(i), songLyricsObjectWithId);
-                i++;
-            }
-
-            songObject.put("0", s.songName);
-            songObject.put("1", s.songOriginalTitle);
-            songObject.put("2", s.songAuthor);
-            songObject.put("3", s.songLink);
-            songObject.put("4", s.id);
-            songObject.put("5", songLyricsObject);
-            an.add(songObject);
+            ObjectNode songJson = SongToJson.convert(s);
+            an.add(songJson);
         }
         return ok(result);
     }
@@ -223,9 +189,6 @@ public class Application extends Controller {
         for (Song song : songs) {
             songSuggestionsList.add(new SimpleEntry(song.id, song.songName));
         }
-                //.orderBy(sortBy + " " + sortBy + ", id " + sortBy);
-                //.findPagingList(pageSize).setFetchAhead(false)
-                //.getPage(page);
 
         return ok(Json.toJson(songSuggestionsList));
     }

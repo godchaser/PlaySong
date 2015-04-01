@@ -28,6 +28,8 @@ public class Song extends Model {
 
     public String songLink;
 
+    public String songImporter;
+
     @OneToMany(mappedBy="song",cascade= CascadeType.ALL)
     public List<SongLyrics> songLyrics  = new ArrayList<>();
 

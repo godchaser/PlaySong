@@ -16,6 +16,9 @@ POST        /songs/:id/delete                 controllers.Application.deletesong
 # used for retrieving specific song info in json format
 GET         /songjson/:id                     controllers.Application.getsongjson(id: Long)
 
+# used for retrieving specific song lyrics info in json format
+GET         /songlyricsjson/:id              controllers.Application.getsonglyricsjson(id: Long)
+
 # used for dashboard search engine
 GET         /songsuggestions                  controllers.Application.songsuggestions()
 

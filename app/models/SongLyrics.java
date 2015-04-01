@@ -32,4 +32,6 @@ public class SongLyrics extends Model {
     public void setSongLyrics(String lyrics) {
         songLyrics = lyrics;
     }
+
+    public static Finder<Long, SongLyrics> find = new Finder(Long.class, SongLyrics.class);
 }
