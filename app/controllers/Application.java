@@ -1,7 +1,5 @@
 package controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import models.Song;
 import models.SongLyrics;
 import play.Logger;
@@ -29,6 +27,7 @@ import play.twirl.api.Html;
 public class Application extends Controller {
 
     static Form<Song> songForm = Form.form(Song.class);
+
 
     public static Result javascriptRoutes() {
         response().setContentType("text/javascript");
@@ -68,8 +67,11 @@ public class Application extends Controller {
     }
 
     public static Result getsonglyricsjson (Long id){
-        SongLyrics lyrics = SongLyrics.find.byId(id);
-        return ok(Json.toJson(lyrics.getSongLyrics()));
+        SongLyrics lyricsObject = SongLyrics.find.byId(id);
+        String lyrics = lyricsObject.getsongLyrics();
+        ObjectNode lyricsResult  =Json.newObject();
+        lyricsResult.put("songLyrics", lyrics);
+        return ok(lyricsResult);
     }
 
     public static Result deletesong(Long id) {
@@ -84,7 +86,6 @@ public class Application extends Controller {
                     views.html.error.render()
             );
         } else {
-            Song song = filledForm.get();
             Song.create(filledForm.get());
             return redirect(routes.Application.table());
         }

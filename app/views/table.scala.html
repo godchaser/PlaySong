@@ -11,12 +11,36 @@
     <script type="text/javascript">
     var id;
     var selected = [];
+
+
+    $('.lyrics_link').click(function() {
+    console.log("YYYYYYYYYYYYEEEEEE");
+    });
+
+    function updateLyrics (id) {
+    jsRoutes.controllers.Application.getsonglyricsjson ( id ).ajax ( {
+    success : function ( data ) {
+    $('.transpose-keys').remove();
+    $ ( '#songLyrics' ).html ( data.songLyrics ) ;
+    $ ( function ( ) {
+    $ ( "#songLyrics" ).transpose ( { key : 'C' } ) ;
+    } ) ;
+    $ ( '#songLyrics' ).focus ( ) ;
+    },
+    error : function ( ) {
+    console.log ( "Error: ajax failure" ) ;
+    }
+    } )
+    }
+
+
     /* Table initialisation */
     $ ( document ).ready ( function ( ) {
     // copy song table div to dynamic content div
-    $('#dynamiccontent').html($('#song_table_wrapper' ).html())
+    $('#dynamiccontent').html($('#song_table_wrapper' ).html());
     // delete initial table div
-    $('#song_table_wrapper' ).remove()
+    $('#song_table_wrapper' ).remove();
+
     $ ( '#song_table' ).dataTable ( {
     responsive : true,
     "bProcessing" : true,
@@ -37,41 +61,29 @@
     "sRowSelect": "single"
     },
     "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-    var sLinks = '<a href="#" id=' + aData.songLyricsIDs[0] + '">' + aData.songName + '</a>';
+    var sLinks = '<a class="lyrics_link" id=' + aData.songLyricsIDs[0] + '>' + aData.songName + '</a>';
     var songIdCount = Object.keys(aData.songLyricsIDs).length
     console.log(songIdCount);
     if (songIdCount > 1){
-    var sLinks = sLinks.concat('<a href="#" id=' + aData.songLyricsIDs[1] + '"> | '+ 2 + '</a>');
+    var sLinks = sLinks.concat('<a class="lyrics_link" id=' + aData.songLyricsIDs[1] + '> | '+ 2 + '</a>');
     }
     console.log(sLinks);
     $('td:eq(0)', nRow).html(sLinks);
     return nRow;
     }
     } );
-    //todo: ADD CLICK EVENT HANDLER
 
 
-    var table = $('#song_table').DataTable();
-    $('#song_table tbody').on( 'click', 'tr', function () {
-    $('.transpose-keys').remove();
-    var data = table.row(this).data( );
-    id = data.songId;
-    jsRoutes.controllers.Application.getsonglyricsjson(id).ajax({
-    success: function(data) {
-    $('#songLyrics').html(data);
-    $(function() {
-    $("#songLyrics").transpose({ key : 'C' });
+    $('.lyrics_link').click(function() {
+    console.log("YYYYYYYYYYYYEEEEEE");
     });
-    $('#songLyrics' ).focus();
-    },
-    error: function() {
-    console.log("Error: ajax failure");
-    }
-    })
-
     } );
 
-    } );
+    $('.lyrics_link').click(function() {
+    console.log("YYYYYYYYYYYYEEEEEE");
+    });
+
+
 
     $('.alert .close').live("click", function(e) {
     $(this).parent().hide();

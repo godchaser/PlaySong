@@ -16,7 +16,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Properties;
 
 
@@ -101,7 +100,7 @@ public class SongImporter  {
         song.songAuthor= author;
         //TODO: this is temp solution to clean all .
         SongLyrics songLyrics = new SongLyrics();
-        songLyrics.setSongLyrics(lyrics);
+        songLyrics.setsongLyrics(lyrics);
         song.songLyrics.add(songLyrics);
         Song.create(song);
     }

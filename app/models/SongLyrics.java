@@ -21,17 +21,19 @@ public class SongLyrics extends Model {
     @Column(columnDefinition = "TEXT")
     public String songLyrics;
 
-    public String getSongLyrics() {
+    public String getsongLyrics() {
         return songLyrics;
     }
 
-    public Long getSongLyricsId() {
+    public void setsongLyrics(String lyrics) {
+        songLyrics = lyrics;
+    }
+
+
+    public Long getsongLyricsId() {
         return id;
     }
 
-    public void setSongLyrics(String lyrics) {
-        songLyrics = lyrics;
-    }
 
     public static Finder<Long, SongLyrics> find = new Finder(Long.class, SongLyrics.class);
 }

@@ -21,7 +21,7 @@ public class SongToJson {
     ArrayNode songLyricsIDsArray = songLyricsIDs.putArray("songLyricsIDs");
 
     for (SongLyrics lyrics : s.songLyrics){
-        songLyricsIDsArray.add(lyrics.getSongLyricsId());
+        songLyricsIDsArray.add(lyrics.getsongLyricsId());
     }
 
     songObject.put("songName", s.songName);

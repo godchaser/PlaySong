@@ -10,18 +10,18 @@
         @helper.inputText(songForm("songOriginalTitle"), args = '_label -> "Original title: ")
         @helper.inputText(songForm("songAuthor"), args = '_label -> "Author: ")
         @helper.inputText(songForm("songLink"), args = '_label -> "Link: ")
-        @helper.textarea(field = songForm("songLyricsIDs[0]"), args = '_label -> "Lyrics: ", 'rows -> 20, 'cols -> 40)
-        @helper.textarea(field = songForm("songLyricsIDs[1]"), args = 'style -> "display:none;", 'rows -> 20, 'cols -> 40)
+        @helper.textarea(field = songForm("songLyrics[0].songLyrics"), args = '_label -> "Lyrics: ", 'rows -> 20, 'cols -> 40)
+        @helper.textarea(field = songForm("songLyrics[1].songLyrics"), args = 'style -> "display:none;", 'rows -> 20, 'cols -> 40)
         <input type="submit" value="Save">
     }
-        <button type="button" id="addadditionallyrics">Add additional lyrics</button>
+        <button type="button" id="addAdditionalLyrics">Add additional lyrics</button>
     </div>
 
     <script type="text/javascript">
 
     $ ( document ).ready ( function ( ) {
         var id = @id;
-        var songLyricsIds = [];
+        var songLyricsIDs = [];
         if (id > -1){
             jsRoutes.controllers.Application.getsongjson(id).ajax({
             datatype: 'json',
@@ -30,49 +30,31 @@
             $('#songOriginalTitle').attr("value", data.songOriginalTitle);
             $('#songAuthor').attr("value", data.songAuthor);
             $('#songLink').attr("value", data.songLink);
-            console.log(data);
+            songLyricsIDs = data.songLyricsIDs;
 
-            console.log(Object.prototype.toString.call(data.songLyricsIds));
-            console.log("+++" + data.songLyricsIds[0]);
-            var jSongLyrics = JSON.parse(data);
-            console.log(jSongLyrics);
-            songLyricsIds = data.songLyricsIds;
-            console.log(data);
-            console.log(songLyricsIds);
-            console.log(Object.prototype.toString.call(data.songLyricsIds));
+            $.each(songLyricsIDs, function(i,s){
+            jsRoutes.controllers.Application.getsonglyricsjson(s).ajax({
+            success : function ( data ) {
+            var songLyricsTag = '#songLyrics_' + i + '_songLyrics';
+            $ (songLyricsTag).val (data.songLyrics);
+            $ (songLyricsTag).attr ("style", "display:block;");
+            },
+            error : function ( ) {
+            console.log ( "Error: ajax failure" )
+            }
+            })
+            });
 
-            var arr = JSON.parse(data.songLyricsIds);
-            songLyricsIds = data.songLyricsIds;
-            console.log(songLyricsIds);
             },
             error: function() {
             console.log("Error: ajax failure");
             }
         })
 
-        var i = 0;
-        $.each(songLyricsIds, function(i,s){
-        console.log ( "......." + s );
-        jsRoutes.controllers.Application.getsonglyricsjson(s).ajax({
-        success : function ( data ) {
-        console.log ( "+++++++++" + songLyricsIds );
-        var songLyricsTag = '#songLyrics_' + i + '_songLyrics' ;
-        console.log ( "---------" + songLyricsTag ) ;
-        $ ( songLyricsTag ).val ( data.songLyricsIds ) ;
-        $ ( songLyricsTag ).attr ( "style", "display:block;" ) ;
-        i = i+1 ;
-        },
-        error : function ( ) {
-        console.log ( "Error: ajax failure" )
-        }
-        })
-        });
-
-
         }
 
-            $( "#addadditionallyrics" ).click(function() {
-            $('#songLyrics_1_songLyrics' ).attr("style", "display:block;");
+            $( "#addAdditionalLyrics" ).click(function() {
+            $('#songLyrics_'+'1'+'_songLyrics').attr("style", "display:block;");
             });
         });
     </script>
