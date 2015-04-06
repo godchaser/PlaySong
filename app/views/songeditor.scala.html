@@ -20,29 +20,32 @@
     <script type="text/javascript">
 
     $ ( document ).ready ( function ( ) {
+        $('label[for="songLyrics_1_songLyrics"]').hide();
         var id = @id;
+        console.log("ID "+id);
         var songLyricsIDs = [];
         if (id > -1){
             jsRoutes.controllers.Application.getsongjson(id).ajax({
             datatype: 'json',
             success: function(data) {
-            $('#songName').attr("value", data.songName);
-            $('#songOriginalTitle').attr("value", data.songOriginalTitle);
-            $('#songAuthor').attr("value", data.songAuthor);
-            $('#songLink').attr("value", data.songLink);
-            songLyricsIDs = data.songLyricsIDs;
+                $('#songName').attr("value", data.songName);
+                $('#songOriginalTitle').attr("value", data.songOriginalTitle);
+                $('#songAuthor').attr("value", data.songAuthor);
+                $('#songLink').attr("value", data.songLink);
+                songLyricsIDs = data.songLyricsIDs;
+                console.log(data);
 
-            $.each(songLyricsIDs, function(i,s){
-            jsRoutes.controllers.Application.getsonglyricsjson(s).ajax({
-            success : function ( data ) {
-            var songLyricsTag = '#songLyrics_' + i + '_songLyrics';
-            $ (songLyricsTag).val (data.songLyrics);
-            $ (songLyricsTag).attr ("style", "display:block;");
-            },
-            error : function ( ) {
-            console.log ( "Error: ajax failure" )
-            }
-            })
+                $.each(songLyricsIDs, function(i,s){
+                jsRoutes.controllers.Application.getsonglyricsjson(s).ajax({
+                success : function ( data ) {
+                    var songLyricsTag = '#songLyrics_' + i + '_songLyrics';
+                    $ (songLyricsTag).val (data.songLyrics);
+                    $ (songLyricsTag).attr ("style", "display:block;");
+                    },
+                error : function ( ) {
+                    console.log ( "Error: ajax failure" )
+                }
+                })
             });
 
             },
@@ -50,11 +53,10 @@
             console.log("Error: ajax failure");
             }
         })
-
         }
 
-            $( "#addAdditionalLyrics" ).click(function() {
+         $( "#addAdditionalLyrics" ).click(function() {
             $('#songLyrics_'+'1'+'_songLyrics').attr("style", "display:block;");
-            });
-        });
+         });
+    });
     </script>

@@ -24,6 +24,7 @@ import com.avaje.ebean.Page;
 import java.util.AbstractMap.SimpleEntry;
 
 import play.twirl.api.Html;
+
 public class Application extends Controller {
 
     static Form<Song> songForm = Form.form(Song.class);
@@ -53,7 +54,13 @@ public class Application extends Controller {
 
     public static Result songbook() {
         Html welcome = new Html("");
-        return ok(songbook.render());
+        List <Song> sortedSongs = Song.all();
+        Collections.sort(sortedSongs, new Comparator<Song>(){
+            @Override
+            public int compare(Song s1, Song s2) {
+                return s1.songName.compareTo(s2.songName);
+            }});
+        return ok(songbook.render(sortedSongs));
     }
 
     public static Result getsongs() {

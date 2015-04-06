@@ -1,20 +1,19 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.*;
 
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
 
+import static java.util.Collections.*;
+
 /**
  * Created by samuel on 19.02.15..
  */
 @Entity
-public class Song extends Model {
+public class Song extends Model implements Comparator<Song>{
 
     @Id
     public Long id;
@@ -50,4 +49,9 @@ public class Song extends Model {
     }
 
     public static Finder<Long, Song> find = new Finder(Long.class, Song.class);
+
+    @Override
+    public int compare(Song song1, Song song2) {
+        return song1.songName.compareTo(song2.songName);
+    }
 }

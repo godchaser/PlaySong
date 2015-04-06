@@ -55,15 +55,18 @@
     <script src="@routes.Assets.at("javascripts/jquery.transposer.js")" type="text/javascript"></script>
 
     <script type="text/javascript">
+    //variable holding reference to selected song
+    var selectedSongID;
+    //variable holding reference to selected songlyrics
+    var selectedSongLyricsID;
 
-    /* Table initialisation */
     $ ( document ).ready ( function ( ) {
-    var selectedId;
     // copy song table div to dynamic content div
     $('#dynamiccontent').html($('#song_table_wrapper' ).html());
     // delete initial table div
     $('#song_table_wrapper' ).remove();
 
+    /* Table initialisation */
     $ ( '#song_table' ).dataTable ( {
     responsive : true,
     "bProcessing" : true,
@@ -84,40 +87,46 @@
     "sRowSelect": "single"
     },
     "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-    var sLinks = '<a class="lyrics_link" id=' + aData.songLyricsIDs[0] + '>' + aData.songName + '</a>';
-    var songIdCount = Object.keys(aData.songLyricsIDs).length;
-    if (songIdCount > 1){
-        var sLinks = sLinks.concat(' | '+ '<a class="lyrics_link" id=' + aData.songLyricsIDs[1] + '>'+ 2 + '</a>');
+    var sLinks = '<div class="paginationBar"> <button type="button" class="btn btn-link lyrics-link" id=' + aData.songLyricsIDs[0] + '>' + aData.songName + '</button>';
+    var songLyricsIdsCount = Object.keys(aData.songLyricsIDs).length;
+    if (songLyricsIdsCount > 1){
+        $.each(aData.songLyricsIDs, function(i,s){
+            //this it to skip zeroth iteration
+            if (i>0) {
+                var idx = i + 1;
+                sLinks = sLinks.concat ( '<button class="lyrics-link" id=' + aData.songLyricsIDs[i] + '>' + idx + '</button>' ) ;
+            }
+        });
     }
+    sLinks = sLinks.concat('</div>');
     $('td:eq(0)', nRow).html(sLinks);
     $(nRow).attr('id', aData.songId);
     return nRow;
     }
-    } );
-    var table = $('#song_table').DataTable();
+    });
 
-
-    var table = $('#song_table').DataTable();
-
-    //for static row selection
-    $('#song_table tbody').on( 'click', 'tr', function () {
-        selectedId =  $(this ).find('.lyrics_link' )[0].id;
-        table.$('tr.selected').removeClass('selected');
-        $(this).addClass('selected');
-        updateLyrics(selectedId);
-    } );
-
-    // for dynamic links in dt cells
-    $('#song_table tbody').click(function(event) {
-        if ("lyrics_link" == event.target.attributes.class.value){
-            var lyricsid = event.target.attributes.id.value;
-            if (lyricsid != null){
-                if (lyricsid != selectedId){
-                    updateLyrics(lyricsid);
-                    selectedId = lyricsid;
+    //for static row selection events - marking selected/deselected rows
+    $('#song_table tbody').on( 'click', 'tr', function (event) {
+    // ignore responsive expand button trigger
+    if (!$(event.target).hasClass("sorting_1")){
+        // this is lyrics link event selection
+        if ($(event.target).hasClass("lyrics-link")){
+            var lyricsID = $(event.target).attr("id");
+                if (lyricsID != null){
+                    if (lyricsID != selectedSongLyricsID){
+                        selectedSongLyricsID = lyricsID;
+                    }
                 }
-            }
         }
+        // this is default row lyrics selection
+        else {
+            selectedSongID = $(this).attr('id');
+            selectedSongLyricsID =  $(this).find('.lyrics-link' )[0].id;
+        }
+        $('#song_table').DataTable().$('tr.selected').removeClass('selected');
+        $(this).addClass('selected');
+        updateLyrics(selectedSongLyricsID);
+    }
     });
 
     $('.songbuttons').click(function(event) {
@@ -133,75 +142,74 @@
         switch ( action ) {
             // edit song
             case 1 :
-            jsRoutes.controllers.Application.songeditor ( selectedId ).ajax ( {
-            success : function ( data ) {
-            $ ( '#dynamiccontent' ).html ( data ) ;
-            },
-            error : function ( ) {
-            console.log ( "Error: ajax failure" )
-            }
-            } )
-            break ;
+                jsRoutes.controllers.Application.songeditor ( selectedSongID ).ajax ( {
+                success : function ( data ) {
+                    $ ( '#dynamiccontent' ).html ( data ) ;
+                },
+                error : function ( ) {
+                    console.log ( "Error: ajax failure" )
+                }
+                })
+            break;
 
             //add new song
             case 2 :
-            jsRoutes.controllers.Application.newsongeditor ( selectedId ).ajax ( {
+            jsRoutes.controllers.Application.newsongeditor ( selectedSongID ).ajax ( {
             success : function ( data ) {
-            $ ( '#dynamiccontent' ).html ( data ) ;
+                $ ( '#dynamiccontent' ).html ( data ) ;
             },
             error : function ( ) {
-            console.log ( "Error: ajax failure" )
+                console.log ( "Error: ajax failure" )
             }
-            } )
-            break ;
+            })
+            break;
 
             //delete song
             case 3 :
-            jsRoutes.controllers.Application.deletesong ( selectedId ).ajax ( {
+            jsRoutes.controllers.Application.deletesong ( selectedSongID ).ajax ( {
             type : "POST",
             success : function ( data ) {
-            showAlert ( ) ;
-            $ ( '#song_table' ).DataTable ( ).ajax.reload ( ) ;
+                $ ( '#song_table' ).DataTable ( ).ajax.reload ( ) ;
             },
             error : function ( ) {
-            console.log ( "Error: ajax failure" )
+                console.log ( "Error: ajax failure" )
             }
-            } )
-            break ;
+            })
+            break;
         }
     }
 
-    function updateLyrics (lyricsid) {
-        jsRoutes.controllers.Application.getsonglyricsjson ( lyricsid ).ajax ( {
+    function updateLyrics (lyricsID) {
+        jsRoutes.controllers.Application.getsonglyricsjson ( lyricsID ).ajax ( {
         success : function ( data ) {
             $('.transpose-keys').remove();
             $ ( '#songLyrics' ).html ( data.songLyrics );
-            $ ( function ( ) {
-            $ ( "#songLyrics" ).transpose ( { key : 'C' } );
-            if ($(window).width()<1024) {
-            $ ( '#songLyrics' )[ 0 ].scrollIntoView ( true ) ;
-            }
-            } ) ;
+                $ ( function ( ) {
+                $ ( "#songLyrics" ).transpose ( { key : 'C' } );
+                if ($(window).width()<1024) {
+                    $ ( '#songLyrics' )[ 0 ].scrollIntoView ( true ) ;
+                }
+                });
         },
         error : function ( ) {
             console.log ( "Error: ajax failure" ) ;
         }
-        } )
+        })
     }
 
     });
 
     $('.alert .close').live("click", function(e) {
-    $(this).parent().hide();
+        $(this).parent().hide();
     });
 
     function showAlert() {
-    $(".alert").addClass("in");
-    $("#cert-error").show();
+        $(".alert").addClass("in");
+        $("#cert-error").show();
     }
 
     function closeAlert() {
-    $("#cert-error").hide();
+        $("#cert-error").hide();
     }
 
     </script>
