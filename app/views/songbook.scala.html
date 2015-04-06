@@ -21,11 +21,11 @@
                         @songs.map { song =>
                             @song.songLyrics.zipWithIndex.map{ case (songlyrics, i) =>
                                 @if(i==0){
-                                    <option value="@songlyrics.id">@song.songName</option>
+                                    <option id="@song.id" value="@songlyrics.id">@song.songName</option>
                                 }
                                 @if(i>0){
                                     @defining(i + 1) { idx =>
-                                        <option value="@songlyrics.id">@song.songName @idx</option>
+                                        <option id="@song.id" value="@songlyrics.id">@song.songName @idx</option>
                                     }
                                 }
                             }
@@ -54,6 +54,7 @@
     disableIfEmpty: true,
     numberDisplayed: 4,
     enableClickableOptGroups: false,
+    nonSelectedText: 'Select songs'
     });
 
     //reset button
@@ -67,8 +68,16 @@
 
     //generate button
     $('#example-submit-button').on('click', function() {
-        var values = $('#example-reset').val();
-        console.log(values);
+        var songLyricsIds = $('#example-reset').val();
+        var songIds= [];
+        $('#example-reset option:selected').each(function() {
+            var songObject = new Object();
+            songObject.id = $(this).attr('id');
+            songObject.lyricsID = $(this).val();
+            songIds.push(songObject);
+        })
+        var songsJson = JSON.stringify(songIds);
+        console.log(songsJson);
     });
 
     });
