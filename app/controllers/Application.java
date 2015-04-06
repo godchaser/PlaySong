@@ -171,7 +171,7 @@ public class Application extends Controller {
         // dont send whole song object, only songname and id
         Map<String, String[]> params = request().queryString();
         String filter = params.get("q")[0];
-        Logger.info("Filter param" + filter);
+        //Logger.info("Filter param" + filter);
         /**
          * Get sorting order and column
          */
@@ -181,7 +181,7 @@ public class Application extends Controller {
                         Expr.ilike("songName", "%"+filter+"%"),
                         Expr.or(
                                 Expr.ilike("songAuthor", "%"+filter+"%"),
-                                Expr.contains("songLyrics", "%" + filter + "%")
+                                Expr.contains("songLyrics.songLyrics", "%" + filter + "%")
                         )
                 )
         ).findList();
