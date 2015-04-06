@@ -101,7 +101,7 @@
 
     //for static row selection
     $('#song_table tbody').on( 'click', 'tr', function () {
-        selectedId =  $(this ).attr('id');
+        selectedId =  $(this ).find('.lyrics_link' )[0].id;
         table.$('tr.selected').removeClass('selected');
         $(this).addClass('selected');
         updateLyrics(selectedId);
