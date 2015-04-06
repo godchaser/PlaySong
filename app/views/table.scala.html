@@ -86,7 +86,6 @@
     "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
     var sLinks = '<a class="lyrics_link" id=' + aData.songLyricsIDs[0] + '>' + aData.songName + '</a>';
     var songIdCount = Object.keys(aData.songLyricsIDs).length;
-    //console.log(songIdCount);
     if (songIdCount > 1){
         var sLinks = sLinks.concat(' | '+ '<a class="lyrics_link" id=' + aData.songLyricsIDs[1] + '>'+ 2 + '</a>');
     }
@@ -95,30 +94,33 @@
     return nRow;
     }
     } );
+    var table = $('#song_table').DataTable();
 
-    $('#song_table').click(function(event) {
-    if ("lyrics_link" == event.target.attributes.class.value){
-        var lyricsId = event.target.attributes.id.value;
-        updateLyrics(lyricsId);}
-    }
-    );
 
     var table = $('#song_table').DataTable();
 
+    //for static row selection
     $('#song_table tbody').on( 'click', 'tr', function () {
-        if ( $(this).hasClass('selected') ) {
-        $(this).removeClass('selected');
-        selectedId = null;
-        }
-        else {
         selectedId =  $(this ).attr('id');
         table.$('tr.selected').removeClass('selected');
         $(this).addClass('selected');
-        }
+        updateLyrics(selectedId);
     } );
 
+    // for dynamic links in dt cells
+    $('#song_table tbody').click(function(event) {
+        if ("lyrics_link" == event.target.attributes.class.value){
+            var lyricsid = event.target.attributes.id.value;
+            if (lyricsid != null){
+                if (lyricsid != selectedId){
+                    updateLyrics(lyricsid);
+                    selectedId = lyricsid;
+                }
+            }
+        }
+    });
+
     $('.songbuttons').click(function(event) {
-        console.log("I am here");
         if ( "editsongbutton" == event.target.attributes.id.value ) {
             songActions ( 1 ) ;
         } else if ( "addsongbutton" == event.target.attributes.id.value ) {
@@ -169,8 +171,8 @@
         }
     }
 
-    function updateLyrics (id) {
-        jsRoutes.controllers.Application.getsonglyricsjson ( selectedId ).ajax ( {
+    function updateLyrics (lyricsid) {
+        jsRoutes.controllers.Application.getsonglyricsjson ( lyricsid ).ajax ( {
         success : function ( data ) {
             $('.transpose-keys').remove();
             $ ( '#songLyrics' ).html ( data.songLyrics );
