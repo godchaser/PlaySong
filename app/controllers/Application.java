@@ -1,9 +1,11 @@
 package controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import models.Song;
 import models.SongLyrics;
 import play.Logger;
 import play.Routes;
+import play.data.DynamicForm;
 import play.data.Form;
 import play.libs.Json;
 import play.mvc.Controller;
@@ -201,9 +203,10 @@ public class Application extends Controller {
         return ok(Json.toJson(songSuggestionsList));
     }
 
+
     public static Result downloadAndDeleteFile() {
 
-        File tmpFile = new File("/path/to/your/generated.zip");
+        File tmpFile = new File("/tmp/tmp");
 
         FileInputStream fin = null;
         try {
@@ -216,9 +219,18 @@ public class Application extends Controller {
         response().setHeader(CONTENT_TYPE, "application/zip");
         response().setHeader(CONTENT_LENGTH, tmpFile.length() + "");
 
-        tmpFile.delete();
+        //tmpFile.delete();
 
         return ok(fin);
+    }
+
+    public static Result generateSongbook() {
+        //DynamicForm form = Form.form().bindFromRequest();
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+        System.out.println("###########");
+        System.out.println(values.keySet());
+        System.out.println(values.values());
+        return ok();
     }
 
     public static Result table() {

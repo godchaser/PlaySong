@@ -17,7 +17,7 @@ POST        /songs/:id/delete                 controllers.Application.deletesong
 GET         /songjson/:id                     controllers.Application.getsongjson(id: Long)
 
 # used for retrieving specific song lyrics info in json format
-GET         /songlyricsjson/:id              controllers.Application.getsonglyricsjson(id: Long)
+GET         /songlyricsjson/:id               controllers.Application.getsonglyricsjson(id: Long)
 
 # used for dashboard search engine
 GET         /songsuggestions                  controllers.Application.songsuggestions()
@@ -29,6 +29,10 @@ GET         /init                             controllers.Application.init()
 GET         /getsongsdatatable                controllers.Application.getsongsdatatable()
 GET         /admin                            controllers.Application.admin()
 
+# download songbook
+GET         /downloadsongbook                 controllers.Application.downloadAndDeleteFile()
+POST        /generatesongbook                controllers.Application.generateSongbook()
+
 # views
 GET         /table                            controllers.Application.table()
 GET         /songbook                         controllers.Application.songbook()
@@ -39,6 +43,3 @@ GET         /songviewer/:id                   controllers.Application.songview(i
 GET         /assets/javascripts/routes        controllers.Application.javascriptRoutes()
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                     controllers.Assets.at(path="/public", file)
-
-
-    

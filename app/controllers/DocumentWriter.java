@@ -7,10 +7,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.List;
-import java.util.Set;
 
+import models.SongLyrics;
 import org.apache.poi.xwpf.usermodel.Borders;
 import org.apache.poi.xwpf.usermodel.BreakType;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -59,10 +58,10 @@ public class DocumentWriter {
         }
     }
 
-    public File newSongbookWordDoc(String filename, List<AbstractMap.SimpleEntry> songIds) throws Exception {
+    public File newSongbookWordDoc(String filename, List<SongPrint> songPrintObjects) throws Exception {
 
         final String outputFile = "/tmp/" + "filename" + ".docx";
-        File templateFile = new File( "/tmp/resources/template.dotx"));
+        File templateFile = new File( "/tmp/resources/template.dotx");
         XWPFDocument template = new XWPFDocument(new FileInputStream(templateFile));
 
         final XWPFDocument document = new XWPFDocument();
@@ -70,40 +69,21 @@ public class DocumentWriter {
         XWPFStyles newStyles = document.createStyles();
         newStyles.setStyles(template.getStyle());
 
-        final List<AbstractMap.SimpleEntry> selectedSongsRowIds = new ArrayList<AbstractMap.SimpleEntry>();
-        if (selectedSongs instanceof Set) {
-            Logger.trace("Multiple song export");
-            @SuppressWarnings("unchecked")
-            Set<RowId> set = (Set<RowId>) selectedSongs;
-            Iterator<RowId> iter = set.iterator();
-            while (iter.hasNext()) {
-                RowId row = (RowId) iter.next();
-                selectedSongsRowIds.add(row);
-            }
-        } else {
-            Logger.trace("Single song export");
-            selectedSongsRowIds.add((RowId) selectedSongs);
-        }
-
-        boolean singleSong = (selectedSongsRowIds.size() == 1) ? true : false;
-        int songTotalNumber = (singleSong) ? -1 : selectedSongsRowIds.size();
+        boolean singleSong = (songPrintObjects.size() == 1) ? true : false;
+        int songTotalNumber = (singleSong) ? -1 : songPrintObjects.size();
         Logger.trace("Number of songs (-1 if single page): " + songTotalNumber);
 
-        for (int i = 0; i < selectedSongsRowIds.size(); i++) {
-            RowId row = selectedSongsRowIds.get(i);
+        for (int i = 0; i < songPrintObjects.size(); i++) {
+            SongPrint s = songPrintObjects.get(i);
 
             // if this is single page or last page then we don't need page break
-            if (singleSong || (i == selectedSongsRowIds.size()-1)) {
+            if (singleSong || (i == songPrintObjects.size()-1)) {
                 songTotalNumber = -1;
             } else {
                 songTotalNumber = i;
             }
-            Logger.trace("Now exporting songId: " + selectedSongsRowIds.get(i));
-            writeSong(document,
-                    sqlContainter.getItem(row).getItemProperty(SongSQLContainer.propertyIds.SONGTITLE.toString())
-                            .getValue().toString(),
-                    sqlContainter.getItem(row).getItemProperty(SongSQLContainer.propertyIds.SONGLYRICS.toString())
-                            .getValue().toString(), songTotalNumber);
+            Logger.trace("Now exporting songId: " + songPrintObjects.get(i));
+            writeSong(document, s.getSong().songName, SongLyrics.get(s.getLyricsID()).songLyrics, songTotalNumber);
         }
 
         FileOutputStream fos = null;
@@ -117,9 +97,7 @@ public class DocumentWriter {
             e1.printStackTrace();
         }
 
-        generatedFile = new FileResource(new File(outputFile));
-
-        return generatedFile;
+        return new File(outputFile);
     }
 
     public static void main(String[] args) throws Exception {

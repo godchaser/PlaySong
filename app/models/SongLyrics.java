@@ -34,6 +34,10 @@ public class SongLyrics extends Model {
         return id;
     }
 
+    public static SongLyrics get(Long id){
+        return find.byId(id);
+    }
+
 
     public static Finder<Long, SongLyrics> find = new Finder(Long.class, SongLyrics.class);
 }

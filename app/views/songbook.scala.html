@@ -78,6 +78,11 @@
         })
         var songsJson = JSON.stringify(songIds);
         console.log(songsJson);
+        $.post("@routes.Application.generateSongbook()",
+            songsJson,
+            function(data, status){
+            //window.location = "@routes.Application.downloadAndDeleteFile()";
+            });
     });
 
     });
