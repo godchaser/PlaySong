@@ -60,7 +60,7 @@ public class DocumentWriter {
 
     public File newSongbookWordDoc(String filename, List<SongPrint> songPrintObjects) throws Exception {
 
-        final String outputFile = "/tmp/" + "filename" + ".docx";
+        final String outputFile = "/tmp/" + filename + ".docx";
         File templateFile = new File( "/tmp/resources/template.dotx");
         XWPFDocument template = new XWPFDocument(new FileInputStream(templateFile));
 

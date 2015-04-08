@@ -78,11 +78,23 @@
         })
         var songsJson = JSON.stringify(songIds);
         console.log(songsJson);
+        $.ajax("@routes.Application.generateSongbook()", {
+            type: 'POST',
+            data: songsJson,
+            success: function (data) {
+                var link = "@routes.Application.downloadAndDeleteFile()"
+                link = link.concat("?hash=" + data);
+                window.location=link;
+            },
+            contentType : 'application/json'
+        });
+        /*
         $.post("@routes.Application.generateSongbook()",
             songsJson,
             function(data, status){
             //window.location = "@routes.Application.downloadAndDeleteFile()";
             });
+            */
     });
 
     });

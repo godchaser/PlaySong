@@ -205,8 +205,15 @@ public class Application extends Controller {
 
 
     public static Result downloadAndDeleteFile() {
+        final Set<Map.Entry<String,String[]>> entries = request().queryString().entrySet();
+        String value = null;
+        for (Map.Entry<String,String[]> entry : entries) {
+            final String key = entry.getKey();
+            value = Arrays.toString(entry.getValue());
+            Logger.debug(key + " " + value);
+        }
 
-        File tmpFile = new File("/tmp/tmp");
+        File tmpFile = new File("/tmp/"+value.substring(1,value.length()-1)+".docx");
 
         FileInputStream fin = null;
         try {
@@ -216,21 +223,34 @@ public class Application extends Controller {
         }
 
         response().setHeader("Content-disposition", "attachment;filename=" + tmpFile.getName());
-        response().setHeader(CONTENT_TYPE, "application/zip");
-        response().setHeader(CONTENT_LENGTH, tmpFile.length() + "");
+        //response().setHeader(CONTENT_TYPE, "application/zip");
+        response().setHeader(CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        //response().setHeader(CONTENT_LENGTH, tmpFile.length() + "");
 
-        //tmpFile.delete();
+        tmpFile.delete();
 
         return ok(fin);
     }
 
     public static Result generateSongbook() {
-        //DynamicForm form = Form.form().bindFromRequest();
-        final Map<String, String[]> values = request().body().asFormUrlEncoded();
-        System.out.println("###########");
-        System.out.println(values.keySet());
-        System.out.println(values.values());
-        return ok();
+        JsonNode values = request().body().asJson();
+        ArrayList<SongPrint> songsForPrint = new ArrayList<>();
+        for (JsonNode j : values){
+            Long songId = j.get("id").asLong();
+            Long lyricsID = j.get("lyricsID").asLong();
+            songsForPrint.add(new SongPrint(Song.get(songId), lyricsID));
+        }
+
+        Random rand = new Random();
+        int hash = rand.nextInt(1000);
+        DocumentWriter docWriter = new DocumentWriter();
+        try {
+            docWriter.newSongbookWordDoc(Integer.toString(hash), songsForPrint);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return ok(Integer.toString(hash));
     }
 
     public static Result table() {
