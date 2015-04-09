@@ -3,10 +3,7 @@ package controllers;
 /**
  * Created by samuel on 4/6/15.
  */
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 import models.SongLyrics;
@@ -17,6 +14,7 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFStyles;
 import play.Logger;
+import play.Play;
 
 
 public class DocumentWriter {
@@ -60,9 +58,9 @@ public class DocumentWriter {
 
     public File newSongbookWordDoc(String filename, List<SongPrint> songPrintObjects) throws Exception {
 
-        final String outputFile = "/tmp/" + filename + ".docx";
-        File templateFile = new File( "/tmp/resources/template.dotx");
-        XWPFDocument template = new XWPFDocument(new FileInputStream(templateFile));
+        InputStream is = Play.application().resourceAsStream("template.dotx");
+        File outputFile = new File("resources/" + filename + ".docx");
+        XWPFDocument template = new XWPFDocument(is);
 
         final XWPFDocument document = new XWPFDocument();
         // copy styles from template to new doc
@@ -89,7 +87,8 @@ public class DocumentWriter {
         FileOutputStream fos = null;
         try {
             Logger.trace("Now writing to exported file: " + outputFile);
-            fos = new FileOutputStream(new File(outputFile));
+            //fos = new FileOutputStream(new File(outputFile));
+            fos = new FileOutputStream(outputFile);
             document.write(fos);
             fos.close();
         } catch (IOException e1) {
@@ -97,7 +96,7 @@ public class DocumentWriter {
             e1.printStackTrace();
         }
 
-        return new File(outputFile);
+        return outputFile;
     }
 
     public static void main(String[] args) throws Exception {

@@ -213,7 +213,7 @@ public class Application extends Controller {
             Logger.debug(key + " " + value);
         }
 
-        File tmpFile = new File("/tmp/"+value.substring(1,value.length()-1)+".docx");
+        File tmpFile = new File("resources/"+value.substring(1,value.length()-1)+".docx");
 
         FileInputStream fin = null;
         try {
