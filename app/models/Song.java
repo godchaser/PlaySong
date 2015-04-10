@@ -41,6 +41,14 @@ public class Song extends Model implements Comparator<Song>{
     }
 
     public static void create(Song song) {
+        //delete empty lyrics
+        List removedList = new ArrayList();
+        for (int i=0;i<song.songLyrics.size();i++){
+            if (song.songLyrics.get(i).getsongLyrics().length()<2){
+                removedList.add(song.songLyrics.get(i));
+            }
+        }
+        song.songLyrics.removeAll(removedList);
         song.save();
     }
 

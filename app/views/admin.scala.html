@@ -172,15 +172,8 @@
             $('#scrollable-dropdown-menu .typeahead').bind('typeahead:selected', function(obj, datum, name) {
             // you can print datum to see json avps
             var id = datum.key
-
-            jsRoutes.controllers.Application.songview(id).ajax({
-            success: function(data) {
-                $("#dynamiccontent").html(data);
-            },
-            error: function() {
-                console.log("Error: ajax failure")
-            }
-            })
+            var songViewerUrl = jsRoutes.controllers.Application.songview(id).url;
+            window.location.href = songViewerUrl;
             });
 
             });

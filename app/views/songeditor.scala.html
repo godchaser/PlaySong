@@ -22,52 +22,59 @@
 
     <script type="text/javascript">
 
-    function CreateSongEditor(){
-        $('label[for="songLyrics_1_songLyrics"]').hide();
-        $('label[for="songLyrics_2_songLyrics"]').hide();
-        $('label[for="songLyrics_3_songLyrics"]').hide();
-        var id = @id;
-        var songLyricsIDs = [];
-        var songLyricsCount = 0;
-        if (id>0){
-            jsRoutes.controllers.Application.getsongjson(id).ajax({
-                datatype: 'json',
-                success: function(data) {
-                    $('#songName').attr("value", data.songName);
-                    $('#songOriginalTitle').attr("value", data.songOriginalTitle);
-                    $('#songAuthor').attr("value", data.songAuthor);
-                    $('#songLink').attr("value", data.songLink);
-                    songLyricsIDs = data.songLyricsIDs;
-
-                    $.each(songLyricsIDs, function(i,s){
-                        songLyricsCount = songLyricsCount + 1;
-                        jsRoutes.controllers.Application.getsonglyricsjson(s).ajax({
-                        success : function ( data ) {
-                            var songLyricsTag = '#songLyrics_' + i + '_songLyrics';
-                            $ (songLyricsTag).val (data.songLyrics);
-                            $ (songLyricsTag).attr ("style", "display:block;");
-                        },
-                        error : function ( ) {
-                            console.log ( "Error: ajax failure" )
-                            }
-                        })
-                });
-
-                },
-                error: function() {
-                    console.log("Error: ajax failure");
-                }
-        })
-    }
-
-    $( "#addAdditionalLyricsButton" ).click(function() {
-        $('#songLyrics_'+songLyricsCount+'_songLyrics').attr("style", "display:block;");
-    });
-
-    $('#dynamiccontent').html($('#songEditor' ).html());
+    $ ( document ).ready ( function ( ) {
+        $('#dynamiccontent').html($('#songEditor' ).html());
         $('#songEditor' ).remove();
-    }
-    window.onload = CreateSongEditor;
+
+        var songLyricsCount = 0;
+        var id = @id;
+
+        function CreateSongEditor(id){
+            $('label[for="songLyrics_1_songLyrics"]').hide();
+            $('label[for="songLyrics_2_songLyrics"]').hide();
+            $('label[for="songLyrics_3_songLyrics"]').hide();
+
+            var songLyricsIDs = [];
+            if (id>0){
+                jsRoutes.controllers.Application.getsongjson(id).ajax({
+                    datatype: 'json',
+                    success: function(data) {
+                        $('#songName').attr("value", data.songName);
+                        $('#songOriginalTitle').attr("value", data.songOriginalTitle);
+                        $('#songAuthor').attr("value", data.songAuthor);
+                        $('#songLink').attr("value", data.songLink);
+                        songLyricsIDs = data.songLyricsIDs;
+
+                        $.each(songLyricsIDs, function(i,s){
+                            songLyricsCount = songLyricsCount + 1;
+                            jsRoutes.controllers.Application.getsonglyricsjson(s).ajax({
+                            success : function ( data ) {
+                                var songLyricsTag = '#songLyrics_' + i + '_songLyrics';
+                                $ (songLyricsTag).val (data.songLyrics);
+                                $ (songLyricsTag).attr ("style", "display:block;");
+                            },
+                            error : function ( ) {
+                                console.log ( "Error: ajax failure" )
+                                }
+                            })
+                    });
+
+                    },
+                    error: function() {
+                        console.log("Error: ajax failure");
+                    }
+            })
+            }
+        }
+
+        $( "#addAdditionalLyricsButton" ).click(function() {
+            $('#songLyrics_'+songLyricsCount+'_songLyrics').attr("style", "display:block;");
+            songLyricsCount = songLyricsCount + 1;
+        });
+
+    CreateSongEditor(id);
+
+    });
     </script>
 }
 

@@ -181,14 +181,7 @@
 
     function openSongEditor(id){
         var songEditorUrl = jsRoutes.controllers.Application.songeditor(id).url;
-            jsRoutes.controllers.Application.songeditor(id).ajax({
-                success: function (data) {
-                    window.location.href = songEditorUrl;
-                },
-                error: function () {
-                    e.preventDefault();
-                }
-        })
+        window.location.href = songEditorUrl;
     }
 
     function deleteSong(id){
