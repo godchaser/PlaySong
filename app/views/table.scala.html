@@ -120,9 +120,9 @@
         }
         // this is default row lyrics selection
         else {
-            selectedSongID = $(this).attr('id');
             selectedSongLyricsID =  $(this).find('.lyrics-link' )[0].id;
         }
+        selectedSongID = $(this).attr('id');
         $('#song_table').DataTable().$('tr.selected').removeClass('selected');
         $(this).addClass('selected');
         updateLyrics(selectedSongLyricsID);
