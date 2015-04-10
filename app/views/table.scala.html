@@ -32,7 +32,7 @@
 
         <div class="col-lg-6" id="song_section_div">
             <div class="row">
-            <button id="editsongbutton" class="songbuttons"><i class="glyphicon glyphicon-edit"></i>Edit song</button>
+            <button id="editsongbutton" class="songbuttons" href="#"><i class="glyphicon glyphicon-edit"></i>Edit song</button>
             <button id="addsongbutton" class="songbuttons"><i class="glyphicon glyphicon-plus"></i>Add new song</button>
             <button id="deletesongbutton" class="songbuttons"><i class="glyphicon glyphicon-minus"></i>Delete song</button>
 
@@ -142,39 +142,21 @@
         switch ( action ) {
             // edit song
             case 1 :
-                jsRoutes.controllers.Application.songeditor ( selectedSongID ).ajax ( {
-                success : function ( data ) {
-                    $ ( '#dynamiccontent' ).html ( data ) ;
-                },
-                error : function ( ) {
-                    console.log ( "Error: ajax failure" )
+                if (selectedSongID != null){
+                    openSongEditor(selectedSongID);
                 }
-                })
             break;
 
             //add new song
             case 2 :
-            jsRoutes.controllers.Application.newsongeditor ( selectedSongID ).ajax ( {
-            success : function ( data ) {
-                $ ( '#dynamiccontent' ).html ( data ) ;
-            },
-            error : function ( ) {
-                console.log ( "Error: ajax failure" )
-            }
-            })
+                openSongEditor(-1);
             break;
 
             //delete song
             case 3 :
-            jsRoutes.controllers.Application.deletesong ( selectedSongID ).ajax ( {
-            type : "POST",
-            success : function ( data ) {
-                $ ( '#song_table' ).DataTable ( ).ajax.reload ( ) ;
-            },
-            error : function ( ) {
-                console.log ( "Error: ajax failure" )
-            }
-            })
+                if (selectedSongID != null){
+                    deleteSong(selectedSongID);
+                }
             break;
         }
     }
@@ -194,6 +176,32 @@
         error : function ( ) {
             console.log ( "Error: ajax failure" ) ;
         }
+        })
+    }
+
+    function openSongEditor(id){
+        var songEditorUrl = jsRoutes.controllers.Application.songeditor(id).url;
+            jsRoutes.controllers.Application.songeditor(id).ajax({
+                success: function (data) {
+                    window.location.href = songEditorUrl;
+                },
+                error: function () {
+                    e.preventDefault();
+                }
+        })
+    }
+
+    function deleteSong(id){
+        jsRoutes.controllers.Application.deletesong (id).ajax ( {
+            type : "POST",
+            success : function ( data ) {
+                $ ( '#song_table' ).DataTable ( ).ajax.reload ( ) ;
+                $('.transpose-keys').remove();
+                $ ('#songLyrics' ).empty();
+            },
+            error : function ( ) {
+                console.log ( "Error: ajax failure" )
+            }
         })
     }
 
