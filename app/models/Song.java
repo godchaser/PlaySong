@@ -40,7 +40,7 @@ public class Song extends Model implements Comparator<Song>{
         return find.byId(id);
     }
 
-    public static void create(Song song) {
+    public static void updateOrCreateSong(Song song) {
         //delete empty lyrics
         List removedList = new ArrayList();
         for (int i=0;i<song.songLyrics.size();i++){
@@ -49,12 +49,22 @@ public class Song extends Model implements Comparator<Song>{
             }
         }
         song.songLyrics.removeAll(removedList);
-        song.save();
+        if (song.id>0){
+            song.update();
+        } else {
+            song.id = null;
+            song.save();
+        }
     }
 
     public static void delete(Long id) {
         find.ref(id).delete();
     }
+
+    public static boolean contains(Long id) {
+        return find.ref(id).contains(id);
+    }
+
 
     public static Finder<Long, Song> find = new Finder(Long.class, Song.class);
 

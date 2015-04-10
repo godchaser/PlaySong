@@ -102,6 +102,6 @@ public class SongImporter  {
         SongLyrics songLyrics = new SongLyrics();
         songLyrics.setsongLyrics(lyrics);
         song.songLyrics.add(songLyrics);
-        Song.create(song);
+        Song.updateOrCreateSong(song);
     }
 }

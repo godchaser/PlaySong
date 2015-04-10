@@ -186,7 +186,7 @@
 
     function deleteSong(id){
         jsRoutes.controllers.Application.deletesong (id).ajax ( {
-            type : "POST",
+            type : "DELETE",
             success : function ( data ) {
                 $ ( '#song_table' ).DataTable ( ).ajax.reload ( ) ;
                 $('.transpose-keys').remove();

@@ -1,4 +1,3 @@
-#scrollable-dropdown-menu .tt-dropdown-menu {
-    max-height: 150px;
-    overflow-y: auto;
+.monoSpaceTextArea {
+    font-family: Menlo,Monaco,Consolas,"Courier New", monospace !important;
 }

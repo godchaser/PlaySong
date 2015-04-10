@@ -5,16 +5,16 @@
 # Home page
 GET         /                                 controllers.Application.index()
 
-# Songs
+# Songs RESTFUL API
 # not used currently - sending all (unfiltered) songs as json
-GET         /getsongs                         controllers.Application.getsongs()
+GET         /songs                            controllers.Application.getsongs()
 
-# add and deleting existing songs
-POST        /newsong                          controllers.Application.newsong()
-POST        /songs/:id/delete                 controllers.Application.deletesong(id: Long)
+# POST add song - from form - not JSON
+POST        /songs                             controllers.Application.newsong()
+DELETE      /songs/:id                         controllers.Application.deletesong(id: Long)
 
 # used for retrieving specific song info in json format
-GET         /songjson/:id                     controllers.Application.getsongjson(id: Long)
+GET         /songs/:id                     controllers.Application.getsongjson(id: Long)
 
 # used for retrieving specific song lyrics info in json format
 GET         /songlyricsjson/:id               controllers.Application.getsonglyricsjson(id: Long)
@@ -31,7 +31,7 @@ GET         /admin                            controllers.Application.admin()
 
 # download songbook
 GET         /downloadsongbook                 controllers.Application.downloadAndDeleteFile()
-POST        /generatesongbook                controllers.Application.generateSongbook()
+POST        /generatesongbook        controllers.Application.generateSongbook()
 
 # views
 GET         /table                            controllers.Application.table()

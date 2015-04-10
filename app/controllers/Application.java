@@ -5,7 +5,6 @@ import models.Song;
 import models.SongLyrics;
 import play.Logger;
 import play.Routes;
-import play.data.DynamicForm;
 import play.data.Form;
 import play.libs.Json;
 import play.mvc.Controller;
@@ -95,7 +94,7 @@ public class Application extends Controller {
                     views.html.error.render()
             );
         } else {
-            Song.create(filledForm.get());
+            Song.updateOrCreateSong(filledForm.get());
             return redirect(routes.Application.table());
         }
     }
