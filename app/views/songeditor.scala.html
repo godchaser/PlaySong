@@ -2,7 +2,7 @@
 
 @admin("Song Editor"){
     <div id="songEditor">
-        <h2>Edit or updateOrCreateSong new song</h2>
+        <h2>Edit or create song</h2>
         @helper.form(action = routes.Application.newsong()) {
             @helper.inputText(songForm("songName"), args = '_label -> "Song name: ")
             @helper.inputText(songForm("songOriginalTitle"), args = '_label -> "Original title: ")
