@@ -148,7 +148,7 @@
             el.text(newChord);
 
             var sib = el[0].nextSibling;
-            if (sib && sib.nodeType == 3 && sib.nodeValue.length > 0 && sib.nodeValue.charAt(0) != "/") {
+            if (sib && sib.nodeType == 3 && sib.nodeValue.length > 0 && sib.nodeValue.charAt(0) != "/" && sib.nodeValue.charAt(0) != "-" ) {
                 var wsLength = getNewWhiteSpaceLength(oldChord.length, newChord.length, sib.nodeValue.length);
                 sib.nodeValue = makeString(" ", wsLength);
             }
@@ -172,12 +172,17 @@
 
         var isChordLine = function (input) {
             var tokens = input.replace(/\s+/, " ").split(" ");
-
+            console.log(tokens);
             // Try to find tokens that aren't chords
             // if we find one we know that this line is not a 'chord' line.
             for (var i = 0; i < tokens.length; i++) {
-                if (!$.trim(tokens[i]).length == 0 && !tokens[i].match(opts.chordRegex))
+                tokens[i]=tokens[i].replace("-/","");
+                tokens[i]=tokens[i].replace(/\s+/,"");
+                // i should replace ( ) also, maybe with one regex
+                if (!$.trim(tokens[i]).length == 0 && !tokens[i].match(opts.chordRegex)){
+                    console.log("not chord: " + tokens[i]);
                     return false;
+                }
             }
             return true;
         };
