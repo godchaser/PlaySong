@@ -167,7 +167,7 @@
             $('.transpose-keys').remove();
             $ ( '#songLyrics' ).html ( data.songLyrics );
                 $ ( function ( ) {
-                $ ( "#songLyrics" ).transpose ( { key : 'C' } );
+                $ ( "#songLyrics" ).transpose ( );
                 if ($(window).width()<1024) {
                     $ ( '#songLyrics' )[ 0 ].scrollIntoView ( true ) ;
                 }
