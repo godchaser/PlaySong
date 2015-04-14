@@ -167,24 +167,43 @@
             var o = [];
             for (var i = 0; i < repeat; i++) o.push(s);
             return o.join("");
-        }
-
+        };
 
         var isChordLine = function (input) {
             var tokens = input.replace(/\s+/, " ").split(" ");
-            console.log(tokens);
             // Try to find tokens that aren't chords
             // if we find one we know that this line is not a 'chord' line.
             for (var i = 0; i < tokens.length; i++) {
-                tokens[i]=tokens[i].replace("-/","");
-                tokens[i]=tokens[i].replace(/\s+/,"");
+                // match -/,(,)," " and replace them with ""
+                tokens[i]=tokens[i].replace(/(\()|(\))|(\-\/)|(\s+)/,"");
                 // i should replace ( ) also, maybe with one regex
                 if (!$.trim(tokens[i]).length == 0 && !tokens[i].match(opts.chordRegex)){
-                    console.log("not chord: " + tokens[i]);
                     return false;
                 }
             }
             return true;
+        };
+
+        var getFirstChordInLine = function (input) {
+            var tokens = input.replace(/\s+/, " ").split(" ");
+            // Try to find tokens that aren't chords
+            // if we find one we know that this line is not a 'chord' line.
+            for (var i = 0; i < tokens.length; i++) {
+                // match -/,(,)," " and replace them with ""
+                tokens[i]=tokens[i].replace(/(\()|(\))|(\-\/)|(\s+)/,"");
+                if ($.trim(tokens[i]).length != 0 && tokens[i].match(opts.chordRegex)){
+                    var tokenString = tokens[i];
+                    if (tokenString.indexOf("/") !=-1){
+                        tokenString = tokenString.substring(0,tokenString.indexOf("/"));
+                    }
+                    tokenString = tokenString.replace(/[0-9]/g, '');
+                    var firstChord = getKeyByName(tokenString);
+                    return firstChord;
+                }
+            }
+            //default
+            var firstChord = getKeyByName("C");
+            return firstChord;
         };
 
         var wrapChords = function (input) {
@@ -193,18 +212,29 @@
 
 
         return $(this).each(function() {
+            console.log("1111");
+            var output = [];
+            var lines = $(this).text().split("\n");
+            var line = "";
+            var initialChordSet = false;
 
-            var startKey = $(this).attr("data-key");
-            if (!startKey || $.trim(startKey) == "") {
-                startKey = opts.key;
+            for (var i = 0; i < lines.length; i++) {
+                line = lines[i];
+
+                if (isChordLine(line)){
+                    if (!initialChordSet) {
+                        currentKey=getFirstChordInLine(line);
+                        initialChordSet = true;
+                    }
+                    output.push("<span>" + wrapChords(line) + "</span>")
+                }
+            else
+                output.push("<span>" + line + "</span>");
+            };
+
+            if (!initialChordSet){
+                currentKey =  getKeyByName("C");
             }
-
-            if (!startKey || $.trim(startKey) == "") {
-                throw("Starting key not defined.");
-                return this;
-            }
-
-            currentKey = getKeyByName(startKey);
 
             // Build tranpose links ===========================================
             var keyLinks = [];
@@ -228,19 +258,6 @@
             });
 
             $(this).before(keysHtml);
-
-            var output = [];
-            var lines = $(this).text().split("\n");
-            var line, tmp = "";
-
-            for (var i = 0; i < lines.length; i++) {
-                line = lines[i];
-
-                if (isChordLine(line))
-                    output.push("<span>" + wrapChords(line) + "</span>");
-                else
-                    output.push("<span>" + line + "</span>");
-            };
 
             $(this).html(output.join("\n"));
         });
