@@ -243,7 +243,7 @@
                 else
                     keyLinks.push("<a href='#'>" + key.name + "</a>");
             });
-            var hideChords = "<button id='hideChordsButton' type='button' class='btn btn-default'>Hide Chords</button>";
+            var hideChords = "<button id='hideChordsButton' type='button' class='btn btn-xs'>Hide Chords</button>";
             keyLinks.push(hideChords);
 
             var $this = $(this);
