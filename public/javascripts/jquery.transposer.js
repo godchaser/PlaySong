@@ -212,7 +212,6 @@
 
 
         return $(this).each(function() {
-            console.log("1111");
             var output = [];
             var lines = $(this).text().split("\n");
             var line = "";
@@ -226,17 +225,17 @@
                         currentKey=getFirstChordInLine(line);
                         initialChordSet = true;
                     }
-                    output.push("<span>" + wrapChords(line) + "</span>")
+                    output.push("<span class='chordLine'>" + wrapChords(line) + "</span>")
                 }
             else
-                output.push("<span>" + line + "</span>");
+                output.push("<span class='lyrics'>" + line + "</span>");
             };
 
             if (!initialChordSet){
                 currentKey =  getKeyByName("C");
             }
 
-            // Build tranpose links ===========================================
+            // Build transpose links ===========================================
             var keyLinks = [];
             $(keys).each(function(i, key) {
                 if (currentKey.name == key.name)
@@ -244,7 +243,8 @@
                 else
                     keyLinks.push("<a href='#'>" + key.name + "</a>");
             });
-
+            var hideChords = "<button id='hideChordsButton' type='button' class='btn btn-default'>Hide Chords</button>";
+            keyLinks.push(hideChords);
 
             var $this = $(this);
             var keysHtml = $("<div class='transpose-keys'></div>");
@@ -257,8 +257,20 @@
                 return false;
             });
 
+
             $(this).before(keysHtml);
 
+            $('#hideChordsButton').click(function(event) {
+                $('.chordLine').remove();
+                var output = $();
+
+                $.each($("pre[id*='songLyrics']").html().split(/[\n\r]+/g), function(i, el) {
+                    if (el) {
+                        output = output.add($("<span class='lyricsOnly'>" + el + "</span>"));
+                    }
+                });
+                $("pre[id*='songLyrics']").html(output);
+            });
             $(this).html(output.join("\n"));
         });
     };

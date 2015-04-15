@@ -13,6 +13,16 @@ span.c {
     color: #2159D6;
 }
 
+span.lyricsOnly {
+    display: block;
+    margin: 0;
+}
+
+span.lyrics {
+    font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+}
+
+
 .transpose-keys {
     margin: 10px 0;
     overflow: auto;
