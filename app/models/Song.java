@@ -49,7 +49,7 @@ public class Song extends Model implements Comparator<Song>{
             }
         }
         song.songLyrics.removeAll(removedList);
-        if (song.id>0){
+        if (song.id != null && song.id>0){
             song.update();
         } else {
             song.id = null;
