@@ -10,6 +10,11 @@ create table song (
   song_author               varchar(255),
   song_link                 varchar(255),
   song_importer             varchar(255),
+  song_last_modified_by     varchar(255),
+  song_key                  varchar(255),
+  song_book_id              integer,
+  date_created              timestamp,
+  date_modified             timestamp,
   constraint pk_song primary key (id))
 ;
 

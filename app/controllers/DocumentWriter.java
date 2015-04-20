@@ -99,6 +99,38 @@ public class DocumentWriter {
         return outputFile;
     }
 
+    public String getSongTitleFont() {
+        return songTitleFont;
+    }
+
+    public void setSongTitleFont(String songTitleFont) {
+        this.songTitleFont = songTitleFont;
+    }
+
+    public int getSongTitleSize() {
+        return songTitleSize;
+    }
+
+    public void setSongTitleSize(int songTitleSize) {
+        this.songTitleSize = songTitleSize;
+    }
+
+    public String getSongLyricsFont() {
+        return songLyricsFont;
+    }
+
+    public void setSongLyricsFont(String songLyricsFont) {
+        this.songLyricsFont = songLyricsFont;
+    }
+
+    public int getSongLyricsFontSize() {
+        return songLyricsFontSize;
+    }
+
+    public void setSongLyricsFontSize(int songLyricsFontSize) {
+        this.songLyricsFontSize = songLyricsFontSize;
+    }
+
     public static void main(String[] args) throws Exception {
         // DocumentWriter doc = new DocumentWriter();
         // ArrayList<String> song = ParserHelpers.readFile("test_data\\" + "inputTestSong");

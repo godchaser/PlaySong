@@ -31,6 +31,16 @@
                             }
                         }
                     </select>
+                    <select id="title-font">
+                        <option value="1">Arial</option>
+                        <option value="2">Droid</option>
+                        <option value="3">Courier New</option>
+                    </select>
+                    <select id="lyrics-font">
+                        <option value="1">Courier New</option>
+                        <option value="2">Droid Mono</option>
+                        <option value="3">Arial</option>
+                    </select>
                     <button type="reset" id="example-reset-button" class="btn btn-default"><i class="fa fa-repeat fa-fw"></i>Reset</button>
                     <button type="button" id="example-submit-button" class="btn btn-default"><i class="fa fa-book fa-fw"></i>Generate</button>
                 </div>
@@ -54,7 +64,8 @@
     disableIfEmpty: true,
     numberDisplayed: 4,
     enableClickableOptGroups: false,
-    nonSelectedText: 'Select songs'
+    nonSelectedText: 'Select songs',
+    maxHeight: 400
     });
 
     //reset button
@@ -75,12 +86,20 @@
             songObject.id = $(this).attr('id');
             songObject.lyricsID = $(this).val();
             songIds.push(songObject);
-        })
-        var songsJson = JSON.stringify(songIds);
-        console.log(songsJson);
+        });
+        /*
+        var songBookData = new Object();
+        var songBookData.songsJson = songIds;
+        var songFont = new Object();;
+        songFont.titleFont = $('#title-font option:selected').text();
+        songFont.lyricsFont = $('#lyrics-font option:selected').text();
+        songBookData.fonts = songFont;
+        console.log(songBookData);
+        */
+        var songBookData = JSON.stringify(songIds);
         $.ajax("@routes.Application.generateSongbook()", {
             type: 'POST',
-            data: songsJson,
+            data: songBookData,
             success: function (data) {
                 var link = "@routes.Application.downloadAndDeleteFile()"
                 link = link.concat("?hash=" + data);

@@ -4,6 +4,7 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import play.data.format.Formats;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
 
@@ -28,6 +29,25 @@ public class Song extends Model implements Comparator<Song>{
     public String songLink;
 
     public String songImporter;
+
+    public String songLastModifiedBy;
+
+    public String songKey;
+
+    public int songBookId;
+
+    @Formats.DateTime(pattern="dd/MM/yyyy hh:mm")
+    public Date dateCreated = new Date();
+
+    @Formats.DateTime(pattern="dd/MM/yyyy hh:mm")
+    public Date dateModified = new Date();
+
+    /*
+    Date dNow = new Date( );
+    SimpleDateFormat ft =
+      new SimpleDateFormat ("E yyyy.MM.dd 'at' hh:mm:ss a zzz");
+      System.out.println("Current Date: " + ft.format(dNow));
+     */
 
     @OneToMany(mappedBy="song",cascade= CascadeType.ALL)
     public List<SongLyrics> songLyrics  = new ArrayList<>();
