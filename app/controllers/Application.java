@@ -1,6 +1,8 @@
 package controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import models.Song;
 import models.SongLyrics;
 import play.Logger;
@@ -232,17 +234,29 @@ public class Application extends Controller {
     }
 
     public static Result generateSongbook() {
-        JsonNode values = request().body().asJson();
+        JsonNode jsonNode= request().body().asJson();
         ArrayList<SongPrint> songsForPrint = new ArrayList<>();
-        for (JsonNode j : values){
-            Long songId = j.get("id").asLong();
-            Long lyricsID = j.get("lyricsID").asLong();
-            songsForPrint.add(new SongPrint(Song.get(songId), lyricsID));
+        DocumentWriter docWriter = null;
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            SongbookJson songbook = mapper.treeToValue(jsonNode, SongbookJson.class);
+            List<SongJson> songsObject = songbook.getSongsJson();
+            for (Object songPrintTuple : songsObject){
+                for (SongPrint sp : songPrintTuple){
+                    songsForPrint.add(new SongPrint(Song.get(sp.getSong().id), sp.getLyricsID()));
+                }
+            }
+            docWriter = new DocumentWriter();
+            docWriter.setSongLyricsFont(songbook.getFonts().getLyricsFont());
+            docWriter.setSongTitleFont(songbook.getFonts().getTitleFont());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
 
         Random rand = new Random();
         int hash = rand.nextInt(1000);
-        DocumentWriter docWriter = new DocumentWriter();
+
         try {
             docWriter.newSongbookWordDoc(Integer.toString(hash), songsForPrint);
         } catch (Exception e) {

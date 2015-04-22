@@ -83,27 +83,35 @@
         var songIds= [];
         $('#example-reset option:selected').each(function() {
             var songObject = new Object();
-            songObject.id = $(this).attr('id');
-            songObject.lyricsID = $(this).val();
+            var songValue = new Object();
+            songValue.id = $(this).attr('id');
+            songValue.lyricsID = $(this).val();
+            songObject.song = songValue;
             songIds.push(songObject);
         });
-        /*
+
         var songBookData = new Object();
-        var songBookData.songsJson = songIds;
-        var songFont = new Object();;
-        songFont.titleFont = $('#title-font option:selected').text();
-        songFont.lyricsFont = $('#lyrics-font option:selected').text();
+        songBookData.songsJson = songIds;
+        var songFont = new Object();
+        //songFont.titleFont = $('#title-font option:selected').text();
+        songFont.titleFont = "test";
+        //songFont.lyricsFont = $('#lyrics-font option:selected').text();
+        songFont.lyricsFont = "test2";
         songBookData.fonts = songFont;
+        //var json = new Object();
+        //json.SongbookJson = songBookData;
+
         console.log(songBookData);
-        */
-        var songBookData = JSON.stringify(songIds);
+        console.log(JSON.stringify(songBookData));
+
+        //var songBookData = JSON.stringify(songIds);
         $.ajax("@routes.Application.generateSongbook()", {
             type: 'POST',
-            data: songBookData,
+            data: JSON.stringify(songBookData),
             success: function (data) {
                 var link = "@routes.Application.downloadAndDeleteFile()"
                 link = link.concat("?hash=" + data);
-                window.location=link;
+                //window.location=link;
             },
             contentType : 'application/json'
         });
