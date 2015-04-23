@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.List;
 
 import models.SongLyrics;
+import models.helpers.SongPrint;
 import org.apache.poi.xwpf.usermodel.Borders;
 import org.apache.poi.xwpf.usermodel.BreakType;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -23,6 +24,8 @@ public class DocumentWriter {
     private int songTitleSize = 18;
     private String songLyricsFont = "Courier New";
     private int songLyricsFontSize = 14;
+    private String title = "Songbook";
+    private String subtitle = "2015";
 
     public void writeSong(XWPFDocument document, String songTitle, String songLyrics, int songTotalNumber) {
         Logger.trace("Exporting song: " + songTitle);
@@ -69,6 +72,8 @@ public class DocumentWriter {
 
         boolean singleSong = (songPrintObjects.size() == 1) ? true : false;
         int songTotalNumber = (singleSong) ? -1 : songPrintObjects.size();
+        Logger.trace("Fonts - title:" + songTitleFont + " lyrics: " + songLyricsFont);
+        Logger.trace("Sizes - title:" + songTitleSize + " lyrics: " + songLyricsFontSize);
         Logger.trace("Number of songs (-1 if single page): " + songTotalNumber);
 
         for (int i = 0; i < songPrintObjects.size(); i++) {
@@ -80,7 +85,7 @@ public class DocumentWriter {
             } else {
                 songTotalNumber = i;
             }
-            Logger.trace("Now exporting songId: " + songPrintObjects.get(i));
+            Logger.trace("Now exporting songId: " + songPrintObjects.get(i).getSong().id);
             writeSong(document, s.getSong().songName, SongLyrics.get(s.getLyricsID()).songLyrics, songTotalNumber);
         }
 
@@ -129,6 +134,22 @@ public class DocumentWriter {
 
     public void setSongLyricsFontSize(int songLyricsFontSize) {
         this.songLyricsFontSize = songLyricsFontSize;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getSubtitle() {
+        return subtitle;
+    }
+
+    public void setSubtitle(String subtitle) {
+        this.subtitle = subtitle;
     }
 
     public static void main(String[] args) throws Exception {

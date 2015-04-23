@@ -4,6 +4,7 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import controllers.chords.LineTypeChecker;
 import play.data.format.Formats;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
@@ -31,8 +32,6 @@ public class Song extends Model implements Comparator<Song>{
     public String songImporter;
 
     public String songLastModifiedBy;
-
-    public String songKey;
 
     public int songBookId;
 
@@ -69,6 +68,10 @@ public class Song extends Model implements Comparator<Song>{
             }
         }
         song.songLyrics.removeAll(removedList);
+        for (SongLyrics songLyrics : song.songLyrics){
+            String songKey = LineTypeChecker.getSongKey(songLyrics.getsongLyrics());
+            songLyrics.setSongKey(songKey);
+        }
         if (song.id != null && song.id>0){
             song.update();
         } else {

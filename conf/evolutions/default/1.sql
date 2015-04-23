@@ -11,7 +11,6 @@ create table song (
   song_link                 varchar(255),
   song_importer             varchar(255),
   song_last_modified_by     varchar(255),
-  song_key                  varchar(255),
   song_book_id              integer,
   date_created              timestamp,
   date_modified             timestamp,
@@ -22,6 +21,7 @@ create table song_lyrics (
   id                        bigint not null,
   song_id                   bigint,
   song_lyrics               TEXT,
+  song_key                  varchar(255),
   constraint pk_song_lyrics primary key (id))
 ;
 

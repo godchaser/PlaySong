@@ -21,6 +21,8 @@ public class SongLyrics extends Model {
     @Column(columnDefinition = "TEXT")
     public String songLyrics;
 
+    public String songKey;
+
     public String getsongLyrics() {
         return songLyrics;
     }
@@ -32,6 +34,14 @@ public class SongLyrics extends Model {
 
     public Long getsongLyricsId() {
         return id;
+    }
+
+    public String getSongKey() {
+        return songKey;
+    }
+
+    public void setSongKey(String songKey) {
+        this.songKey = songKey;
     }
 
     public static SongLyrics get(Long id){

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import models.Song;
 import models.SongLyrics;
+import models.helpers.SongPrint;
+import models.json.JsonSongbookGenerator;
 import play.Logger;
 import play.Routes;
 import play.data.Form;
@@ -237,19 +239,18 @@ public class Application extends Controller {
         JsonNode jsonNode= request().body().asJson();
         ArrayList<SongPrint> songsForPrint = new ArrayList<>();
         DocumentWriter docWriter = null;
-
+        Logger.trace("Songbook generator json string: " + jsonNode);
         ObjectMapper mapper = new ObjectMapper();
+
         try {
-            SongbookJson songbook = mapper.treeToValue(jsonNode, SongbookJson.class);
-            List<SongJson> songsObject = songbook.getSongsJson();
-            for (Object songPrintTuple : songsObject){
-                for (SongPrint sp : songPrintTuple){
-                    songsForPrint.add(new SongPrint(Song.get(sp.getSong().id), sp.getLyricsID()));
-                }
+            JsonSongbookGenerator jsonSongbook = mapper.treeToValue(jsonNode, JsonSongbookGenerator.class);
+            List<models.json.Song> songsJson = jsonSongbook.getSongs();
+            for (models.json.Song songJson : songsJson){
+                    songsForPrint.add(new SongPrint(Song.get(Long.parseLong(songJson.getSong().getId())), Long.parseLong(songJson.getSong().getLyricsID())));
             }
             docWriter = new DocumentWriter();
-            docWriter.setSongLyricsFont(songbook.getFonts().getLyricsFont());
-            docWriter.setSongTitleFont(songbook.getFonts().getTitleFont());
+            docWriter.setSongLyricsFont(jsonSongbook.getFonts().getLyricsFont());
+            docWriter.setSongTitleFont(jsonSongbook.getFonts().getTitleFont());
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
