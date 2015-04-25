@@ -47,7 +47,7 @@
                         <option value="3">Arial</option>
                     </select>
                     <button type="reset" id="reset-button" class="btn btn-default"><i class="fa fa-repeat fa-fw"></i>Reset</button>
-                    <button type="button" id="submit-button" class="btn btn-default"><i class="fa fa-book fa-fw"></i>Generate</button>
+                    <button type="button" id="submit-button" class="btn btn-default"><i class="fa fa-book fa-fw"></i>Prepare songbook</button>
                 </div>
             </form>
         </div>
@@ -83,12 +83,16 @@
     $('#songbook-form').on('reset', function() {
     $('#song-selector option:selected').each(function() {
         $(this).prop('selected', false);
-    })
+    });
         $('#reset').multiselect('refresh');
     });
     var dataSet = [];
+    var songBookData;
+    var songBookPrepared = false;
     //generate button
     $('#submit-button').on('click', function() {
+    if (songBookPrepared===false){
+    console.log("click1");
         var songIds= [];
         $('#song-selector option:selected').each(function() {
             var songObject = new Object();
@@ -104,11 +108,11 @@
             songObject.song = songValue;
             songIds.push(songObject);
         });
-        if (songIds==0){
+        if (songIds===0){
             window.alert("Select songs first");
         }
         else {
-            var songBookData = new Object();
+            songBookData = new Object();
             songBookData.songs = songIds;
             var songFont = new Object();
             var titleFont = $('#title-font option:selected').text();
@@ -146,41 +150,28 @@
                     { "title": "SongKey", "class": "center" }
                     ]
             });
-
-            $.ajax("@routes.Application.generateSongbook()", {
-                type: 'POST',
-                data: JSON.stringify(songBookData),
-                success: function (data) {
-                    var link = "@routes.Application.downloadAndDeleteFile()"
-                    link = link.concat("?hash=" + data);
-                    //window.location=link;
-                },
-                contentType : 'application/json'
-            });
+            songBookPrepared = true;
+            $('#submit-button').text("Generate Songbook");
         }
-    });
-
-    var dataSet2 = [
-    ['Trident','Internet Explorer 4.0','Win 95+','4','X'],
-    ['Trident','Internet Explorer 5.0','Win 95+','5','C']
-    ];
-    console.log("dataset2");
-    console.log(dataSet2);
-
-
-    /* Table initialisation
-    $ ( '#song_table' ).dataTable ({
-    "data": dataSet,
-    "columns": [
-            { "title": "SongId" },
-            { "title": "LyricsId" },
-            { "title": "SongKey" }
-        ]
-    });
-    */
+        }
+    else {
+        console.log("click2");
+        console.log(songBookData);
+                    $.ajax("@routes.Application.generateSongbook()", {
+                    type: 'POST',
+                    data: JSON.stringify(songBookData),
+                    success: function (data) {
+                        var link = "@routes.Application.downloadAndDeleteFile()"
+                        link = link.concat("?hash=" + data);
+                        window.location=link;
+                    },
+                    contentType : 'application/json'
+                });
+    }
 
     });
 
+    });
     </script>
 
 }
