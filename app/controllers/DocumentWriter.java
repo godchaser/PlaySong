@@ -6,6 +6,8 @@ package controllers;
 import java.io.*;
 import java.util.List;
 
+import controllers.chords.ChordLineTransposer;
+import controllers.chords.LineTypeChecker;
 import models.SongLyrics;
 import models.helpers.SongPrint;
 import org.apache.poi.xwpf.usermodel.Borders;
@@ -86,7 +88,18 @@ public class DocumentWriter {
                 songTotalNumber = i;
             }
             Logger.trace("Now exporting songId: " + songPrintObjects.get(i).getSong().id);
-            writeSong(document, s.getSong().songName, SongLyrics.get(s.getLyricsID()).songLyrics, songTotalNumber);
+
+            String origLyrics = SongLyrics.get(s.getLyricsID()).songLyrics;
+            String origKey = SongLyrics.get(s.getLyricsID()).songKey;
+            String newKey = songPrintObjects.get(i).getKey();
+            Logger.trace("Orig key: " + origKey + " New key: " + newKey);
+            String songLyrics = SongLyrics.get(s.getLyricsID()).songLyrics;
+            if (!origKey.equals(newKey)){
+                //TODO: this has to be implemented - calculate ammount needed for transposing
+                Logger.trace("Transposing! ");
+                songLyrics = chordTranspose(2,songLyrics);
+            }
+            writeSong(document, s.getSong().songName, songLyrics, songTotalNumber);
         }
 
         FileOutputStream fos = null;
@@ -102,6 +115,23 @@ public class DocumentWriter {
         }
 
         return outputFile;
+    }
+
+    private String chordTranspose(int transposeAmmount, String songText) {
+        String[] songLines = songText.split("[\r\n]+");
+        StringBuilder transposedSong = new StringBuilder();
+        for (String songLine : songLines) {
+            Logger.trace("Checking song lines: " + songLine);
+            String updatedSongLine = songLine;
+            if (LineTypeChecker.isChordLine(songLine)) {
+                Logger.trace("Transposing by ammount: " + transposeAmmount);
+                ChordLineTransposer clt = new ChordLineTransposer(songLine);
+                updatedSongLine = clt.transpose(transposeAmmount, null);
+                Logger.trace(updatedSongLine);
+            }
+            transposedSong.append(updatedSongLine + "\r\n");
+        }
+        return transposedSong.toString();
     }
 
     public String getSongTitleFont() {

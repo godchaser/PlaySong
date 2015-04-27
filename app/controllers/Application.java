@@ -246,11 +246,15 @@ public class Application extends Controller {
             JsonSongbookGenerator jsonSongbook = mapper.treeToValue(jsonNode, JsonSongbookGenerator.class);
             List<models.json.Song> songsJson = jsonSongbook.getSongs();
             for (models.json.Song songJson : songsJson){
-                    songsForPrint.add(new SongPrint(Song.get(Long.parseLong(songJson.getSong().getId())), Long.parseLong(songJson.getSong().getLyricsID())));
+                    songsForPrint.add(new SongPrint(Song.get(Long.parseLong(songJson.getSong().getId())), Long.parseLong(songJson.getSong().getLyricsID()), songJson.getSong().getKey()));
             }
             docWriter = new DocumentWriter();
-            docWriter.setSongLyricsFont(jsonSongbook.getFonts().getLyricsFont());
-            docWriter.setSongTitleFont(jsonSongbook.getFonts().getTitleFont());
+            try {
+                docWriter.setSongLyricsFont(jsonSongbook.getFonts().getLyricsFont());
+                docWriter.setSongTitleFont(jsonSongbook.getFonts().getTitleFont());
+            } catch(NullPointerException e) {
+            } finally {
+            }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

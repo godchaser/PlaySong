@@ -4,14 +4,14 @@
             "song": {
                 "id": "259",
                 "lyricsID": "259",
-		"key": "A"
+		        "key": "F#"
             }
         },
         {
             "song": {
                 "id": "142",
                 "lyricsID": "142",
-		"key": "C"
+		        "key": "C"
             }
         }
     ],

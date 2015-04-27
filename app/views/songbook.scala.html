@@ -24,11 +24,11 @@
                         @songs.map { song =>
                             @song.songLyrics.zipWithIndex.map{ case (songlyrics, i) =>
                                 @if(i==0){
-                                    <option id="@song.id" value="@songlyrics.id">@song.songName (@songlyrics.songKey)</option>
+                                    <option id="@song.id" value="@songlyrics.id" data-songkey="@songlyrics.songKey">@song.songName (@songlyrics.songKey)</option>
                                 }
                                 @if(i>0){
                                     @defining(i + 1) { idx =>
-                                        <option id="@song.id" value="@songlyrics.id">@song.songName @idx (@songlyrics.songKey)</option>
+                                        <option id="@song.id" value="@songlyrics.id" data-songkey="@songlyrics.songKey">@song.songName @idx (@songlyrics.songKey)</option>
                                     }
                                 }
                             }
@@ -79,6 +79,11 @@
     maxHeight: 400
     });
 
+    function setSelected() {
+    console.log("Change Event")
+    }
+
+
     //reset button
     $('#songbook-form').on('reset', function() {
     $('#song-selector option:selected').each(function() {
@@ -99,9 +104,10 @@
             var songValue = new Object();
             songValue.id = $(this).attr('id');
             songValue.lyricsID = $(this).val();
-            songValue.key = "C";
+            songValue.key = $(this).attr('data-songkey');
             var helper = [];
             helper.push($(this).text());
+            helper.push(songValue.id);
             helper.push(songValue.lyricsID);
             helper.push(songValue.key);
             dataSet.push(helper);
@@ -128,27 +134,31 @@
                 lyricsFont = "Courier New";
             }
             songFont.lyricsFont = lyricsFont;
-
             songBookData.fonts = songFont;
-
-            console.log(songBookData);
-            console.log(JSON.stringify(songBookData));
-
-            console.log("dataSet: ");
-            console.log(dataSet);
 
             $('#song_table').html( '<table cellpadding="0" cellspacing="0" border="0" class="display" id="example"></table>' );
             $('#song_table').dataTable( {
                 "data": dataSet,
                 responsive : true,
-                 "bJQueryUI" : true,
+                "bJQueryUI" : true,
                 "sPaginationType" : "full",
-                 "dom": 'T<"clear">lfrtip',
+                "dom": 'T<"clear">lfrtip',
                 "columns": [
                     { "title": "Song" },
-                    { "title": "LyricsId", "class": "center" },
-                    { "title": "SongKey", "class": "center" }
-                    ]
+                    { "title": "SongID" },
+                    { "title": "LyricsId"},
+                    { "title": "SongKey"}
+                    ],
+                "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+                    var songKeySelect = '<select id="songKeySelector_'+aData[2]+'"><option value="C"  >C</option><option value="C#"  >C#</option><option value="D"  >D</option><option value="D#"  >D#</option><option value="E"  >E</option><option value="F"  >F</option><option value="F#"  >F#</option><option value="G"  >G</option><option value="G#"  >G#</option><option value="A"  >A</option><option value="A#"  >A#</option><option value="B"  >B</option></select>';
+                    var idx = songKeySelect.indexOf("\""+aData[3]+"\"");
+                    var songKeySelect = songKeySelect.slice(0, idx+5) + "selected=\"true\"" + songKeySelect.slice(idx+5);
+                    $('td:eq(3)', nRow).html(songKeySelect);
+                    var rowId = 'row_'+aData[2];
+                    $(nRow).attr('id', rowId);
+                    $(rowId + " select").val(aData[3]);
+                    return nRow;
+                 }
             });
             songBookPrepared = true;
             $('#submit-button').text("Generate Songbook");
@@ -156,6 +166,47 @@
         }
     else {
         console.log("click2");
+        var chordTable = $('#song_table').dataTable();
+        var tableData = chordTable.fnGetData();
+        var data = chordTable.$('select').serialize();
+        var songIds= [];
+        for (var i=0;i<tableData.length;i++){
+            tableData[i][2]
+            var songObject = new Object();
+            var songValue = new Object();
+            songValue.id = tableData[i][1];
+            songValue.lyricsID = tableData[i][2];
+            var songKeySelector = "#songKeySelector_"+ tableData[i][2];
+            var key = $( songKeySelector+ " option:selected" ).text();
+            songValue.key = key;
+            var helper = [];
+            helper.push(songValue.id);
+            helper.push(songValue.lyricsID);
+            helper.push(songValue.key);
+            dataSet.push(helper);
+            songObject.song = songValue;
+            songIds.push(songObject);
+        }
+        songBookData = new Object();
+        songBookData.songs = songIds;
+
+        var songFont = new Object();
+        var titleFont = $('#title-font option:selected').text();
+        if (titleFont == "Title font"){
+            //default
+                titleFont = "Arial";
+        }
+        songFont.titleFont = titleFont;
+
+        var lyricsFont = $('#lyrics-font option:selected').text();
+        if (lyricsFont == "Lyrics font"){
+                //default
+                lyricsFont = "Courier New";
+         }
+
+         songFont.lyricsFont = lyricsFont;
+         songBookData.fonts = songFont;
+
         console.log(songBookData);
                     $.ajax("@routes.Application.generateSongbook()", {
                     type: 'POST',

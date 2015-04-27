@@ -8,10 +8,12 @@ import models.Song;
 public class SongPrint {
     Song song;
     Long lyricsID;
+    String key;
 
-    public SongPrint(Song s, Long lid){
+    public SongPrint(Song s, Long lid, String key){
         setSong(s);
         setLyricsID(lid);
+        setKey(key);
     }
 
     public Song getSong() {
@@ -29,4 +31,13 @@ public class SongPrint {
     public void setLyricsID(Long lyricsID) {
         this.lyricsID = lyricsID;
     }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
 }
