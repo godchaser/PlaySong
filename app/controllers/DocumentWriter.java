@@ -6,6 +6,7 @@ package controllers;
 import java.io.*;
 import java.util.List;
 
+import controllers.chords.ChordHelper;
 import controllers.chords.ChordLineTransposer;
 import controllers.chords.LineTypeChecker;
 import models.SongLyrics;
@@ -96,8 +97,10 @@ public class DocumentWriter {
             String songLyrics = SongLyrics.get(s.getLyricsID()).songLyrics;
             if (!origKey.equals(newKey)){
                 //TODO: this has to be implemented - calculate ammount needed for transposing
-                Logger.trace("Transposing! ");
-                songLyrics = chordTranspose(2,songLyrics);
+                //TODO: take in consideration when transposing if it is flat or sharp - ChordTransposer has methods
+                //int keyDelta = ChordHelper.getDeltaFromKeys(origKey,newKey);
+                //Logger.trace("Transposing by key delta: " + keyDelta);
+                songLyrics = chordTranspose(origKey,newKey, songLyrics);
             }
             writeSong(document, s.getSong().songName, songLyrics, songTotalNumber);
         }
@@ -117,16 +120,16 @@ public class DocumentWriter {
         return outputFile;
     }
 
-    private String chordTranspose(int transposeAmmount, String songText) {
+    private String chordTranspose(String origKey, String newKey, String songText) {
         String[] songLines = songText.split("[\r\n]+");
         StringBuilder transposedSong = new StringBuilder();
         for (String songLine : songLines) {
             Logger.trace("Checking song lines: " + songLine);
             String updatedSongLine = songLine;
             if (LineTypeChecker.isChordLine(songLine)) {
-                Logger.trace("Transposing by ammount: " + transposeAmmount);
+                //Logger.trace("Transposing by ammount: " + transposeAmmount);
                 ChordLineTransposer clt = new ChordLineTransposer(songLine);
-                updatedSongLine = clt.transpose(transposeAmmount, null);
+                updatedSongLine = clt.transpose2(origKey,newKey);
                 Logger.trace(updatedSongLine);
             }
             transposedSong.append(updatedSongLine + "\r\n");

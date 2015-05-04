@@ -150,7 +150,7 @@
                     { "title": "SongKey"}
                     ],
                 "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-                    var songKeySelect = '<select id="songKeySelector_'+aData[2]+'"><option value="C"  >C</option><option value="C#"  >C#</option><option value="D"  >D</option><option value="D#"  >D#</option><option value="E"  >E</option><option value="F"  >F</option><option value="F#"  >F#</option><option value="G"  >G</option><option value="G#"  >G#</option><option value="A"  >A</option><option value="A#"  >A#</option><option value="B"  >B</option></select>';
+                    var songKeySelect = '<select id="songKeySelector_'+aData[2]+'"><option value="C"  >C</option><option value="C#"  >C#</option><option value="Db"  >Db</option><option value="D"  >D</option><option value="D#"  >D#</option><option value="Eb"  >Eb</option><option value="E"  >E</option><option value="F"  >F</option><option value="F#"  >F#</option><option value="Gb"  >Gb</option><option value="G"  >G</option><option value="G#"  >G#</option><option value="Ab"  >Ab</option><option value="A"  >A</option><option value="A#"  >A#</option><option value="B"  >B</option></select>';
                     var idx = songKeySelect.indexOf("\""+aData[3]+"\"");
                     var songKeySelect = songKeySelect.slice(0, idx+5) + "selected=\"true\"" + songKeySelect.slice(idx+5);
                     $('td:eq(3)', nRow).html(songKeySelect);

@@ -27,6 +27,8 @@ import play.Logger;
 public class ChordLineTransposer {
 
     private String line;
+    ChordHelper chordHelper = new ChordHelper();
+
 
     /**
      * Create a new chord line transposer.
@@ -84,6 +86,37 @@ public class ChordLineTransposer {
         if (chordsComment) {
             line = line + "//chords";
         }
+        return str;
+    }
+
+    public String transpose2 (String currentKey, String targetKey){
+
+        String[] chords = line.split("\\s+");
+        String[] whitespace = line.split("[A-Za-z0-9#/]+");
+        StringBuilder ret = new StringBuilder();
+        System.out.println("LINE: " + line);
+        System.out.println(chords.toString());
+        for (String s : chords){
+            System.out.println("S" + s + "!");
+        }
+        for (int i = 0; i < chords.length; i++) {
+            //I am skipping empty string
+            if (chords[i].length()>0 || !chords[i].contains("")){
+                //TODO: Fix / chord transpose - and minor tail
+                if (line.contains("/")){
+                    ret.append(chordHelper.transpose(currentKey, targetKey, chords[i].trim()));
+                } else {
+                    ret.append(chordHelper.transpose(currentKey, targetKey, chords[i].trim()));
+                }
+            }
+            //ret.append(ch.transpose(currentKey, targetKey, chords[i].trim()));
+            if (i < whitespace.length) {
+                ret.append(whitespace[i]);
+            }
+        }
+
+        String str = ret.toString();
+
         return str;
     }
 

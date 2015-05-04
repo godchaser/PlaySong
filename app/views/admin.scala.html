@@ -154,11 +154,12 @@
             <script type="text/javascript">
             $(document).ready(function() {
 
+            var songSuggestionUrl = jsRoutes.controllers.Application.songsuggestions().url;
             var songList = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             //prefetch: '../data/films/post_1960.json',
-            remote: '/songsuggestions?q=%QUERY'
+            remote: songSuggestionUrl+'?q=%QUERY'
             });
 
             songList.initialize();

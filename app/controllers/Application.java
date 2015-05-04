@@ -43,6 +43,7 @@ public class Application extends Controller {
                         controllers.routes.javascript.Application.deletesong(),
                         controllers.routes.javascript.Application.getsongjson(),
                         controllers.routes.javascript.Application.songeditor(),
+                        controllers.routes.javascript.Application.songsuggestions(),
                         controllers.routes.javascript.Application.getsonglyricsjson()
                 )
         );
