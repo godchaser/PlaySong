@@ -29,7 +29,7 @@ public class ChordHelper {
         keys.add(new Key("C#",5,"S"));
         keys.add(new Key("Db",5,"F"));
         keys.add(new Key("D",6,"N"));
-        keys.add(new Key("D#",7,"F"));
+        keys.add(new Key("D#",7,"S"));
         keys.add(new Key("Eb",7,"F"));
         keys.add(new Key("E",8,"N"));
         keys.add(new Key("F",9,"N"));
@@ -62,13 +62,14 @@ public class ChordHelper {
 
     String getNewKey (String oldKey, int delta, String targetKey) {
         int keyValue = getKeyByName(oldKey).value + delta;
+        System.out.println("targetKey: " + targetKey);
 
         if (keyValue > 11) {
             keyValue -= 12;
         } else if (keyValue < 0) {
             keyValue += 12;
         }
-
+        System.out.println("keyValue: " + keyValue);
         int i=0;
         if (keyValue == 0 || keyValue == 2 || keyValue == 5 || keyValue == 7 || keyValue == 10) {
             // Return the Flat or Sharp Key
@@ -129,22 +130,56 @@ public class ChordHelper {
     }
 
     String transpose (String currentKey, String targetKey, String chord){
-        System.out.println("AAAA");
         System.out.println("curr: " + currentKey);
         System.out.println("target: " + targetKey);
         System.out.println("chord: " + chord);
 
         int delta = getDelta(getKeyByName(currentKey.trim()).value, getKeyByName(targetKey.trim()).value);
-        String chordRoot = getChordRoot(chord);
-        String newChordRoot = getNewKey(chordRoot, delta, targetKey.trim());
-        String newChord = newChordRoot + chord.substring(chordRoot.length());
+        System.out.println("delta: " + delta);
+        String newChord;
+        if (chord.contains("/")){
+            String[] parts = chord.split("/");
+            String chordFirstTransposed;
+            String chordFirst = parts[0];
+            System.out.println("#" +parts[0] + ":PARTS:" +parts[1]+"#");
+            if ("-".equals(chordFirst)){
+                chordFirstTransposed = chordFirst;
+            }else {
+                String chordRootFirstChord = getChordRoot(chordFirst);
+                chordFirstTransposed = getNewChord(delta, chordFirst, chordRootFirstChord, targetKey);
+            }
+            String chordSecond = parts[1];
+            String chordRootSecondChord = getChordRoot(chordSecond);
+            String chordSecondTransposed = getNewChord(delta, chordSecond, chordRootSecondChord, targetKey);
+
+            newChord = chordFirstTransposed+"/"+chordSecondTransposed;
+        } else {
+            String chordRoot = getChordRoot(chord);
+            String newChordRoot = getNewKey(chordRoot, delta, targetKey.trim());
+            System.out.println("len:" + chord.substring(chordRoot.length())+"$");
+            String chordTail = chord.substring(chordRoot.length()).replace("#","");
+            chordTail= chordTail.replace("b","");
+            newChord = newChordRoot + chordTail;
+        }
         return newChord;
     }
 
+    private String getNewChord(int delta, String chord, String chordRoot, String targetKey){
+        String newChordRoot = getNewKey(chordRoot, delta, targetKey.trim());
+        String chordTail = chord.substring(chordRoot.length()).replace("#", "");
+        chordTail= chordTail.replace("b","");
+        String newChord = newChordRoot + chordTail;
+        System.out.println("len:" + chord.substring(chordRoot.length())+"$");
+        return newChord;
+    }
     public static void main (String[] args){
-        String currentKey = "C";
-        String targetKey = "D";
-        String chord = "G/B";
+        String currentKey = "D";
+        String targetKey = "C";
+        //String chord = "-/F#";
+        //String chord = "F#";
+        //String chord = "A/C#";
+        //String chord = "F#";
+        String chord = "Am7";
         ChordHelper ch = new ChordHelper();
         String transposed = ch.transpose(currentKey, targetKey, chord);
         System.out.println("key: " + currentKey + "\n targ: " +targetKey + "\n chord: " + chord +"\n trans: " + transposed);

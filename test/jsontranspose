@@ -1,0 +1,23 @@
+{
+    "songs": [
+        {
+            "song": {
+                "id": "16",
+                "lyricsID": "16",
+		        "key": "C"
+            }
+        }
+    ],
+    "fonts": {
+        "titleFont": "Arial",
+        "lyricsFont": "Courier New"
+    },
+    "sizes": {
+        "titleSize": "18",
+        "lyricsSize": "12"
+    },
+    "frontpage": {
+        "title": "Songbook",
+        "subtitle": "2015"
+    }
+}
