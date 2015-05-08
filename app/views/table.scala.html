@@ -100,6 +100,11 @@
     }
     sLinks = sLinks.concat('</div>');
     $('td:eq(0)', nRow).html(sLinks);
+    if (aData.songLink){
+    var sYTLink = '<a href="'+aData.songLink+'"><i class="glyphicon glyphicon-play-circle"></i></a>';
+    $('td:eq(3)', nRow).html(sYTLink);
+    }
+
     $(nRow).attr('id', aData.songId);
     return nRow;
     }

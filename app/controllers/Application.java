@@ -3,6 +3,7 @@ package controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import controllers.songbook.XLSHelper;
 import models.Song;
 import models.SongLyrics;
 import models.helpers.SongPrint;
@@ -55,7 +56,7 @@ public class Application extends Controller {
 
     public static Result admin() {
         Html welcome = new Html("");
-        return ok(admin.render("",welcome));
+        return ok(admin.render("", welcome));
     }
 
     public static Result songbook() {
@@ -114,6 +115,11 @@ public class Application extends Controller {
             System.out.print(e.getStackTrace());
             System.out.print(e.getMessage());
         }
+        return redirect(routes.Application.index());
+    }
+
+    public static Result updateFromXLS(){
+        XLSHelper.importAndUpdateSongs();
         return redirect(routes.Application.index());
     }
 

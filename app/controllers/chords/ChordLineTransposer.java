@@ -94,22 +94,22 @@ public class ChordLineTransposer {
         String[] chords = line.split("\\s+");
         String[] whitespace = line.split("[A-Za-z0-9#/]+");
         StringBuilder ret = new StringBuilder();
-        System.out.println("LINE: " + line);
-        for (String s : chords){
-            System.out.println("S:" + s + ":!");
-        }
+        Logger.debug("LINE: " + line);
+        //for (String s : chords){
+        //    System.out.println("S:" + s + ":!");
+        //}
         for (int i = 0; i < chords.length; i++) {
             //I am skipping empty string
             if (chords[i].length()>0 || !chords[i].contains("")){
                 //TODO: Fix / chord transpose - and minor tail
-                System.out.println("APPEND:" + chords[i].trim() + ":!");
+                //System.out.println("APPEND:" + chords[i].trim() + ":!");
                 String s = chordHelper.transpose(currentKey, targetKey, chords[i].trim());
-                System.out.println("APPEND_NEW:" + s + ":!");
+                //System.out.println("APPEND_NEW:" + s + ":!");
                 ret.append(s);
             }
             //ret.append(ch.transpose(currentKey, targetKey, chords[i].trim()));
             if (i < whitespace.length) {
-                System.out.println("APPEND_WHITE: " + whitespace[i]);
+                //System.out.println("APPEND_WHITE: " + whitespace[i]);
                 ret.append(whitespace[i].replace("-",""));
             }
         }

@@ -1,5 +1,7 @@
 package controllers.chords;
 
+import play.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,12 +50,12 @@ public class ChordHelper {
                 return keys.get(i);
             }
         }
-        System.out.println("NAME: " + name + "!!!");
+        //System.out.println("NAME: " + name + "!!!");
         return null;
     }
 
     String getChordRoot (String input) {
-        System.out.println("INPUT: " + input + "!!!");
+        //System.out.println("INPUT: " + input + "!!!");
         if (input.length() > 1 && ("b".equals(input.charAt(1)) || "#".equals(input.charAt(1))))
             return input.substring(0, 2);
         else
@@ -62,14 +64,14 @@ public class ChordHelper {
 
     String getNewKey (String oldKey, int delta, String targetKey) {
         int keyValue = getKeyByName(oldKey).value + delta;
-        System.out.println("targetKey: " + targetKey);
+        //System.out.println("targetKey: " + targetKey);
 
         if (keyValue > 11) {
             keyValue -= 12;
         } else if (keyValue < 0) {
             keyValue += 12;
         }
-        System.out.println("keyValue: " + keyValue);
+        //System.out.println("keyValue: " + keyValue);
         int i=0;
         if (keyValue == 0 || keyValue == 2 || keyValue == 5 || keyValue == 7 || keyValue == 10) {
             // Return the Flat or Sharp Key
@@ -130,18 +132,18 @@ public class ChordHelper {
     }
 
     String transpose (String currentKey, String targetKey, String chord){
-        System.out.println("curr: " + currentKey);
-        System.out.println("target: " + targetKey);
-        System.out.println("chord: " + chord);
+        Logger.debug("Curr key: " + currentKey);
+        Logger.debug("Target key: " + targetKey);
+        Logger.debug("Chord: " + chord);
 
         int delta = getDelta(getKeyByName(currentKey.trim()).value, getKeyByName(targetKey.trim()).value);
-        System.out.println("delta: " + delta);
+        Logger.debug("Key delta: " + delta);
         String newChord;
         if (chord.contains("/")){
             String[] parts = chord.split("/");
             String chordFirstTransposed;
             String chordFirst = parts[0];
-            System.out.println("#" +parts[0] + ":PARTS:" +parts[1]+"#");
+            //System.out.println("#" +parts[0] + ":PARTS:" +parts[1]+"#");
             if ("-".equals(chordFirst)){
                 chordFirstTransposed = chordFirst;
             }else {
@@ -156,7 +158,7 @@ public class ChordHelper {
         } else {
             String chordRoot = getChordRoot(chord);
             String newChordRoot = getNewKey(chordRoot, delta, targetKey.trim());
-            System.out.println("len:" + chord.substring(chordRoot.length())+"$");
+            //System.out.println("len:" + chord.substring(chordRoot.length())+"$");
             String chordTail = chord.substring(chordRoot.length()).replace("#","");
             chordTail= chordTail.replace("b","");
             newChord = newChordRoot + chordTail;
@@ -169,7 +171,7 @@ public class ChordHelper {
         String chordTail = chord.substring(chordRoot.length()).replace("#", "");
         chordTail= chordTail.replace("b","");
         String newChord = newChordRoot + chordTail;
-        System.out.println("len:" + chord.substring(chordRoot.length())+"$");
+        //System.out.println("len:" + chord.substring(chordRoot.length())+"$");
         return newChord;
     }
     public static void main (String[] args){

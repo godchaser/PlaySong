@@ -95,4 +95,76 @@ public class Song extends Model implements Comparator<Song>{
     public int compare(Song song1, Song song2) {
         return song1.songName.compareTo(song2.songName);
     }
+
+    public String getSongName() {
+        return songName;
+    }
+
+    public void setSongName(String songName) {
+        this.songName = songName;
+    }
+
+    public String getSongOriginalTitle() {
+        return songOriginalTitle;
+    }
+
+    public void setSongOriginalTitle(String songOriginalTitle) {
+        this.songOriginalTitle = songOriginalTitle;
+    }
+
+    public String getSongAuthor() {
+        return songAuthor;
+    }
+
+    public void setSongAuthor(String songAuthor) {
+        this.songAuthor = songAuthor;
+    }
+
+    public String getSongLink() {
+        return songLink;
+    }
+
+    public void setSongLink(String songLink) {
+        this.songLink = songLink;
+    }
+
+    public String getSongImporter() {
+        return songImporter;
+    }
+
+    public void setSongImporter(String songImporter) {
+        this.songImporter = songImporter;
+    }
+
+    public String getSongLastModifiedBy() {
+        return songLastModifiedBy;
+    }
+
+    public void setSongLastModifiedBy(String songLastModifiedBy) {
+        this.songLastModifiedBy = songLastModifiedBy;
+    }
+
+    public int getSongBookId() {
+        return songBookId;
+    }
+
+    public void setSongBookId(int songBookId) {
+        this.songBookId = songBookId;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateModified() {
+        return dateModified;
+    }
+
+    public void setDateModified(Date dateModified) {
+        this.dateModified = dateModified;
+    }
 }
