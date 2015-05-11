@@ -55,6 +55,10 @@ public class Song extends Model implements Comparator<Song>{
         return find.all();
     }
 
+    public static int getNumberOfSongsInDatabase() {
+        return find.all().size();
+    }
+
     public static Song get(Long id){
         return find.byId(id);
     }

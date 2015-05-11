@@ -11,13 +11,10 @@
 
     <div class="panel-group" id="collapse-accordion">
         <div class="panel panel-default" style="overflow:visible;">
-            <div class="panel-heading">
-                <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#collapse-accordion" href="#collapse-accordion-one">
-                        Songbook creator
-                    </a>
-                </h4>
+           <div class="panel-heading">
+                <h3 class="panel-title">Songbook Creator <i class="glyphicon glyphicon-cog"></i></h3>
             </div>
+        </div>
             <form class="btn-group" id="songbook-form">
                 <div class="btn-group">
                     <select id="song-selector" multiple="multiple">
@@ -46,8 +43,8 @@
                         <option value="2">Droid Sans Mono</option>
                         <option value="3">Arial</option>
                     </select>
-                    <button type="reset" id="reset-button" class="btn btn-default"><i class="fa fa-repeat fa-fw"></i>Reset</button>
-                    <button type="button" id="submit-button" class="btn btn-default"><i class="fa fa-book fa-fw"></i>Prepare songbook</button>
+                    <button type="reset" id="reset-button" class="btn btn-warning"><i class="fa fa-repeat fa-fw"></i>Reset</button>
+                    <button type="button" id="submit-button" class="btn btn-primary"><i class="fa fa-book fa-fw"></i>Prepare songbook</button>
                 </div>
             </form>
         </div>
@@ -161,7 +158,8 @@
                  }
             });
             songBookPrepared = true;
-            $('#submit-button').text("Generate Songbook");
+            $('#submit-button').addClass("btn btn-success");
+            $('#submit-button').html('Download Songbook ' + '<i class="glyphicon glyphicon-download-alt"></i>');
         }
         }
     else {

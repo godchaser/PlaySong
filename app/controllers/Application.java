@@ -279,7 +279,7 @@ public class Application extends Controller {
     }
 
     public static Result table() {
-        return ok(table.render());
+        return ok(table.render(Song.getNumberOfSongsInDatabase()));
     }
 
     public static Result songeditor(Long id) {

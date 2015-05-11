@@ -32,7 +32,7 @@
         datatype : 'json',
         success : function ( data ) {
             var songLyricsIDs = [];
-            $ ( '#songName' ).html ( data.songName ) ;
+            $ ( '#songName' ).html ( data.songName + ' <i class="glyphicon glyphicon-music">') ;
 
             //$ ( '#songAuthor' ).html ( data.songAuthor ) ;
             if (data.songLink && isUrl(data.songLink)){
