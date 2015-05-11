@@ -1,5 +1,7 @@
 package models;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.persistence.*;
@@ -41,13 +43,6 @@ public class Song extends Model implements Comparator<Song>{
     @Formats.DateTime(pattern="dd/MM/yyyy hh:mm")
     public Date dateModified = new Date();
 
-    /*
-    Date dNow = new Date( );
-    SimpleDateFormat ft =
-      new SimpleDateFormat ("E yyyy.MM.dd 'at' hh:mm:ss a zzz");
-      System.out.println("Current Date: " + ft.format(dNow));
-     */
-
     @OneToMany(mappedBy="song",cascade= CascadeType.ALL)
     public List<SongLyrics> songLyrics  = new ArrayList<>();
 
@@ -67,7 +62,7 @@ public class Song extends Model implements Comparator<Song>{
         //delete empty lyrics
         List removedList = new ArrayList();
         for (int i=0;i<song.songLyrics.size();i++){
-            if (song.songLyrics.get(i).getsongLyrics().length()<2){
+             if (song.songLyrics.get(i).getsongLyrics().length()<2){
                 removedList.add(song.songLyrics.get(i));
             }
         }
@@ -77,9 +72,15 @@ public class Song extends Model implements Comparator<Song>{
             songLyrics.setSongKey(songKey);
         }
         if (song.id != null && song.id>0){
+            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+            Date date = new Date();
+            song.setDateModified(date);
             song.update();
         } else {
             song.id = null;
+            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+            Date date = new Date();
+            song.setDateCreated(date);
             song.save();
         }
     }
