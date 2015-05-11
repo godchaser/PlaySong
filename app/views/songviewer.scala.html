@@ -48,7 +48,7 @@
                 jsRoutes.controllers.Application.getsonglyricsjson (s).ajax ( {
                 success : function (data) {
                     var songLyricsTag = '#songLyrics_' + i + '_songLyrics' ;
-                    console.log(songLyricsTag);
+                    //console.log(songLyricsTag);
                     $ ( songLyricsTag ).html ( data.songLyrics ) ;
                     $ ( songLyricsTag ).attr ( "style", "display:block;" ) ;
                     $ ( function ( ) {
