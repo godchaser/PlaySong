@@ -1,5 +1,7 @@
 package controllers;
 
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.SqlUpdate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,6 +10,7 @@ import models.Song;
 import models.SongLyrics;
 import models.helpers.SongPrint;
 import models.json.JsonSongbookGenerator;
+import org.apache.commons.lang3.StringUtils;
 import play.Logger;
 import play.Routes;
 import play.data.Form;
@@ -100,14 +103,24 @@ public class Application extends Controller {
                     views.html.error.render()
             );
         } else {
+            System.out.println("updateOrCreateSong ");
             Song.updateOrCreateSong(filledForm.get());
             return redirect(routes.Application.table());
         }
     }
 
+    public static Result emptyDb(){
+        Ebean.createSqlUpdate("delete from song_lyrics")
+                .execute();
+        Ebean.createSqlUpdate("delete from song")
+                .execute();
+        return ok();
+    }
+
     public static Result init(){
         try {
             SongImporter.importFromDb();
+            //Ebean.
         }
         catch (Exception e){
             Logger.error("Exception occured during init" + e.getStackTrace());
@@ -115,12 +128,18 @@ public class Application extends Controller {
             System.out.print(e.getStackTrace());
             System.out.print(e.getMessage());
         }
-        return redirect(routes.Application.index());
+        return ok();
+    }
+
+    public static Result test(){
+        String input = StringUtils.stripAccents("Tĥïŝ ĩš â fůňķŷ Šťŕĭńġ čćžđšđčćžšđ");
+        System.out.println(input);
+        return ok();
     }
 
     public static Result updateFromXLS(){
         XLSHelper.importAndUpdateSongs();
-        return redirect(routes.Application.index());
+        return ok();
     }
 
     public static Result getsongsdatatable() {
@@ -159,7 +178,7 @@ public class Application extends Controller {
                         )
                 )
         )
-                .orderBy(sortBy + " " + order + ", id " + order)
+                .orderBy(sortBy + " " + order)
                 .findPagingList(pageSize).setFetchAhead(false)
                 .getPage(page);
         Integer iTotalDisplayRecords = songPage.getTotalRowCount();

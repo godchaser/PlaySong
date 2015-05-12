@@ -25,8 +25,14 @@ GET           /songsuggestions                  controllers.Application.songsugg
 # used for db init
 GET           /init                             controllers.Application.init()
 
+# used for clearing all data from db
+GET           /empty                            controllers.Application.emptyDb()
+
 #used for update through xls file
-GET           /updatexls                        controllers.Application.updateFromXLS()
+GET           /update                           controllers.Application.updateFromXLS()
+
+#simple echo test
+GET           /test                           controllers.Application.test()
 
 # getting paginated data fost data table
 GET           /getsongsdatatable                controllers.Application.getsongsdatatable()
