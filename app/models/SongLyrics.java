@@ -12,6 +12,8 @@ import play.db.ebean.Model;
 @Entity
 public class SongLyrics extends Model {
 
+
+
     @Id
     public Long id;
 
@@ -50,4 +52,28 @@ public class SongLyrics extends Model {
 
 
     public static Finder<Long, SongLyrics> find = new Finder(Long.class, SongLyrics.class);
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Song getSong() {
+        return song;
+    }
+
+    public void setSong(Song song) {
+        this.song = song;
+    }
+
+    public String getSongLyrics() {
+        return songLyrics;
+    }
+
+    public void setSongLyrics(String songLyrics) {
+        this.songLyrics = songLyrics;
+    }
 }

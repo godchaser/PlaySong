@@ -101,6 +101,23 @@ public class Song extends Model implements Comparator<Song>{
         return song1.songName.compareTo(song2.songName);
     }
 
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public List<SongLyrics> getSongLyrics() {
+        return songLyrics;
+    }
+
+    public void setSongLyrics(List<SongLyrics> songLyrics) {
+        this.songLyrics = songLyrics;
+    }
+
     public String getSongName() {
         return songName;
     }
