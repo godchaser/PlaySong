@@ -137,7 +137,7 @@
     <!-- Bootstrap Core JavaScript -->
     <script src="@routes.Assets.at("bower_components/bootstrap/dist/js/bootstrap.min.js")" type="text/javascript"></script>
 
-    <!-- Bootstrap Core JavaScript -->>
+    <!-- Bootstrap Core JavaScript -->
     <!-- Custom Theme JavaScript -->
     <script src="@routes.Assets.at("javascripts/sb-admin-2.js")" type="text/javascript"></script>
 
@@ -169,7 +169,7 @@
             //typeahead callback function
             $('#scrollable-dropdown-menu .typeahead').bind('typeahead:selected', function(obj, datum, name) {
             // you can print datum to see json avps
-            var id = datum.key
+            var id = datum.key;
             var songViewerUrl = jsRoutes.controllers.Application.songview(id).url;
             window.location.href = songViewerUrl;
             });

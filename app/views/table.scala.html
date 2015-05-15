@@ -69,7 +69,7 @@
     // delete initial table div
     $('#song_table_wrapper' ).remove();
     function isUrl(s) {
-        var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/
+        var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
         return regexp.test(s);
     }
     /* Table initialisation */
@@ -194,7 +194,7 @@
         error : function ( ) {
             console.log ( "Error: ajax failure" ) ;
         }
-        })
+        });
     }
 
     function openSongEditor(id){
@@ -211,9 +211,9 @@
                 $ ('#songLyrics' ).empty();
             },
             error : function ( ) {
-                console.log ( "Error: ajax failure" )
+                console.log ( "Error: ajax failure" );
             }
-        })
+        });
     }
 
     });
