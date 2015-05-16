@@ -5,6 +5,9 @@
 # Home page
 GET           /                                 controllers.Application.index()
 
+GET           /login                            controllers.Application.login()
+POST          /login                            controllers.Application.authenticate()
+GET     /logout                     controllers.Application.logout()
 # Songs RESTFUL API
 # not used currently - sending all (unfiltered) songs as json
 GET           /songs                            controllers.Application.getsongs()
@@ -32,7 +35,7 @@ GET           /empty                            controllers.Application.emptyDb(
 GET           /update                           controllers.Application.updateFromXLS()
 
 #simple echo test
-GET           /test                           controllers.Application.test()
+GET           /test                             controllers.Application.test()
 
 # getting paginated data fost data table
 GET           /getsongsdatatable                controllers.Application.getsongsdatatable()
