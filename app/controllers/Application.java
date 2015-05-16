@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import controllers.songbook.XLSHelper;
 import models.Song;
 import models.SongLyrics;
+import models.User;
 import models.helpers.SongPrint;
 import models.json.JsonSongbookGenerator;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +18,7 @@ import play.data.Form;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Security;
 import views.html.*;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -35,12 +37,40 @@ import java.util.AbstractMap.SimpleEntry;
 
 import play.twirl.api.Html;
 
+import static play.data.Form.form;
+
 public class Application extends Controller {
 
-    static Form<Song> songForm = Form.form(Song.class);
+    static Form<Song> songForm = form(Song.class);
     public final static Locale HR_LOCALE = new Locale("HR");
     public final static Collator HR_COLLATOR = Collator.getInstance(HR_LOCALE);
 
+    public static Result login() {
+        return ok(
+                login.render(form(Login.class))
+        );
+    }
+
+    public static Result authenticate() {
+        Form<Login> loginForm = form(Login.class).bindFromRequest();
+        if (loginForm.hasErrors()) {
+            return badRequest(login.render(loginForm));
+        } else {
+            session().clear();
+            session("email", loginForm.get().email);
+            return redirect(
+                    routes.Application.index()
+            );
+        }
+    }
+
+    public static Result logout() {
+        session().clear();
+        flash("success", "You've been logged out");
+        return redirect(
+                routes.Application.admin()
+        );
+    }
 
     public static Result javascriptRoutes() {
         response().setContentType("text/javascript");
@@ -95,6 +125,7 @@ public class Application extends Controller {
         return ok(lyricsResult);
     }
 
+    @Security.Authenticated(Secured.class)
     public static Result deletesong(Long id) {
         Song.delete(id);
         return ok();
@@ -124,7 +155,9 @@ public class Application extends Controller {
     public static Result init(){
         try {
             SongImporter.importFromDb();
-            //Ebean.
+            User test = new User("test@test.com", "test", "test");
+            test.save();
+            XLSHelper.importAndUpdateSongs();
         }
         catch (Exception e){
             Logger.error("Exception occured during init" + e.getStackTrace());
@@ -306,10 +339,12 @@ public class Application extends Controller {
         return ok(table.render(Song.getNumberOfSongsInDatabase()));
     }
 
+    @Security.Authenticated(Secured.class)
     public static Result songeditor(Long id) {
         return ok(songeditor.render(id, songForm));
     }
 
+    @Security.Authenticated(Secured.class)
     public static Result newsongeditor() {
         Long id = -1L;
         return redirect(routes.Application.songeditor(id));
@@ -319,4 +354,16 @@ public class Application extends Controller {
         return ok(songviewer.render(id));
     }
 
+    public static class Login {
+
+        public String email;
+        public String password;
+
+        public String validate() {
+            if (User.authenticate(email, password) == null) {
+                return "Invalid user or password";
+            }
+            return null;
+        }
+    }
 }

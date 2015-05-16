@@ -1,0 +1,44 @@
+@(form: Form[Application.Login])
+@import helper.twitterBootstrap._
+
+<link rel="stylesheet" media="screen" href="@routes.Assets.at("bower_components/bootstrap/dist/css/bootstrap.min.css")">
+    <!-- Bootstrap Core JavaScript -->
+<script src="@routes.Assets.at("bower_components/bootstrap/dist/js/bootstrap.min.js")" type="text/javascript"></script>
+
+<html>
+    <head>
+        <title>PlaySong Login</title>
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+    </head>
+    <body>
+        <header>
+            <a href="@routes.Application.index()">
+                <img class="img-responsive" src="@routes.Assets.at("images/play-song-logo.png")">
+            </a>
+        </header>
+        @helper.form(routes.Application.authenticate) {
+        <h3>Sign in</h3>
+        @if(form.hasGlobalErrors) {
+            <p class="error">
+        @form.globalError.message
+            </p>
+        }
+            @if(flash.contains("success")) {
+                <p class="success">
+                @flash.get("success")
+                </p>
+            }
+
+        <p>
+            <input type="email" name="email" placeholder="Email" value="@form("email").value">
+        </p>
+        <p>
+            <input type="password" name="password" placeholder="Password">
+        </p>
+        <p>
+            <button type="submit">Login</button>
+        </p>
+        }
+
+    </body>
+</html>

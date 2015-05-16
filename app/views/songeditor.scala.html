@@ -8,10 +8,10 @@
             @helper.inputText(songForm("songOriginalTitle"), args = '_label -> "Original title: ")
             @helper.inputText(songForm("songAuthor"), args = '_label -> "Author: ")
             @helper.inputText(songForm("songLink"), args = '_label -> "Link: ")
-            @helper.textarea(field = songForm("songLyrics[0].songLyrics"), args = '_label -> "Lyrics: ", 'rows -> 20, 'cols -> 40, 'class -> "monoSpaceTextArea")
-            @helper.textarea(field = songForm("songLyrics[1].songLyrics"), args = 'style -> "display:none;", 'rows -> 20, 'cols -> 40, 'class -> "monoSpaceTextArea")
-            @helper.textarea(field = songForm("songLyrics[2].songLyrics"), args = 'style -> "display:none;", 'rows -> 20, 'cols -> 40, 'class -> "monoSpaceTextArea")
-            @helper.textarea(field = songForm("songLyrics[3].songLyrics"), args = 'style -> "display:none;", 'rows -> 20, 'cols -> 40, 'class -> "monoSpaceTextArea")
+            @helper.textarea(field = songForm("songLyrics[0].songLyrics"), args = '_label -> "Lyrics: ", 'rows -> 30, 'cols -> 50, 'class -> "monoSpaceTextArea")
+            @helper.textarea(field = songForm("songLyrics[1].songLyrics"), args = 'style -> "display:none;", 'rows -> 30, 'cols -> 50, 'class -> "monoSpaceTextArea")
+            @helper.textarea(field = songForm("songLyrics[2].songLyrics"), args = 'style -> "display:none;", 'rows -> 30, 'cols -> 50, 'class -> "monoSpaceTextArea")
+            @helper.textarea(field = songForm("songLyrics[3].songLyrics"), args = 'style -> "display:none;", 'rows -> 30, 'cols -> 50, 'class -> "monoSpaceTextArea")
             <input type="submit" value="Save">
             @helper.inputText(songForm("id"), args = 'style -> "display:none;")
         }
