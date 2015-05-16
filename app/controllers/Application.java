@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.text.Collator;
 import java.util.*;
 
 import com.avaje.ebean.Expr;
@@ -37,6 +38,8 @@ import play.twirl.api.Html;
 public class Application extends Controller {
 
     static Form<Song> songForm = Form.form(Song.class);
+    public final static Locale HR_LOCALE = new Locale("HR");
+    public final static Collator HR_COLLATOR = Collator.getInstance(HR_LOCALE);
 
 
     public static Result javascriptRoutes() {
@@ -64,11 +67,12 @@ public class Application extends Controller {
 
     public static Result songbook() {
         Html welcome = new Html("");
+        HR_COLLATOR.setStrength(Collator.PRIMARY);
         List <Song> sortedSongs = Song.all();
         Collections.sort(sortedSongs, new Comparator<Song>(){
             @Override
             public int compare(Song s1, Song s2) {
-                return s1.songName.compareTo(s2.songName);
+                return HR_COLLATOR.compare(s1.songName, s2.songName);
             }});
         return ok(songbook.render(sortedSongs));
     }
@@ -134,6 +138,7 @@ public class Application extends Controller {
     public static Result test(){
         String input = StringUtils.stripAccents("Tĥïŝ ĩš â fůňķŷ Šťŕĭńġ čćžđšđčćžšđ");
         System.out.println(input);
+        System.out.println("TEST2");
         return ok();
     }
 
