@@ -1,14 +1,13 @@
 package controllers;
 
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.SqlUpdate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import controllers.songbook.XLSHelper;
 import models.Song;
 import models.SongLyrics;
-import models.User;
+import models.UserAccount;
 import models.helpers.SongPrint;
 import models.json.JsonSongbookGenerator;
 import org.apache.commons.lang3.StringUtils;
@@ -155,7 +154,7 @@ public class Application extends Controller {
     public static Result init(){
         try {
             SongImporter.importFromDb();
-            User test = new User("test@test.com", "test", "test");
+            UserAccount test = new UserAccount("test@test.com", "test", "test");
             test.save();
             XLSHelper.importAndUpdateSongs();
         }
@@ -165,7 +164,9 @@ public class Application extends Controller {
             System.out.print(e.getStackTrace());
             System.out.print(e.getMessage());
         }
-        return ok();
+        return redirect(
+                routes.Application.index()
+        );
     }
 
     public static Result test(){
@@ -360,7 +361,7 @@ public class Application extends Controller {
         public String password;
 
         public String validate() {
-            if (User.authenticate(email, password) == null) {
+            if (UserAccount.authenticate(email, password) == null) {
                 return "Invalid user or password";
             }
             return null;
