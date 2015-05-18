@@ -30,7 +30,7 @@ public class DocumentWriter {
     private String title = "Songbook";
     private String subtitle = "2015";
 
-    public void writeSong(XWPFDocument document, String songTitle, String songLyrics, int songTotalNumber) {
+    public void writeSong(XWPFDocument document, String songTitle, String songLyrics, int songTotalNumber, boolean isLast) {
         Logger.trace("Exporting song: " + songTitle);
         XWPFParagraph tmpHeader = document.createParagraph();
         XWPFRun tmpRunHeader = tmpHeader.createRun();
@@ -57,8 +57,12 @@ public class DocumentWriter {
             tmpRun.addBreak(BreakType.TEXT_WRAPPING);
             tmpParagraph.setStyle("NoSpacing");
         }
-        if (songTotalNumber != -1) {
-            tmpRun.addBreak(BreakType.PAGE);
+        if (songTotalNumber != -1 ) {
+            if (!isLast){
+                System.out.println("adding break");
+                tmpRun.addBreak(BreakType.PAGE);
+            }
+            System.out.println("not adding break");
         }
     }
 
@@ -102,7 +106,10 @@ public class DocumentWriter {
                 //Logger.trace("Transposing by key delta: " + keyDelta);
                 songLyrics = chordTranspose(origKey,newKey, songLyrics);
             }
-            writeSong(document, s.getSong().songName, songLyrics, songTotalNumber);
+            boolean isLast = (i==(songPrintObjects.size()-1))? true : false;
+            System.out.println("isLast");
+            System.out.println(isLast);
+            writeSong(document, s.getSong().songName, songLyrics, songTotalNumber, isLast);
         }
 
         FileOutputStream fos = null;

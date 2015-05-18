@@ -172,6 +172,7 @@ public class Application extends Controller {
     public static Result test(){
         String input = StringUtils.stripAccents("Tĥïŝ ĩš â fůňķŷ Šťŕĭńġ čćžđšđčćžšđ");
         System.out.println(input);
+        PdfWriter.convert();
         System.out.println("TEST2");
         return ok();
     }
