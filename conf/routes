@@ -7,7 +7,7 @@ GET           /                                 controllers.Application.index()
 
 GET           /login                            controllers.Application.login()
 POST          /login                            controllers.Application.authenticate()
-GET     /logout                     controllers.Application.logout()
+GET           /logout                           controllers.Application.logout()
 # Songs RESTFUL API
 # not used currently - sending all (unfiltered) songs as json
 GET           /songs                            controllers.Application.getsongs()
@@ -50,7 +50,7 @@ GET           /table                            controllers.Application.table()
 GET           /songbook                         controllers.Application.songbook()
 GET           /songeditor/:id                   controllers.Application.songeditor(id: Long)
 GET           /newsongeditor                    controllers.Application.newsongeditor()
-GET           /songviewer/:id                   controllers.Application.songview(id: Long)
+GET           /songview/:id                     controllers.Application.songview(id: Long)
 
 GET           /assets/javascripts/routes        controllers.Application.javascriptRoutes()
 # Map static resources from the /public folder to the /assets URL path

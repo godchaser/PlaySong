@@ -15,4 +15,5 @@ tmp
 /.settings
 *.sql.lck
 /bin/
-/test/test_data/opensongbook/*
+*.lock
+/test/test_data/opensongbook
