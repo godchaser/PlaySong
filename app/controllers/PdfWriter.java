@@ -14,37 +14,25 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 
 public class PdfWriter {
 
-    public static void convert (){
-        // 1) Load DOCX into XWPFDocument
-        InputStream in;
+    public static void convert (String inputFile, String outputFile){
         try {
-            /*
-            in = new FileInputStream(new File("resources//260.docx"));
-            XWPFDocument document = new XWPFDocument(in);
-            XWPFDocument document = new XWPFDocument(is);
-            // 2) Prepare Pdf options
-            PdfOptions options = PdfOptions.create();
-            // 3) Convert XWPFDocument to Pdf
-            OutputStream out = new FileOutputStream(new File("resources//260.pdf"));
-            PdfConverter.getInstance().convert(document, out, options);
-            */
+            
             long start = System.currentTimeMillis();
+            System.out.println("Starting on: " + start);
 
             // 1) Load DOCX into XWPFDocument
-            InputStream is = new FileInputStream(new File(
-                    "resources/976.docx"));
+            InputStream is = new FileInputStream(new File(inputFile));
             XWPFDocument document = new XWPFDocument(is);
 
             // 2) Prepare Pdf options
             PdfOptions options = PdfOptions.create();
 
             // 3) Convert XWPFDocument to Pdf
-            OutputStream out = new FileOutputStream(new File(
-                    "resources/export.pdf"));
+            OutputStream out = new FileOutputStream(new File(outputFile));
             PdfConverter.getInstance().convert(document, out, options);
 
-            System.err.println("Generate resources/260.pdf with "
-                    + (System.currentTimeMillis() - start) + "ms");
+            System.err.println("Generate with " + outputFile+
+            		+ (System.currentTimeMillis() - start) + "ms");
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -56,6 +44,8 @@ public class PdfWriter {
     }
     public static void main(String[] args) {
         // TODO Auto-generated method stub
-        PdfWriter.convert();
+        PdfWriter.convert("resources/test.docx", "resources/test.pdf");
+        PdfWriter.convert("resources/test.docx", "resources/test2.pdf");
+        PdfWriter.convert("resources/test.docx", "resources/test3.pdf");
     }
 }

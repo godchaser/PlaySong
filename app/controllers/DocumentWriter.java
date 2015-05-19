@@ -4,19 +4,25 @@ package controllers;
  * Created by samuel on 4/6/15.
  */
 import java.io.*;
+import java.math.BigInteger;
 import java.util.List;
 
-import controllers.chords.ChordHelper;
 import controllers.chords.ChordLineTransposer;
 import controllers.chords.LineTypeChecker;
 import models.SongLyrics;
 import models.helpers.SongPrint;
+
 import org.apache.poi.xwpf.usermodel.Borders;
 import org.apache.poi.xwpf.usermodel.BreakType;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFStyles;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageSz;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STPageOrientation;
+
 import play.Logger;
 import play.Play;
 
@@ -61,8 +67,11 @@ public class DocumentWriter {
             if (!isLast){
                 System.out.println("adding break");
                 tmpRun.addBreak(BreakType.PAGE);
+                //tmpParagraph.setPageBreak(true);
+            } 
+            else {
+            	System.out.println("not adding break");
             }
-            System.out.println("not adding break");
         }
     }
 
@@ -76,13 +85,29 @@ public class DocumentWriter {
         // copy styles from template to new doc
         XWPFStyles newStyles = document.createStyles();
         newStyles.setStyles(template.getStyle());
+        
+        CTBody body = document.getDocument().getBody();
+        if (!body.isSetSectPr()) {
+             body.addNewSectPr();
+        }
+        CTSectPr section = body.getSectPr();
 
+        if(!section.isSetPgSz()) {
+            section.addNewPgSz();
+        }
+        CTPageSz pageSize = section.getPgSz();
+
+        pageSize.setOrient(STPageOrientation.LANDSCAPE);
+        // word page sizes: http://stackoverflow.com/questions/20188953/how-to-set-page-orientation-for-word-document
+        pageSize.setH(BigInteger.valueOf(11900));
+        pageSize.setW(BigInteger.valueOf(16900));
+        
         boolean singleSong = (songPrintObjects.size() == 1) ? true : false;
         int songTotalNumber = (singleSong) ? -1 : songPrintObjects.size();
         Logger.trace("Fonts - title:" + songTitleFont + " lyrics: " + songLyricsFont);
         Logger.trace("Sizes - title:" + songTitleSize + " lyrics: " + songLyricsFontSize);
         Logger.trace("Number of songs (-1 if single page): " + songTotalNumber);
-
+        boolean isLast = false;
         for (int i = 0; i < songPrintObjects.size(); i++) {
             SongPrint s = songPrintObjects.get(i);
 
@@ -94,21 +119,15 @@ public class DocumentWriter {
             }
             Logger.trace("Now exporting songId: " + songPrintObjects.get(i).getSong().id);
 
-            String origLyrics = SongLyrics.get(s.getLyricsID()).songLyrics;
             String origKey = SongLyrics.get(s.getLyricsID()).songKey;
             String newKey = songPrintObjects.get(i).getKey();
             Logger.trace("Orig key: " + origKey + " New key: " + newKey);
             String songLyrics = SongLyrics.get(s.getLyricsID()).songLyrics;
             if (!origKey.equals(newKey)){
-                //TODO: this has to be implemented - calculate ammount needed for transposing
-                //TODO: take in consideration when transposing if it is flat or sharp - ChordTransposer has methods
-                //int keyDelta = ChordHelper.getDeltaFromKeys(origKey,newKey);
-                //Logger.trace("Transposing by key delta: " + keyDelta);
                 songLyrics = chordTranspose(origKey,newKey, songLyrics);
             }
-            boolean isLast = (i==(songPrintObjects.size()-1))? true : false;
-            System.out.println("isLast");
-            System.out.println(isLast);
+            isLast = (i==(songPrintObjects.size()-1))? true : false;
+            System.out.println("isLast value: " + isLast);
             writeSong(document, s.getSong().songName, songLyrics, songTotalNumber, isLast);
         }
 
