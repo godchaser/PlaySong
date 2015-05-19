@@ -19,7 +19,7 @@ libraryDependencies ++= Seq( javaJdbc , javaEbean , cache , javaWs ,
   "org.webjars.bower" % "bootstrap-multiselect" % "0.9.12",
   "org.webjars.bower" % "datatables-responsive" % "1.0.6",
   "org.webjars.bower" % "datatables" % "1.10.7",
-  "org.webjars.bower" % "typeahead.js" % "0.11.1",
+  "org.webjars.bower" % "typeahead.js" % "0.10.5",
   "org.webjars.bower" % "startbootstrap-sb-admin-2" % "1.0.0"
   )
 
