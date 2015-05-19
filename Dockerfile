@@ -10,6 +10,8 @@
 FROM ubuntu:14.04
 RUN apt-get -y update
 RUN apt-get -y install unzip python-software-properties software-properties-common git
+RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
+RUN apt-get install ttf-mscorefonts-installer --quiet
 RUN add-apt-repository -y ppa:webupd8team/java
 RUN apt-get -y update
 RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections

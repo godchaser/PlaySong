@@ -26,5 +26,6 @@
     "frontpage": {
         "title": "Songbook",
         "subtitle": "2015"
-    }
+    },
+    "format" : "pdf"
 }

@@ -41,8 +41,8 @@
                         <option value="3">Arial</option>
                     </select>
                     <select id="document-format" class="btn-group selectpicker">
-                        <option value="1" data-content="<i class='fa fa-file-pdf-o fa-lg'></i> Pdf">Pdf</option>
-                        <option value="2" data-content="<i class='fa fa-file-word-o fa-lg'></i> Word">Word</option>
+                        <option value="1" data-content="<i class='fa fa-file-pdf-o fa-lg'></i> pdf">pdf</option>
+                        <option value="2" data-content="<i class='fa fa-file-word-o fa-lg'></i> word">word</option>
                     </select>
                    </div>
                 <button type="reset" id="reset-button" class="btn btn-warning"><i class="fa fa-repeat fa-fw"></i>Reset</button>
@@ -241,7 +241,9 @@
 
          songFont.lyricsFont = lyricsFont;
          songBookData.fonts = songFont;
-
+        var format = $('#document-format' + ' option:selected').text();
+        console.log("format:" + format);
+        songBookData.format = format;
         console.log(songBookData);
                     $.ajax("@routes.Application.generateSongbook()", {
                     type: 'POST',
@@ -249,7 +251,8 @@
                     success: function (data) {
                         var link = "@routes.Application.downloadAndDeleteFile()";
                         link = link.concat("?hash=" + data);
-                        //window.location=link;
+                        link = link.concat("&format=" + format)
+                        window.location=link;
                     },
                     contentType : 'application/json'
                 });

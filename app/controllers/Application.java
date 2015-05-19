@@ -9,7 +9,7 @@ import models.Song;
 import models.SongLyrics;
 import models.UserAccount;
 import models.helpers.SongPrint;
-import models.json.JsonSongbookGenerator;
+import models.json.JsonSongbook;
 import org.apache.commons.lang3.StringUtils;
 import play.Logger;
 import play.Routes;
@@ -274,15 +274,31 @@ public class Application extends Controller {
 
     public static Result downloadAndDeleteFile() {
         final Set<Map.Entry<String,String[]>> entries = request().queryString().entrySet();
-        String value = null;
+        String hashValue = null;
+        String formatValue = null;
+        File tmpFile = null;
         for (Map.Entry<String,String[]> entry : entries) {
             final String key = entry.getKey();
-            value = Arrays.toString(entry.getValue());
+            String value = Arrays.toString(entry.getValue());
             Logger.debug(key + " " + value);
+            if ("format".equals(key.toString())){
+                formatValue = value.substring(1,value.length()-1);
+            } else if ("hash".equals(key.toString())){
+                hashValue = value.substring(1,value.length()-1);
+            }
         }
-
-        File tmpFile = new File("resources/"+value.substring(1,value.length()-1)+".docx");
-
+        Logger.debug("Format: " + formatValue +" Hash: " + hashValue);
+        switch (formatValue) {
+            case "pdf":
+                tmpFile = new File("resources/"+hashValue+".pdf");
+                response().setHeader(CONTENT_TYPE, "application/pdf");
+                break;
+            case "word":
+                tmpFile = new File("resources/"+hashValue+".docx");
+                response().setHeader(CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+                break;
+        }
+        Logger.debug("File: " + tmpFile.getAbsolutePath());
         FileInputStream fin = null;
         try {
             fin = new FileInputStream(tmpFile);
@@ -292,10 +308,10 @@ public class Application extends Controller {
 
         response().setHeader("Content-disposition", "attachment;filename=" + tmpFile.getName());
         //response().setHeader(CONTENT_TYPE, "application/zip");
-        response().setHeader(CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+
         //response().setHeader(CONTENT_LENGTH, tmpFile.length() + "");
 
-        tmpFile.delete();
+        //tmpFile.delete();
 
         return ok(fin);
     }
@@ -306,9 +322,11 @@ public class Application extends Controller {
         DocumentWriter docWriter = null;
         Logger.trace("Songbook generator json string: " + jsonNode);
         ObjectMapper mapper = new ObjectMapper();
+        String format = "word";
 
         try {
-            JsonSongbookGenerator jsonSongbook = mapper.treeToValue(jsonNode, JsonSongbookGenerator.class);
+            JsonSongbook jsonSongbook = mapper.treeToValue(jsonNode, JsonSongbook.class);
+            format = jsonSongbook.getFormat();
             List<models.json.Song> songsJson = jsonSongbook.getSongs();
             for (models.json.Song songJson : songsJson){
                     songsForPrint.add(new SongPrint(Song.get(Long.parseLong(songJson.getSong().getId())), Long.parseLong(songJson.getSong().getLyricsID()), songJson.getSong().getKey()));
@@ -325,10 +343,15 @@ public class Application extends Controller {
         }
 
         Random rand = new Random();
-        int hash = rand.nextInt(1000);
+        int hash = rand.nextInt(100);
 
         try {
             docWriter.newSongbookWordDoc(Integer.toString(hash), songsForPrint);
+            if ("pdf".equals(format)){
+                String in = "resources/" + Integer.toString(hash) + ".docx";
+                String out = "resources/" + Integer.toString(hash) + ".pdf";
+                PdfWriter.convert(in,out);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

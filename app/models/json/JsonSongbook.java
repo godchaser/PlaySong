@@ -12,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -20,9 +22,10 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
     "songs",
     "fonts",
     "sizes",
-    "frontpage"
+    "frontpage",
+    "format"
 })
-public class JsonSongbookGenerator {
+public class JsonSongbook {
 
     @JsonProperty("songs")
     private List<Song> songs = new ArrayList<Song>();
@@ -32,6 +35,8 @@ public class JsonSongbookGenerator {
     private Sizes sizes;
     @JsonProperty("frontpage")
     private Frontpage frontpage;
+    @JsonProperty("format")
+    private String format;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -115,6 +120,26 @@ public class JsonSongbookGenerator {
         this.frontpage = frontpage;
     }
 
+    /**
+     * 
+     * @return
+     *     The format
+     */
+    @JsonProperty("format")
+    public String getFormat() {
+        return format;
+    }
+
+    /**
+     * 
+     * @param format
+     *     The format
+     */
+    @JsonProperty("format")
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -128,6 +153,23 @@ public class JsonSongbookGenerator {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(songs).append(fonts).append(sizes).append(frontpage).append(format).append(additionalProperties).toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if ((other instanceof JsonSongbook) == false) {
+            return false;
+        }
+        JsonSongbook rhs = ((JsonSongbook) other);
+        return new EqualsBuilder().append(songs, rhs.songs).append(fonts, rhs.fonts).append(sizes, rhs.sizes).append(frontpage, rhs.frontpage).append(format, rhs.format).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }
