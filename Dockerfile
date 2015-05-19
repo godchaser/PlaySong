@@ -8,10 +8,14 @@
 #sudo docker attach 3998ab616c0f
 #sudo docker stop 399
 FROM ubuntu:14.04
+RUN echo deb http://us.archive.ubuntu.com/ubuntu/ lucid multiverse >> /etc/apt/sources.list
+RUN echo deb-src http://us.archive.ubuntu.com/ubuntu/ lucid multiverse >> /etc/apt/sources.list
+RUN echo deb http://us.archive.ubuntu.com/ubuntu/ lucid-updates multiverse >> /etc/apt/sources.list
+RUN echo deb-src http://us.archive.ubuntu.com/ubuntu/ lucid-updates multiverse >> /etc/apt/sources.list
 RUN apt-get -y update
 RUN apt-get -y install unzip python-software-properties software-properties-common git
 RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
-RUN apt-get install ttf-mscorefonts-installer --quiet
+RUN apt-get -y install ttf-mscorefonts-installer --quiet
 RUN add-apt-repository -y ppa:webupd8team/java
 RUN apt-get -y update
 RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
