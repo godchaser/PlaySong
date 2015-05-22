@@ -1,6 +1,6 @@
-@(id: Long)
+@(id: Long, user: UserAccount)
 
-@admin("Song Editor"){
+@admin("Song Viewer", user){
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jquery.transposer.css")">
 
     <div id="song_viewer_wrapper">

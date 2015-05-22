@@ -44,45 +44,17 @@ public class Application extends Controller {
     public final static Locale HR_LOCALE = new Locale("HR");
     public final static Collator HR_COLLATOR = Collator.getInstance(HR_LOCALE);
 
-    public static Result login() {
-        return ok(
-                login.render(form(Login.class))
-        );
-    }
+    public static class Login {
 
-    public static Result authenticate() {
-        Form<Login> loginForm = form(Login.class).bindFromRequest();
-        if (loginForm.hasErrors()) {
-            return badRequest(login.render(loginForm));
-        } else {
-            session().clear();
-            session("email", loginForm.get().email);
-            return redirect(
-                    routes.Application.index()
-            );
+        public String email;
+        public String password;
+
+        public String validate() {
+            if (UserAccount.authenticate(email, password) == null) {
+                return "Invalid user or password";
+            }
+            return null;
         }
-    }
-
-    public static Result logout() {
-        session().clear();
-        flash("success", "You've been logged out");
-        return redirect(
-                routes.Application.admin()
-        );
-    }
-
-    public static Result javascriptRoutes() {
-        response().setContentType("text/javascript");
-        return ok(
-                Routes.javascriptRouter("jsRoutes",
-                        controllers.routes.javascript.Application.songview(),
-                        controllers.routes.javascript.Application.deletesong(),
-                        controllers.routes.javascript.Application.getsongjson(),
-                        controllers.routes.javascript.Application.songeditor(),
-                        controllers.routes.javascript.Application.songsuggestions(),
-                        controllers.routes.javascript.Application.getsonglyricsjson()
-                )
-        );
     }
 
     public static Result index() {
@@ -91,7 +63,82 @@ public class Application extends Controller {
 
     public static Result admin() {
         Html welcome = new Html("");
-        return ok(admin.render("", welcome));
+        UserAccount user = null;
+        if (request().cookies().get("PLAY_SESSION") != null){
+            Logger.debug("Found PLAY_SESSION cookie");
+            String cookieVal = request().cookies().get("PLAY_SESSION").value();
+            String userId = cookieVal.substring(cookieVal.indexOf("email=")+6).replace("%40", "@");
+            Logger.debug("PLAY_SESSION User ID: " + userId);
+            if(userId != null) {
+                user = UserAccount.find.byId(userId);
+            }
+        }
+        if (user == null){
+            Logger.debug("Using guest session");
+            user = new UserAccount("Guest", "","");
+        }
+        return ok(admin.render("", user, welcome));
+    }
+
+    public static Result table() {
+        UserAccount user = null;
+        if (request().cookies().get("PLAY_SESSION") != null){
+            Logger.debug("Found PLAY_SESSION cookie");
+            String cookieVal = request().cookies().get("PLAY_SESSION").value();
+            String userId = cookieVal.substring(cookieVal.indexOf("email=")+6).replace("%40", "@");
+            Logger.debug("PLAY_SESSION User ID: " + userId);
+            if(userId != null) {
+                user = UserAccount.find.byId(userId);
+            }
+        }
+        if (user == null){
+            Logger.debug("Using guest session");
+            user = new UserAccount("Guest", "","");
+        }
+        return ok(table.render(Song.getNumberOfSongsInDatabase(), user));
+    }
+
+    @Security.Authenticated(Secured.class)
+    public static Result songeditor(Long id) {
+        UserAccount user = null;
+        if (request().username() != null){
+            user = UserAccount.find.byId(request().username());
+        }
+        if (user==null) {
+            user =  new UserAccount("Guest","","");
+        }
+        return ok(songeditor.render(id, songForm, user));
+    }
+
+    @Security.Authenticated(Secured.class)
+    public static Result newsongeditor() {
+        Long id = -1L;
+        UserAccount user = null;
+        if (request().username() != null){
+            user = UserAccount.find.byId(request().username());
+        }
+        if (user==null) {
+            user =  new UserAccount("Guest","","");
+        }
+        return redirect(routes.Application.songeditor(id));
+    }
+
+    public static Result songview(Long id) {
+        UserAccount user = null;
+        if (request().cookies().get("PLAY_SESSION") != null){
+            Logger.debug("Found PLAY_SESSION cookie");
+            String cookieVal = request().cookies().get("PLAY_SESSION").value();
+            String userId = cookieVal.substring(cookieVal.indexOf("email=")+6).replace("%40", "@");
+            Logger.debug("PLAY_SESSION User ID: " + userId);
+            if(userId != null) {
+                user = UserAccount.find.byId(userId);
+            }
+        }
+        if (user == null){
+            Logger.debug("Using guest session");
+            user = new UserAccount("Guest", "","");
+        }
+        return ok(songviewer.render(id,user));
     }
 
     public static Result songbook() {
@@ -103,7 +150,21 @@ public class Application extends Controller {
             public int compare(Song s1, Song s2) {
                 return HR_COLLATOR.compare(s1.songName, s2.songName);
             }});
-        return ok(songbook.render(sortedSongs));
+        UserAccount user = null;
+        if (request().cookies().get("PLAY_SESSION") != null){
+            Logger.debug("Found PLAY_SESSION cookie");
+            String cookieVal = request().cookies().get("PLAY_SESSION").value();
+            String userId = cookieVal.substring(cookieVal.indexOf("email=")+6).replace("%40", "@");
+            Logger.debug("PLAY_SESSION User ID: " + userId);
+            if(userId != null) {
+                user = UserAccount.find.byId(userId);
+            }
+        }
+        if (user == null){
+            Logger.debug("Using guest session");
+            user = new UserAccount("Guest", "","");
+        }
+        return ok(songbook.render(sortedSongs,user));
     }
 
     public static Result getsongs() {
@@ -154,9 +215,9 @@ public class Application extends Controller {
     public static Result init(){
         try {
             SongImporter.importFromDb();
+            XLSHelper.importAndUpdateSongs();
             UserAccount test = new UserAccount("test@test.com", "test", "test");
             test.save();
-            XLSHelper.importAndUpdateSongs();
         }
         catch (Exception e){
             Logger.error("Exception occured during init" + e.getStackTrace());
@@ -173,6 +234,8 @@ public class Application extends Controller {
         String input = StringUtils.stripAccents("Tĥïŝ ĩš â fůňķŷ Šťŕĭńġ čćžđšđčćžšđ");
         System.out.println(input);
         System.out.println("TEST2");
+        UserAccount test = new UserAccount("test2@test.com", "test", "test");
+        test.save();
         return ok();
     }
 
@@ -329,7 +392,7 @@ public class Application extends Controller {
             format = jsonSongbook.getFormat();
             List<models.json.Song> songsJson = jsonSongbook.getSongs();
             for (models.json.Song songJson : songsJson){
-                    songsForPrint.add(new SongPrint(Song.get(Long.parseLong(songJson.getSong().getId())), Long.parseLong(songJson.getSong().getLyricsID()), songJson.getSong().getKey()));
+                songsForPrint.add(new SongPrint(Song.get(Long.parseLong(songJson.getSong().getId())), Long.parseLong(songJson.getSong().getLyricsID()), songJson.getSong().getKey()));
             }
             docWriter = new DocumentWriter();
             try {
@@ -359,35 +422,44 @@ public class Application extends Controller {
         return ok(Integer.toString(hash));
     }
 
-    public static Result table() {
-        return ok(table.render(Song.getNumberOfSongsInDatabase()));
+    public static Result login() {
+        return ok(
+                login.render(form(Login.class))
+        );
     }
 
-    @Security.Authenticated(Secured.class)
-    public static Result songeditor(Long id) {
-        return ok(songeditor.render(id, songForm));
-    }
-
-    @Security.Authenticated(Secured.class)
-    public static Result newsongeditor() {
-        Long id = -1L;
-        return redirect(routes.Application.songeditor(id));
-    }
-
-    public static Result songview(Long id) {
-        return ok(songviewer.render(id));
-    }
-
-    public static class Login {
-
-        public String email;
-        public String password;
-
-        public String validate() {
-            if (UserAccount.authenticate(email, password) == null) {
-                return "Invalid user or password";
-            }
-            return null;
+    public static Result authenticate() {
+        Form<Login> loginForm = form(Login.class).bindFromRequest();
+        if (loginForm.hasErrors()) {
+            return badRequest(login.render(loginForm));
+        } else {
+            session().clear();
+            session("email", loginForm.get().email);
+            return redirect(
+                    routes.Application.index()
+            );
         }
+    }
+
+    public static Result logout() {
+        session().clear();
+        flash("success", "You've been logged out");
+        return redirect(
+                routes.Application.index()
+        );
+    }
+
+    public static Result javascriptRoutes() {
+        response().setContentType("text/javascript");
+        return ok(
+                Routes.javascriptRouter("jsRoutes",
+                        controllers.routes.javascript.Application.songview(),
+                        controllers.routes.javascript.Application.deletesong(),
+                        controllers.routes.javascript.Application.getsongjson(),
+                        controllers.routes.javascript.Application.songeditor(),
+                        controllers.routes.javascript.Application.songsuggestions(),
+                        controllers.routes.javascript.Application.getsonglyricsjson()
+                )
+        );
     }
 }

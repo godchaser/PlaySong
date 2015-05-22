@@ -1,6 +1,6 @@
-@(numberOfSongsInDatabase: Int)
+@(numberOfSongsInDatabase: Int, user: UserAccount)
 
-@admin("") {
+@admin("Table", user) {
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap/css/bootstrap.min.css")">
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/datatables-responsive/css/dataTables.responsive.css")">
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jquery.transposer.css")">
@@ -34,9 +34,9 @@
 
         <div class="col-lg-6" id="song_section_div">
             <div class="row">
-            <button id="editsongbutton" class="songbuttons btn-warning" href="#"><i class="glyphicon glyphicon-edit"></i> Edit song</button>
-            <button id="addsongbutton" class="songbuttons btn-info"><i class="glyphicon glyphicon-plus"></i> Add new song</button>
-            <button id="deletesongbutton" class="songbuttons btn-danger"><i class="glyphicon glyphicon-trash"></i> Delete song</button>
+                <button id="editsongbutton" class="songbuttons btn-warning" href="#"><i class="glyphicon glyphicon-edit"></i> Edit song</button>
+                <button id="addsongbutton" class="songbuttons btn-info"><i class="glyphicon glyphicon-plus"></i> Add new song</button>
+                <button id="deletesongbutton" class="songbuttons btn-danger"><i class="glyphicon glyphicon-trash"></i> Delete song</button>
 
                 <div class="alert alert-block alert-error fade in" id="cert-error" style="display:none;">
                     <button type="button" class="close" data-dismiss="alert">�</button>
@@ -45,7 +45,7 @@
 
             </div>
             <div class="row">
-            <pre id="songLyrics"></pre>
+                <pre id="songLyrics"></pre>
             </div>
         </div>
 
