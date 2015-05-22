@@ -113,13 +113,6 @@ public class Application extends Controller {
     @Security.Authenticated(Secured.class)
     public static Result newsongeditor() {
         Long id = -1L;
-        UserAccount user = null;
-        if (request().username() != null){
-            user = UserAccount.find.byId(request().username());
-        }
-        if (user==null) {
-            user =  new UserAccount("Guest","","");
-        }
         return redirect(routes.Application.songeditor(id));
     }
 
