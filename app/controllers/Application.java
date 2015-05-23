@@ -226,7 +226,7 @@ public class Application extends Controller {
     public static Result test(){
         String input = StringUtils.stripAccents("Tĥïŝ ĩš â fůňķŷ Šťŕĭńġ čćžđšđčćžšđ");
         System.out.println(input);
-        System.out.println("TEST2");
+        System.out.println("TEST");
         UserAccount test = new UserAccount("test2@test.com", "test", "test");
         test.save();
         return ok();
