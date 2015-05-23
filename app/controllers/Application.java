@@ -406,7 +406,7 @@ public class Application extends Controller {
             if ("pdf".equals(format)){
                 String in = "resources/" + Integer.toString(hash) + ".docx";
                 String out = "resources/" + Integer.toString(hash) + ".pdf";
-                PdfWriter.convert(in,out);
+                PdfConverter.convert(in, out);
             }
         } catch (Exception e) {
             e.printStackTrace();
