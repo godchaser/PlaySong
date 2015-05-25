@@ -1,6 +1,6 @@
 @(songs: List[Song],  user: UserAccount)
 
-@admin("Songbook", user) {
+@admintheme("Song Book Manager", user) {
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap/dist/css/bootstrap.min.css")">
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap-multiselect/dist/css/bootstrap-multiselect.css")">
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/datatables-responsive/css/dataTables.responsive.css")">

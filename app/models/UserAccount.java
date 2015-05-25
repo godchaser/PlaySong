@@ -1,14 +1,19 @@
 package models;
 
 import javax.persistence.*;
+
+import play.data.validation.Constraints.Required;
 import play.db.ebean.*;
 
 @Entity
 public class UserAccount extends Model {
 
     @Id
+    @Required
     public String email;
+    @Required
     public String name;
+    @Required
     public String password;
 
     public UserAccount(String email, String name, String password) {
