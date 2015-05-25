@@ -184,7 +184,8 @@ public class DocumentWriter {
     }
 
     public void setSongLyricsFont(String songLyricsFont) {
-        this.songLyricsFont = songLyricsFont;
+    	this.songLyricsFont = "Consolas";
+        //this.songLyricsFont = songLyricsFont;
     }
 
     public int getSongLyricsFontSize() {

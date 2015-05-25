@@ -33,6 +33,7 @@ GET      /empty                       controllers.Application.emptyDb()
 
 #used for update through xls file
 GET      /update                      controllers.Application.updateFromXLS()
+GET      /getxls                      controllers.Application.getXLS()
 
 #simple echo test
 GET      /test                        controllers.Application.test()

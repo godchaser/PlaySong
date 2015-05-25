@@ -113,7 +113,7 @@ public class Application extends Controller {
 			String message = "File successfully uploaded: "
 					+ file.getAbsolutePath() + " " + contentType;
 			Logger.trace(message);
-			File target = new File("resources/upload/table.xls");
+			File target = new File("resources/upload/songs.xlsx");
 
 			try {
 				Files.copy(file.toPath(), target.toPath(),
@@ -122,6 +122,8 @@ public class Application extends Controller {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			Logger.trace("Updating songs");
+			XLSHelper.importAndUpdateSongs3();
 
 			return redirect(routes.Application.admin());
 		} else {
@@ -207,6 +209,27 @@ public class Application extends Controller {
 		Logger.trace(message);
 		updateUser.update();
 		return ok();
+	}
+
+	@Security.Authenticated(Secured.class)
+	public static Result getXLS() {
+		XLSHelper.dumpSongs((Song.find.all()));
+		String message = "Getting xls songs";
+		Logger.trace(message);
+		File tmpFile = new File("resources/xlsx/songs.xlsx");
+		response().setHeader(CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+	
+		Logger.debug("File: " + tmpFile.getAbsolutePath());
+		FileInputStream fin = null;
+		try {
+			fin = new FileInputStream(tmpFile);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		response().setHeader("Content-disposition",
+				"attachment;filename=" + tmpFile.getName());
+		return ok(fin);
 	}
 
 	public static Result table() {
