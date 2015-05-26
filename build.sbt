@@ -14,14 +14,15 @@ libraryDependencies ++= Seq( javaJdbc , javaEbean , cache , javaWs ,
   "org.apache.commons" % "commons-lang3" % "3.4",
   "fr.opensagres.xdocreport" % "org.apache.poi.xwpf.converter.pdf" % "1.0.5",
   "com.itextpdf" % "itextpdf" % "5.5.6",
-  "org.webjars" % "jquery" % "2.1.4",
-  "org.webjars" % "bootstrap-select" % "1.6.3",
-  "org.webjars" % "bootstrap" % "3.3.4",
+  "org.webjars.bower" % "jquery" % "2.1.3",
+  "org.webjars.bower" % "bootstrap-select" % "1.6.4",
+  "org.webjars.bower" % "bootstrap" % "3.3.4",
   "org.webjars.bower" % "bootstrap-multiselect" % "0.9.12",
   "org.webjars.bower" % "datatables-responsive" % "1.0.6",
   "org.webjars.bower" % "datatables" % "1.10.7",
   "org.webjars.bower" % "typeahead.js" % "0.10.5",
-  "org.webjars.bower" % "startbootstrap-sb-admin-2" % "1.0.0"
+  "org.webjars.bower" % "startbootstrap-sb-admin-2" % "1.0.0",
+  "org.webjars" % "handsontable" % "0.15.0-beta2"
   )
 
 unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )  
