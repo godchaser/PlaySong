@@ -9,7 +9,7 @@ import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-/**q
+/**
  * Created by samuel on 5/23/15.
  */
 public class PdfGenerator extends PdfPageEventHelper
