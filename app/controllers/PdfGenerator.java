@@ -16,7 +16,7 @@ public class PdfGenerator extends PdfPageEventHelper
 {
     private final Document document;
     private final PdfWriter writer;
-    private final BaseFont baseFont       = BaseFont.createFont();
+    private final BaseFont baseFont   = BaseFont.createFont();
     private final Font chapterFont    = FontFactory.getFont(FontFactory.HELVETICA, 24, Font.NORMAL);
     private final String fontPath = "RemachineScript_Personal_Use.ttf";
     private static Font embeddedFont = null;
