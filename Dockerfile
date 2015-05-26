@@ -6,8 +6,10 @@
 #sudo docker run -p 80:9000 -i -t --name playsong playsong
 #sudo docker ps
 #detach shortcut: ctrl+p+q
-#sudo docker attach 3998ab616c0f
-#sudo docker stop 399
+#sudo docker attach playsong
+#sudo docker stop playsong
+#sudo docker start playsong
+# list all containers :#sudo docker ps -a
 FROM ubuntu:14.04
 #RUN echo "deb http://gce_debian_mirror.storage.googleapis.com wheezy contrib non-free" >> /etc/apt/sources.list \
 #  && echo "deb http://gce_debian_mirror.storage.googleapis.com wheezy-updates contrib non-free" >> /etc/apt/sources.list \
