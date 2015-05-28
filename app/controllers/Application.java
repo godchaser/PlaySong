@@ -217,8 +217,10 @@ public class Application extends Controller {
 		String message = "Getting xls songs";
 		Logger.trace(message);
 		File tmpFile = new File("resources/xlsx/songs.xlsx");
-		response().setHeader(CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-	
+		response()
+				.setHeader(CONTENT_TYPE,
+						"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
 		Logger.debug("File: " + tmpFile.getAbsolutePath());
 		FileInputStream fin = null;
 		try {
@@ -321,6 +323,23 @@ public class Application extends Controller {
 
 	public static Result getsongs() {
 		return ok(Json.toJson(Song.all()));
+	}
+
+	public static Result getsongdata() {
+		List<Song> songs = Song.all();
+		ArrayList<ObjectNode> songsJson = new ArrayList<>();
+
+		for (Song s : songs) {
+			ObjectNode songJson = SongToJson.convert(s);
+			songsJson.add(songJson);
+		}
+		return ok(Json.toJson(songsJson));
+	}
+	@Security.Authenticated(Secured.class)
+	public static Result updateFromOnlineSpreadsheet() {
+		JsonNode data = request().body().asJson();
+		Logger.debug("Online spreadsheet data: " + data.asText());
+		return ok();
 	}
 
 	public static Result getsongjson(Long id) {
@@ -465,8 +484,8 @@ public class Application extends Controller {
 		 */
 		String sortBy = "songName";
 		List<Song> songs = Song.find.where(
-				Expr.or(Expr.ilike("songName", "%" + filter + "%"),
-						Expr.or(Expr.ilike("songAuthor", "%" + filter + "%"),
+				Expr.or(Expr.ilike("songName", "%" + filter + "%"), Expr.or(
+						Expr.ilike("songAuthor", "%" + filter + "%"),
 						Expr.icontains("songLyrics.songLyrics", "%" + filter
 								+ "%")))).findList();
 

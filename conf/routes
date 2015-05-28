@@ -10,7 +10,7 @@ POST     /login                       controllers.Application.authenticate()
 GET      /logout                      controllers.Application.logout()
 # Songs RESTFUL API
 # not used currently - sending all (unfiltered) songs as json
-GET      /songs                       controllers.Application.getsongs()
+GET      /songs                       controllers.Application.getsongdata()
 
 # POST add song - from form - not JSON
 POST     /songs                       controllers.Application.newsong()
@@ -34,6 +34,8 @@ GET      /empty                       controllers.Application.emptyDb()
 #used for update through xls file
 GET      /update                      controllers.Application.updateFromXLS()
 GET      /getxls                      controllers.Application.getXLS()
+
+POST     /updatefromspreadsheet       controllers.Application.updateFromOnlineSpreadsheet()
 
 #simple echo test
 GET      /test                        controllers.Application.test()

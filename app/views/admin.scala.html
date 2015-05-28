@@ -14,7 +14,7 @@
 					@userAccounts.map { userAccount =>
 					<li>
 						@userAccount.name, @userAccount.email
-						<button class="deletebutton" type="button" id=@userAccount.email>
+						<button class="deletebutton" type="button" id=@userAccount.email class="btn btn-default">
 							<i class="fa fa-times"></i>
 						</button>
 					</li>
@@ -24,16 +24,16 @@
 			<div class="col-md-4">
 				<h3>Add new users</h3>
 				@helper.form(action = routes.Application.addUser()) {
-				@helper.inputText(userAccountForm("name"), args = '_label -> "User name: ")
-				@helper.inputText(userAccountForm("email"), args = '_label -> "E-mail: ")
-				@helper.inputText(userAccountForm("password"), args = '_label -> "Password: ")
+				@helper.inputText(userAccountForm("name"), args = '_label -> "User name: ", 'class -> "form-control")
+				@helper.inputText(userAccountForm("email"), args = '_label -> "E-mail: ", 'class -> "form-control")
+				@helper.inputText(userAccountForm("password"), args = '_label -> "Password: ", 'class -> "form-control")
 
 				@if(userAccountForm.hasGlobalErrors) {
 				<p class="error">
 					@userAccountForm.globalError.message
 				</p>
 				}
-				<input type="submit" value="Save">
+				<input type="submit" value="Save" class="btn btn-default">
 				}
 			</div>
 		</div>
@@ -42,16 +42,19 @@
 			@helper.form(action = routes.Application.upload, 'enctype -> "multipart/form-data") {
 			<input type="file" name="uploadedfile">
 			<p>
-				<input type="submit">
+				<input type="submit" class="btn btn-default">
 			</p>
 			}
 		</div>
 		<div>
-			<button type="button" id="downloadxlsx">
+			<button type="button" id="downloadxlsx" class="btn btn-default">
 				Download xlsx dump
 			</button>
 		</div>
 		<div id="songtable"></div>
+		<button type="button" id="updatefromspreadsheet" class="btn btn-default">
+			Update songs from table
+		</button>
 	</div>
 </div>
 
@@ -63,7 +66,9 @@
 	$(document).ready(function() {
 		$('#dynamiccontent').html($('#admin_wrapper').html());
 		$('#admin_wrapper').remove();
-
+		
+		var container = document.getElementById('songtable');
+		var handsontable;
 		function deleteUser(email) {
 			console.log("Delete user : " + email);
 			jsRoutes.controllers.Application.deleteUser(email).ajax({
@@ -87,22 +92,58 @@
 			var link = "@routes.Application.getXLS()";
 			window.location = link;
 		});
-
-		var container = document.getElementById('songtable');
-
+		$('#updatefromspreadsheet').click(function(event) {
+			console.log("j1");
+			console.log("j2");
+			var OTable = $(".handsontable").Handsontable();
+			console.log(OTable);
+			var j = OTable.getData();
+			console.log("j3");
+			console.log(j);
+			$.ajax({
+		        url: "@routes.Application.updateFromOnlineSpreadsheet()",
+		        data: {"data": j}, //returns all cells' data
+		        type: 'POST',
+		        success: function (data) {
+		            //alert(data);
+		            console.log("ajax success");
+		        },
+		        error: function () {
+		            console.log("ajax fail");
+		        }
+		    });
+		});
+		
 		var data = function() {
 			return Handsontable.helper.createSpreadsheetData(250, 5);
 		};
 
-		var hot = new Handsontable(container, {
-			data : data(),
-			height : 396,
-			colHeaders : true,
-			rowHeaders : true,
-			stretchH : 'all',
-			columnSorting : true,
-			contextMenu : true
-		});
+		var getSongsData = function() {
+			$.get("@routes.Application.getsongdata()", function(data) {
+				handsontable = new Handsontable(container, {
+					data : data,
+					colHeaders : ['songName', 'songOriginalTitle', 'songAuthor', 'songLink', 'songImporter', 'songId', 'songLyricsIDs'],
+					columns : [{
+						data : 'songName'
+					}, {
+						data : 'songOriginalTitle'
+					}, {
+						data : 'songAuthor'
+					}, {
+						data : 'songLink'
+					}, {
+						data : 'songImporter'
+					}, {
+						data : 'songId'
+					}, {
+						data : 'songLyricsIDs'
+					}],
+					minSpareRows : 1
+				});
+			});
+		};
+
+		getSongsData();
 
 	}); 
 </script>
