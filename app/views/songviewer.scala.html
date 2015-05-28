@@ -1,73 +1,78 @@
 @(id: Long, user: UserAccount)
 
 @admintheme("Song Viewer", user){
-    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jquery.transposer.css")">
+<link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jquery.transposer.css")">
 
-    <div id="song_viewer_wrapper">
-        <div class="col-lg-12" id="song_viewer">
-            <h3 id="songName"></h3>
-            <p id="songOriginalTitle"></p>
-            <!--<p id="songAuthor"></p>-->
-            <!--<p id="songLink"></p>-->
-            <pre id="songLyrics_0_songLyrics" class="songLyrics"></pre>
-            <pre id="songLyrics_1_songLyrics" class="songLyrics" style="display:none;"></pre>
-            <pre id="songLyrics_2_songLyrics" class="songLyrics" style="display:none;"></pre>
-            <pre id="songLyrics_3_songLyrics" class="songLyrics" style="display:none;"></pre>
-        </div>
-    </div>
+<div id="song_viewer_wrapper">
+	<div class="col-lg-12" id="song_viewer">
+		<div class="panel-heading">
+			<h3 id="songName"></h3>
+			<div id="songOriginalTitle"></div>
+		</div>
+		<!--<p id="songAuthor"></p>-->
+		<!--<p id="songLink"></p>-->
+		<div class="panel-body">
+			<pre id="songLyrics_0_songLyrics" class="songLyrics"></pre>
+			<pre id="songLyrics_1_songLyrics" class="songLyrics" style="display:none;"></pre>
+			<pre id="songLyrics_2_songLyrics" class="songLyrics" style="display:none;"></pre>
+			<pre id="songLyrics_3_songLyrics" class="songLyrics" style="display:none;"></pre>
+		</div>
+	</div>
+</div>
 
-    <script src="@routes.Assets.at("javascripts/jquery-2.1.3.min.js")" type="text/javascript"></script>
-    <script src="@routes.Assets.at("javascripts/jquery.transposer.js")" type="text/javascript"></script>
+<script src="@routes.Assets.at("javascripts/jquery-2.1.3.min.js")" type="text/javascript"></script>
+<script src="@routes.Assets.at("javascripts/jquery.transposer.js")" type="text/javascript"></script>
 
-    <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+<script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
 
-    <script type="text/javascript">
-     function isUrl(s) {
-        var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
-        return regexp.test(s);
-    }
-    var id = @id;
-    function songView(id) {
-        jsRoutes.controllers.Application.getsongjson ( id ).ajax ( {
-        datatype : 'json',
-        success : function ( data ) {
-            var songLyricsIDs = [];
-            $ ( '#songName' ).html ( data.songName + ' <i class="glyphicon glyphicon-music">') ;
+<script type="text/javascript">
+	function isUrl(s) {
+		var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
+		return regexp.test(s);
+	}
 
-            //$ ( '#songAuthor' ).html ( data.songAuthor ) ;
-            if (data.songLink && isUrl(data.songLink)){
-                var sYTLink = '<a href="'+data.songLink+'"><i class="glyphicon glyphicon-play-circle"></i></a>';
-                //$ ( '#songLink' ).html ( sYTLink ) ;
-                $ ( '#songOriginalTitle' ).html ( data.songOriginalTitle + ", " + data.songAuthor + " " + sYTLink) ;
-            } else {
-                $ ( '#songOriginalTitle' ).html ( data.songOriginalTitle + ", " + data.songAuthor) ;
-            }
-            songLyricsIDs = data.songLyricsIDs ;
+	var id =   @id;
+	function songView(id) {
+	jsRoutes.controllers.Application.getsongjson ( id ).ajax ( {
+	datatype : 'json',
+	success : function ( data ) {
+	var songLyricsIDs = [];
+	$ ( '#songName' ).html ( data.songName + ' <i class="glyphicon glyphicon-music">') ;
 
-            $.each ( songLyricsIDs, function ( i, s ) {
-                jsRoutes.controllers.Application.getsonglyricsjson (s).ajax ( {
-                success : function (data) {
-                    var songLyricsTag = '#songLyrics_' + i + '_songLyrics' ;
-                    //console.log(songLyricsTag);
-                    $ ( songLyricsTag ).html ( data.songLyrics ) ;
-                    $ ( songLyricsTag ).attr ( "style", "display:block;" ) ;
-                    $ ( function ( ) {
-                        $ ( songLyricsTag ).transpose ( { key : 'C' } );
-                    });
-                },
-                error : function ( ) {
-                    console.log ( "Error: ajax failure" )
-                }
-                } )
-            } ) ;
-        },
-        error : function ( ) {
-        console.log ( "Error: ajax failure" ) ;
-        }
-        })
-        $('#dynamiccontent').html($('#song_viewer_wrapper' ).html());
-        $('#song_viewer_wrapper' ).remove();
-    }
-    window.onload = songView(id);
-    </script>
+	//$ ( '#songAuthor' ).html ( data.songAuthor ) ;
+	if (data.songLink && isUrl(data.songLink)){
+	var sYTLink = '<a href="'+data.songLink+'"><i class="glyphicon glyphicon-play-circle"></i></a>';
+	//$ ( '#songLink' ).html ( sYTLink ) ;
+	$ ( '#songOriginalTitle' ).html ( data.songOriginalTitle + ", " + data.songAuthor + " " + sYTLink) ;
+	} else {
+	$ ( '#songOriginalTitle' ).html ( data.songOriginalTitle + ", " + data.songAuthor) ;
+	}
+	songLyricsIDs = data.songLyricsIDs ;
+
+	$.each ( songLyricsIDs, function ( i, s ) {
+	jsRoutes.controllers.Application.getsonglyricsjson (s).ajax ( {
+	success : function (data) {
+	var songLyricsTag = '#songLyrics_' + i + '_songLyrics' ;
+	//console.log(songLyricsTag);
+	$ ( songLyricsTag ).html ( data.songLyrics ) ;
+	$ ( songLyricsTag ).attr ( "style", "display:block;" ) ;
+	$ ( function ( ) {
+	$ ( songLyricsTag ).transpose ( { key : 'C' } );
+	});
+	},
+	error : function ( ) {
+	console.log ( "Error: ajax failure" )
+	}
+	} )
+	} ) ;
+	},
+	error : function ( ) {
+	console.log ( "Error: ajax failure" ) ;
+	}
+	})
+	$('#dynamiccontent').html($('#song_viewer_wrapper' ).html());
+	$('#song_viewer_wrapper' ).remove();
+	}
+	window.onload = songView(id);
+</script>
 }

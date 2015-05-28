@@ -427,7 +427,7 @@ public class Application extends Controller {
 		Page<Song> songPage = Song.find
 				.where(Expr.or(Expr.ilike("songName", "%" + filter + "%"), Expr
 						.or(Expr.ilike("songAuthor", "%" + filter + "%"),
-								Expr.contains("songLyrics.songLyrics", "%"
+								Expr.icontains("songLyrics.songLyrics", "%"
 										+ filter + "%"))))
 				.orderBy(sortBy + " " + order).findPagingList(pageSize)
 				.setFetchAhead(false).getPage(page);
@@ -465,9 +465,9 @@ public class Application extends Controller {
 		 */
 		String sortBy = "songName";
 		List<Song> songs = Song.find.where(
-				Expr.or(Expr.ilike("songName", "%" + filter + "%"), Expr.or(
-						Expr.ilike("songAuthor", "%" + filter + "%"),
-						Expr.contains("songLyrics.songLyrics", "%" + filter
+				Expr.or(Expr.ilike("songName", "%" + filter + "%"),
+						Expr.or(Expr.ilike("songAuthor", "%" + filter + "%"),
+						Expr.icontains("songLyrics.songLyrics", "%" + filter
 								+ "%")))).findList();
 
 		List<SimpleEntry> songSuggestionsList = new ArrayList<>();
