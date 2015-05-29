@@ -5,6 +5,7 @@
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/datatables-responsive/css/dataTables.responsive.css")">
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jquery.transposer.css")">
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/dataTables.bootstrap.css")">
+<link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/startbootstrap-sb-admin-2/font-awesome-4.1.0/css/font-awesome.css")">
 
 <div id="song_table_wrapper" class="panel panel-default">
 	<h2>Song Database</h2>
@@ -14,51 +15,54 @@
 		</div>
 		<div class="col-lg-6"  id="song_table_div">
 			<div class="panel-body">
-				<table id="song_table" class="table table-striped table-hover dt-responsive" width="100%" cellspacing="0">
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th>Title</th>
-							<th>Author</th>
-							<th class="datatable-nosort"><i class="fa fa-youtube-square"></i> Link</th>
-							<th class="datatable-nosort">Id</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>Row 1 Data 1</td>
-							<td>Row 1 Data 2</td>
-							<td>Row 1 Data 3</td>
-							<td>Row 1 Data 4</td>
-							<td>Row 1 Data 5</td>
-						</tr>
-					</tbody>
-				</table>
+				<div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+					<table id="song_table" class="table table-striped table-bordered table-hover dt-responsive" width="100%" cellspacing="0">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th class="datatable-nosort">Link</th>
+								<th>Title</th>
+								<th>Author</th>
+								<th class="datatable-nosort">Id</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Row 1 Data 1</td>
+								<td>Row 1 Data 2</td>
+								<td>Row 1 Data 3</td>
+								<td>Row 1 Data 4</td>
+								<td>Row 1 Data 5</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 	</div>
 
-	<div class="col-lg-6 well" id="song_section_div">
-		<div class="row">
-			<button id="editsongbutton" class="songbuttons btn-warning" href="#">
-				<i class="glyphicon glyphicon-edit"></i> Edit song
-			</button>
-			<button id="addsongbutton" class="songbuttons btn-info">
-				<i class="glyphicon glyphicon-plus"></i> Add new song
-			</button>
-			<button id="deletesongbutton" class="songbuttons btn-danger">
-				<i class="glyphicon glyphicon-trash"></i> Delete song
-			</button>
-
-			<div class="alert alert-block alert-error fade in" id="cert-error" style="display:none;">
-				<button type="button" class="close" data-dismiss="alert">
+	<div class="panel panel-default col-lg-6" id="song_section_div" hidden>
+		<div class="panel-body">
+			<div class="row">
+				<button id="editsongbutton" class="songbuttons btn btn-primary btn-warning" href="#">
+					<i class="glyphicon glyphicon-edit"></i> Edit song
 				</button>
-				<h4 class="alert-heading">Delete success</h4>
+				<button id="addsongbutton" class="songbuttons btn btn-primary btn-info">
+					<i class="glyphicon glyphicon-plus"></i> Add new song
+				</button>
+				<button id="deletesongbutton" class="songbuttons btn btn-primary btn-danger">
+					<i class="glyphicon glyphicon-trash"></i> Delete song
+				</button>
+
+				<div class="alert alert-block alert-error fade in" id="cert-error" style="display:none;">
+					<button type="button" class="close" data-dismiss="alert"></button>
+					<h4 class="alert-heading">Delete success</h4>
+				</div>
 			</div>
 
-		</div>
-		<div class="row">
-			<pre id="songLyrics"></pre>
+			<div class="row">
+				<pre id="songLyrics"></pre>
+			</div>
 		</div>
 	</div>
 
@@ -100,11 +104,11 @@
 			"columns" : [{
 				"data" : "songName"
 			}, {
+				"data" : "songLink"
+			}, {
 				"data" : "songOriginalTitle"
 			}, {
 				"data" : "songAuthor"
-			}, {
-				"data" : "songLink"
 			}, {
 				"data" : "songId"
 			}],
@@ -133,10 +137,10 @@
 				sLinks = sLinks.concat('</div>');
 				$('td:eq(0)', nRow).html(sLinks);
 				if (aData.songLink && isUrl(aData.songLink)) {
-					var sYTLink = '<a class="center" href="' + aData.songLink + '"><i class="fa fa-youtube-play"></i></a>';
-					$('td:eq(3)', nRow).html(sYTLink);
+					var sYTLink = '<a href="' + aData.songLink + '"><i class="fa fa-play-circle fa-lg"></i></a>';
+					$('td:eq(1)', nRow).html(sYTLink);
 				} else {
-					$('td:eq(3)', nRow).html("");
+					$('td:eq(1)', nRow).html("");
 				}
 
 				$(nRow).attr('id', aData.songId);
@@ -146,6 +150,11 @@
 
 		//for static row selection events - marking selected/deselected rows
 		$('#song_table tbody').on('click', 'tr', function(event) {
+			var hidden = $("#song_section_div").attr("hidden");
+			if (hidden) {
+				$("#song_section_div").toggle();
+				$("#song_section_div").removeAttr("hidden");
+			}
 			// ignore responsive expand button trigger
 			if (!$(event.target).hasClass("sorting_1")) {
 				// this is lyrics link event selection

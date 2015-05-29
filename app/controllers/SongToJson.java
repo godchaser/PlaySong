@@ -25,9 +25,9 @@ public class SongToJson {
     }
 
     songObject.put("songName", s.songName);
-    songObject.put("songOriginalTitle", s.songOriginalTitle);
-    songObject.put("songAuthor", s.songAuthor);
     songObject.put("songLink", s.songLink);
+    songObject.put("songOriginalTitle", s.songOriginalTitle);
+    songObject.put("songAuthor", s.songAuthor);  
     songObject.put("songId", s.id);
     songObject.put("songImporter", s.songImporter);
     songObject.putArray("songLyricsIDs").addAll(songLyricsIDsArray);
