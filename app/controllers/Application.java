@@ -335,6 +335,7 @@ public class Application extends Controller {
 		}
 		return ok(Json.toJson(songsJson));
 	}
+
 	@Security.Authenticated(Secured.class)
 	public static Result updateFromOnlineSpreadsheet() {
 		JsonNode data = request().body().asJson();
@@ -395,12 +396,8 @@ public class Application extends Controller {
 	}
 
 	public static Result test() {
-		String input = StringUtils
-				.stripAccents("Tĥïŝ ĩš â fůňķŷ Šťŕĭńġ čćžđšđčćžšđ");
-		System.out.println(input);
 		System.out.println("TEST!");
-		UserAccount test = new UserAccount("test2@test.com", "test", "test");
-		test.save();
+		// newSongbookPdf
 		return ok();
 	}
 
@@ -516,7 +513,7 @@ public class Application extends Controller {
 		Logger.debug("Format: " + formatValue + " Hash: " + hashValue);
 		switch (formatValue) {
 		case "pdf":
-			tmpFile = new File("resources/" + hashValue + ".pdf");
+			tmpFile = new File("resources/pdf/" + hashValue + ".pdf");
 			response().setHeader(CONTENT_TYPE, "application/pdf");
 			break;
 		case "word":
@@ -564,14 +561,16 @@ public class Application extends Controller {
 						.parseLong(songJson.getSong().getLyricsID()), songJson
 						.getSong().getKey()));
 			}
-			docWriter = new DocumentWriter();
-			try {
-				docWriter.setSongLyricsFont(jsonSongbook.getFonts()
-						.getLyricsFont());
-				docWriter.setSongTitleFont(jsonSongbook.getFonts()
-						.getTitleFont());
-			} catch (NullPointerException e) {
-			} finally {
+			if ("word".equals(format)) {
+				docWriter = new DocumentWriter();
+				try {
+					docWriter.setSongLyricsFont(jsonSongbook.getFonts()
+							.getLyricsFont());
+					docWriter.setSongTitleFont(jsonSongbook.getFonts()
+							.getTitleFont());
+				} catch (NullPointerException e) {
+				} finally {
+				}
 			}
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
@@ -581,11 +580,21 @@ public class Application extends Controller {
 		int hash = rand.nextInt(100);
 
 		try {
-			docWriter.newSongbookWordDoc(Integer.toString(hash), songsForPrint);
-			if ("pdf".equals(format)) {
-				String in = "resources/" + Integer.toString(hash) + ".docx";
-				String out = "resources/" + Integer.toString(hash) + ".pdf";
-				PdfConverter.convert(in, out);
+			if ("word".equals(format)) {
+				docWriter.newSongbookWordDoc(Integer.toString(hash),
+						songsForPrint);
+			} else if ("pdf".equals(format)) {
+				// String in = "resources/" + Integer.toString(hash) + ".docx";
+				// String out = "resources/" + Integer.toString(hash) + ".pdf";
+				// PdfConverter.convert(in, out);
+				String outputPdfPath = "resources/pdf/"
+						+ Integer.toString(hash)+".pdf";
+				try {
+					Logger.debug("Writing PDF: " + outputPdfPath);
+					PdfGenerator.writeSongs(outputPdfPath, songsForPrint);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
