@@ -63,17 +63,21 @@ public class PdfGenerator extends PdfPageEventHelper {
 			MONOSPACE.setSize(MONOSPACE_SIZE);
 
 			NORMAL = FontFactory.getFont(FontFamily.HELVETICA.name(),
-					BaseFont.CP1250, 12);
+					BaseFont.CP1250, BaseFont.EMBEDDED);
 			NORMAL.setStyle(Font.NORMAL);
+			NORMAL.setSize(12);
 			BOLD = FontFactory.getFont(FontFamily.HELVETICA.name(),
-					BaseFont.CP1250, 14);
+					BaseFont.CP1250, BaseFont.EMBEDDED);
 			BOLD.setStyle(Font.BOLD);
+			BOLD.setSize(14);
 			ITALIC = FontFactory.getFont(FontFamily.HELVETICA.name(),
-					BaseFont.CP1250, 12);
+					BaseFont.CP1250, BaseFont.EMBEDDED);
 			ITALIC.setStyle(Font.ITALIC);
+			ITALIC.setSize(12);
 			BOLDITALIC = FontFactory.getFont(FontFamily.HELVETICA.name(),
-					BaseFont.CP1250, 12);
+					BaseFont.CP1250, BaseFont.EMBEDDED);
 			BOLDITALIC.setStyle(Font.BOLDITALIC);
+			BOLDITALIC.setSize(12);
 		}
 	}
 

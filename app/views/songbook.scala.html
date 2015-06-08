@@ -49,7 +49,7 @@
             <button type="button" id="submit-button" class="btn btn-primary"><i class="fa fa-book fa-fw"></i>Prepare songbook</button>
         </form>
         <div>
-            <table id="song_table"></table>
+            <table id="song_table" class="table table-striped table-bordered" width="100%" cellspacing="0"></table>
         </div>
     </div>
 
@@ -143,7 +143,7 @@
             $('#song_table').html( '<table cellpadding="0" cellspacing="0" border="0" class="display" id="example"></table>' );
             var oTable = $('#song_table').dataTable( {
                 "data": dataSet,
-                "responsive" : true,
+                "responsive" : false,
                 "searching" : false,
                 "paging" : false,
                 "bJQueryUI" : true,
