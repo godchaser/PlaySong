@@ -7,11 +7,11 @@ Trnje na čelu kaže mi da
    G             A
 Si podnio bol za mene
 
-    Fm#        G
+    F#m        G
 Kad nebesa nestanu
-    Fm#           G
+    F#m           G
 Tvoje rane bit'' će tu
-  Fm#           G
+  F#m           G
 Ožiljci će govoriti
            A
 Koliko me voliš
@@ -48,13 +48,13 @@ ISCJELI NAM NARODE,  - 3x
          Em     A     D
 I IZLIJ SVOG DUHA NA ZEMLJU SVU.
 
-D                                 Em
+D                 Em
 ČUJEM TVOGA DUHA; SVE JE BLIŽE,
-A                                         D  
+A                    D  
 MOĆAN VAL ŠTO STRUJI ZEMLJOM SVOM
-Bm                      F#m
+Bm            F#m
 NOSI PRAVDU, OPROŠTENJE
-Em                         A
+Em                A
 BOŽE VAPIMO: “DAJ OBNOVI NAS!”
 ', 'D');
 INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (4, 4, ' D       A
@@ -92,15 +92,15 @@ D             A
 JEDINO ŽELIM U TVOJOJ PRISUTNOSTI,
 Bm
 OSTATI ZAUVJEK
-G                 A   D A Bm G
+G                  D A Bm G
 JER TI SI PREDIVAN BOG', 'D');
 INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (5, 5, ' E       A7           E                   A7
 Znam da otkupio me, moj grijeh on pokrio je
   E  A7          E   A7
 vjerujem, vjerujem
-E        A7            E              A7
+E            A7       E         A7
 Moj sram on odnio je, bol svaku uzeo je
-  E  A7          E      A7
+  E  A7      E     A7
 vjerujem, vjerujem!
 B7                A         A/B     B  
 Stjeg dižem uvis, moj Bog pobijedio je!
@@ -112,27 +112,27 @@ Moj otkupitelj je živ, moj otkupitelj je živ!
 
 D                A/C#   
 Bremena sva si   podignuo,
-E/B           A        A/B       B
+E/B         A        A/B       B
 plešem pobjedonosno iščekujući te!
 ', 'E');
 INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (6, 6, ' A       D          
 Tvoja prisutnost je
 A       D
 Tvoja prisutnost je
-A   E    F#m   E
+A   E/G#   F#m   E
 Zrak koji dišem
- D   F#m E
+  D   F#m  E
 U meni živiš
 [V2]
 Kruh koji hrani me
 Kruh koji hrani me
 Je tvoja Riječ koju daješ meni
 [C1]
-A E F#m E
+A E/G#  F#m  E
 Ja gladan sam
        D  F#m E
 Blizine tvoje
-A E F#m     E
+A E/G#  F#m     E
 Ja izgubljen sam
           D F#m E
 Bez tebe Kriste
@@ -291,22 +291,22 @@ Jer on je kralj nad zemljom svom
 A                     B
 Na Svetom prijestolju vlada On!
 ', 'E');
-INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (14, 14, ' E H/D# C#m   E/H   A     E/H H E  H
+INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (14, 14, ' E B/D# C#m   E/B   A     E/B B E  B
 ISUS,    BOŽJI SIN, JANJE DOSTOJNO!           
-E H/D#  C#m7 E/H   A       E/H H  E     
+E H/D#  C#m7 E/B   A       E/B B  E     
 ISUS,    BOŽJI SIN, JANJE DOSTOJNO!
                                                
-E           H/D#       C#m 
+E           B/D#       C#m 
 TI SI MI SNAGA U SLABOSTI,                     
-         E/H       A        
+         E/B       A        
 MOJ SI GOSPODAR JEDINI,                        
-        E/H H  E  H
+        E/B B  E  B
 TI SI MI SVE U SVEMU.                          
-E        H/D#       C#m 
+E        B/D#       C#m 
 TI SI KAMEN DRAGOCJENI,                        
-       E/H         A        
+       E/B         A        
 S TOBOM NEĆU ODUSTATI,                           
-       E/H  H   E   H7
+       E/B  B   E   B7
 TI SI MI SVE, BAŠ SVE!
 
 
@@ -522,11 +522,11 @@ VJERUJEM JA
 VJERUJEM JA, VJERUJEM JA
 BAŠ SVE JE MOGUĆE,
 VJERUJEM JA.', 'A');
-INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (24, 24, ' Bm      Fm#        Bm 
+INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (24, 24, ' Bm      F#m        Bm 
 PJEVAJ ALELUJA GOSPODU 
          D         F#
 PJEVAJ ALELUJA GOSPODU
-Bm      Fm#   G         D     
+Bm      F#m   G         D     
 PJEVAJ ALELUJA PJEVAJ ALELUJA
 Bm       f#        Bm 
 PJEVAJ ALELUJA GOSPODU!
@@ -691,18 +691,18 @@ D         A/C#
 G A       D
 Bože daj mi
 ', 'D');
-INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (32, 32, ' E              A   Cm#        B     A         
+INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (32, 32, ' E              A   C#m        B     A         
 U tišini, u osami, ničeg nema samo ti
 E                      A                      
 U tišini nijemom času, želim tad 
-                Cm#      B     A
+                C#m      B     A
 Čuti tvoj glas, želim te spoznati
 
-E        B/D#     Cm#    A		   
+E        B/D#     C#m    A		   
 Želim te znati, želim ti čuti glas
 E	   B	 A
 Želim te spoznati. 
-E        B/D#      Cm#         A		
+E        B/D#      C#m         A		
 Želim te dotaći, želim te vidjeti
 E	   B	 A
 Želim te spoznati.
@@ -715,7 +715,7 @@ Stane na put, ma sklanjaj se dolazim
 ', 'E');
 INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (33, 33, ' D               Em
 OČE, HVALA TI ZA KRV;
-A               D Fm# Bm
+A               D F#m Bm
 OČE, HVALA TI ZA KRV;
                 Em A
 OČE, HVALA TI ZA KRV
@@ -1481,7 +1481,7 @@ U svim borbama
 ti si moj mir,
      E
 kada slomljen sam,
-            H
+            B
 snagu daješ mi.
          A
 Ti snaga si
@@ -1491,17 +1491,17 @@ i ljubav sva
 i život moj,
      A                 E/G#
 moja radost, moja utjeha.
-       F#m         D             H
+       F#m         D             B
 Slavim tvoju divnu milost i pjevam.
         E             A/E
 Pjevam: Slava Gospodu mom!
  E            A   -/G#
 Slava Gospodu mom!
-    F#m       H
+    F#m       B
 Jer dobar je i milostiv,
     F#m
 on ljubi nas,
-      A/H  H          E
+      A/B  B          E
 on je predivan Gospod moj.
 
 ', 'E');
@@ -1735,7 +1735,7 @@ G              C/G   G
 PREDAJEM SE DOK ZOVEŠ ME 
 D/F#  Em
 U     NARUČJE SVOJE
-A        A      Am -/H -/C  D
+A        A      Am -/B -/C  D
 VODI ME, MOLIM TE!
 
 G          D/F#   Am              Em                        
@@ -1749,7 +1749,7 @@ U RUKE DAJEM SE LONČAREVE!
 ', 'G');
 INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (81, 81, ' D        Em      A7
 PJESMA SI TI SRCA MOG
-        D  Fm#  Bm
+        D  F#m  Bm
 I LJUBAV ŽIVOTA SVEG’.
      Em          A7
 TI SI TAJ KOJI ĆE DOĆ’
@@ -1757,7 +1757,7 @@ TI SI TAJ KOJI ĆE DOĆ’
 K’O PJESMA U TIHU NOĆ.
           G    B     Em
 ČUJEM TVOJ GLAS LJUBLJENI
-A7      D Fm# Bm
+A7      D F#m Bm
 ODZVANJA DOLINAMA, ODJEKUJE
 Em     A7         D
 PLANINAMA; DOLAZIŠ TI.', 'D');
@@ -1775,7 +1775,7 @@ i kad put je zamršen posut zamkama.
 [C1]
         C     G/C  F/C C
 Znam da izlaz imaš Ti
-         Dm7    C/E   G/H    G
+         Dm7    C/E   G/B    G
 da sam s Tobom uvijek sigurna.
         C       G/C   F/C C
 Znam da put moj poznaješ 
@@ -2124,11 +2124,11 @@ KAO ŠTO VODE PUNE MORA.
 ', 'A');
 INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (99, 99, ' E        B7        E    E7 A
 PREDIVAN, PREDIVAN, ISUS JE PREDIVAN,
-E    A  Cm#       F#    B
+E    A  C#m       F#    B
 ISUS JE PREDIVAN U ŽIVOTU MOM.
 E        B7       E     E7 A
 BRIŽLJIVO VODI ME, VIDIK MI OTVARA.
-E   A  Cm#        Fm#  B E
+E   A  C#m        F#m  B E
 ISUS JE PREDIVAN U ŽIVOTU MOM.', 'E');
 INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (100, 100, '            D           A   D
 Ja znam da Bog za mene ima put.
@@ -2156,7 +2156,7 @@ Ja znam da Bog na dobro vodi sve.
 
 ', 'D');
 INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (101, 101, '[V1]
-Hm                  F#
+Bm                  F#
 U BOGU MOM JE SNAGA MOJA SVA.
                     Bm
 ON JE TAJ ŠTO ZGAZI NEPRIJATELJA.
@@ -2384,23 +2384,23 @@ SIGURNA SAMO SA NJIM.
 ZNAJ ON RAZUMIJE SVU BOL, 
 ŽALOST I TUGU.', 'G');
 INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (110, 110, '[V1]
-E  F#m    G#m7      A     E         H 
+E  F#m    G#m7      A     E         B 
 Ja Stvoritelja    znam, život daje mi.
-E     F#m      G#m7    A    C#m    H  E 
+E     F#m      G#m7    A    C#m    B  E 
 Prije nego me stvorio, poznavao me On.
 [C1]
-F#m G#m7 A    E     H  E
+F#m G#m7 A    E     B  E
      On moje ime zna
-A  E/G#  H   C#m
+A  E/G#  B   C#m
 I  svaku misao
 A   E    G#7    C#m
 I   vidi suze    sve
-F#m7   H       E
+F#m7   B       E
 I čuje molitve.
 [V2]
-E  F#m    G#m7    A        E           H 
+E  F#m    G#m7    A        E           B 
 Ja Spasitelja     znam, Njemu pripadam.
-E  F#m  G#m7    A      C#m        H   E 
+E  F#m  G#m7    A      C#m        B   E 
 Ostavit neće    me, ma gdje god bio ja.', 'E');
 INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (111, 111, ' D       Em      A               D-/C# Bm 
 Najveći ti si,o Bože, na zemlji cijeloj,
@@ -2473,7 +2473,7 @@ veži nas zajedno,
 Em         A      D  
 Bože, u ljubavi
 
-D       Em      Fm#  Em
+D       Em      F#m  Em
 POSTOJI JEDAN BOG, 
 D       Em  A  D G/A
 POSTOJI JEDAN SIN.
@@ -2509,7 +2509,7 @@ C         D          G    -/F#  Em
 NE ODBACI ME OD SVOGA LICA, BOŽE!
 Am          D         G  Dm – G
 DUHA SVOJEG NE ODUZMI MI!
-C         D   -/C H  -/D#     Em  -/D
+C         D   -/C B  -/D#     Em  -/D
 RADOST SPASENJA U SRCE STAVI MI
 C           D          C    G         
 I OBNOVI DUH POSTOJAN U MENI!
@@ -2760,7 +2760,7 @@ iznad svih!
 
 E               A      E  C#m
 Tvrda je kula, Jahvino ime                                
-            Fm#   B   
+            F#m   B   
 tko njemu se utječe, 
            E  
 taj spašen je. 						
@@ -2786,16 +2786,16 @@ INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (129,
 DOK GLEDAM BESKRAJ ZVIJEZDA NEBESKIH,
 D            E           A
 SILNU LJUBAV DA ON LJUBI NAS,
-A   D           E    A      Cm#     Fm#
+A   D           E    A      C#m     F#m
 DAO SAM MU SRCE SVO,I SAD SAM KOD NJEGA,
 A           E        A
 KOD MOG ISUSA U MISLIMA.
 
-                      Cm#      D        
+                      C#m      D        
 ISUS KRIST,ISUS KRIST DOLAZI TAKO NJEŽNO, 
      E      A
 TIHO,NEOPISIVO.
-     D              E       Cm#       Fm#
+     D              E       C#m       F#m
 TOM ODUPRIJET SE NE MOŽEŠ SA SVOJIM PONOSOM,
   A           E            A
 ON LOMI SPONE SVE I SAD JE TU.
@@ -2815,7 +2815,7 @@ INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (130,
 O Bože, divan   si,
    D D/F# G  D/F#  A
 za tobom  čeznem ja!
-F#/Bb    Hm    F#/Bb   Bm  A/C# D  D/F#
+F#/Bb    Bm    F#/Bb   Bm  A/C# D  D/F#
 Kad pogled  tvoj me susretne,
    Em       A   D
 tad milost  otkrivam.
@@ -2832,7 +2832,7 @@ TAMO NA OBALI, TAMO NA OBALI,
     E
 TAMO NA OBALI.   
 JA ĆU OSTAVIT’ BRIGE
-G#      Cm#     Fm#    B7 E E7 
+G#      C#m     F#m    B7 E E7 
 TAMO NA OBALI, TAMO NA OBALI;
 
 (E,A,E,B7,E)
@@ -2989,14 +2989,14 @@ i od smrti nas oslobodi
 Nas je Bog kralj nad Zemljom
       C/Am    D        Em
 i nad čitavim svemirom s''ja', 'G');
-INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (138, 138, ' Hm
+INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (138, 138, ' Bm
 TEBE SLAVIM SAD
 A                            
 TEBE SLAVIM SADA (ISUSE)
 
-Hm   G
+Bm   G
 DIVAN SI,
-      D            A           Hm 
+      D            A           Bm 
 SLAVU DIŽEM SAD DO SVODA NEBESKOG
 G                  D        A
 PREDIVNO JE TVOJE KRALJEVSTVO.
@@ -3261,7 +3261,7 @@ Iskupljen sam krvlju Janjeta,
 Iskupljen sam krvlju Janjeta, 	
           E      G#   Cm          
 ispunjen Svetim Duhom sam,
-    Fm#               B              E
+    F#m               B              E
 opran je moj grijeh i sad iskupljen sam.
 
 
@@ -3537,7 +3537,7 @@ SAD U SVJETLU S NJIME HODIM,
 Em        A           D
 I UZ NJEGA JA POBJEĐUJEM.
 
-Fm#       Bm  Fm#         Bm 
+F#m       Bm  F#m         Bm 
 ISUS LJUBI TE, BRINE SE ZA TE
     G      D    G      E      A  A7
 STOG VJERUJ MU I PREDAJ SASVIM SE.
@@ -3733,7 +3733,7 @@ Pred licem Veličanstva tvog
 ', 'D');
 INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (165, 165, ' D         A
 NEMA BOGA OSIM JAHVE,
-Hm         G
+Bm         G
 NEMA HRIDI OSIM JAHVE 
 
 JAHVE MI JE SVJETLOST I SPASENJE,
@@ -3833,11 +3833,11 @@ JAHVE JE IME NJEGOVO.
 
 JAHVE, TKO JE KAO TI, TKO KAO TI SIJA U SVETOSTI?
 SILAN U DJELIMA, DIVAN U ČUDIMA!', 'E');
-INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (170, 170, ' E                Fm#   E E7
+INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (170, 170, ' E                F#m   E E7
 JA LJUBIM TE, MOJ GOSPODE,
- A E    Fm#     B           
+ A E    F#m     B           
 I DIŽEM GLAS, DA SLAVIM TE.
-E                 Fm#   E E7
+E                 F#m   E E7
 O, KRALJU MOJ, SAD RADUJ SE
              A  E   B   B7     A E
 SLATKOM ZVUKU PJESME TE, LJUBIM TE.', 'E');
@@ -3899,7 +3899,7 @@ UČINI ME GLAZBOM
 SAD RUKE TI DIŽEM U ČAST.', 'D');
 INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (173, 173, ' G     D/F#   C/E   G/D
 Nitko kao     Ti
-C       G/H        Am7        D
+C       G/B        Am7        D
 Ne može srce moje dotaknuti
 G         D/F#             
 Da cijelu vječnost tražim
@@ -4001,7 +4001,7 @@ ISUS JE MOJ SPAS.
 VIŠE NEGO POBJEDNIK, 
         E
 U KRISTU SAM.
-Cm#        Fm#           
+C#m        F#m           
 NOVO SAM STVORENJE, 
 B7         E
 NOVI ČOVJEK SAM.', 'E');
@@ -4245,7 +4245,7 @@ O TVOM SLAVNOM IMENU.
 
      Bm
 TI SI STVORITELJ SVEG SVIJETA
-Fm#
+F#m
 JANJE BOŽJE SI TI.
 G
 I GROB JE OSTAO PRAZAN
@@ -4253,7 +4253,7 @@ I GROB JE OSTAO PRAZAN
 TI KRALJUJEŠ NAD SVIM.
    Bm
 OSLOBOĐENI OD GRIJEHA 
- Fm#
+ F#m
 S TVOJOM LJUBAVI.
         G
 UVIJEK S NAMA SI
@@ -4299,7 +4299,7 @@ INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (188,
 Zemljom vladaš ti, na nebesima
         Bm7   C         D     Em
 Snažnim rijekama svodom nebeskim
-       D    C           G/H    Am
+       D    C           G/B   Am
 Čežnja srca mog, sve što želim ja
          Am7   D     G 
 Je to da vladaš u meni!
@@ -4308,7 +4308,7 @@ G      Bm7     C      D      G
 Vladaj u meni, vladaj snagom svom
        Bm7 C           D    Em
 Mojim snovima, mračnim satima
-      D    C         G/H    Am
+      D    C         G/B    Am
 Budi gospodar svega što sam ja
          Am7  D     G 
 I zato vladaj u meni!
@@ -4317,7 +4317,7 @@ G      Bm7     C      D      G
 Svojim mislima, svojim riječima
         Bm7   C         D     Em
 Odražavati lik tvoj želim ja
-       D    C           G/H    Am
+       D    C           G/B    Am
 Više značiš ti od bogatsva sveg
      Am7   D     G 
 Bože vladaj u meni!', 'G');
@@ -4712,9 +4712,9 @@ Da bi sa ocem me izmirio
 Em      Am      C            D       G
 Kriste, Kriste, prijatelj si najbolji
 ', 'E');
-INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (205, 205, ' E    Fm#    B7    E  A  E
+INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (205, 205, ' E    F#m    B7    E  A  E
 ON JE KRALJ, ON JE KRALJ.
-    Gm#       Cm#         Fm# B7
+    G#m       C#m         F#m B7
 ON USKRSNUO JE SADA, ON JE KRALJ.
       E    E7         A      Am7
 SVI ĆE GLEDATI, SVI ĆE PRIZNATI,
@@ -4825,11 +4825,11 @@ TEBI DAJEM SE, SVE SVOJE PREDAJEM.
 SNOVE SVE, NADE PLANOVE
 SVE AMBICIJE I TAJNE NAJDRAŽE. (2X) 
 ', 'D');
-INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (210, 210, '           D           D7    H7
+INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (210, 210, '           D           D7    B7
 CIJELI JE OVAJ SVIJET, U RUKAMA,
          Em           A7
 CIJELI JE OVAJ SVIJET, U RUKAMA,
-          D           D7    H7
+          D           D7    B7
 CIJELI JE OVAJ SVIJET, U RUKAMA;
          Em    A7   D
 U MOĆNIM BOŽJIM RUKAMA.
@@ -5106,18 +5106,18 @@ C        D            A(E)
 u tijelu svome tad ću Boga vidjeti!', 'A');
 INSERT INTO PUBLIC.SONG_LYRICS (ID, SONG_ID, SONG_LYRICS, SONG_KEY) VALUES (224, 224, '   D            G  A  
 1. U tvojoj blizini,
- D2            G/H  A/C#
+ D2            G/B  A/C#
    tu do tvojih no  gu,
  D2               G   A
     gdje tvoja me ljubav
- D2          G/H  A/C#
+ D2          G/B  A/C#
     okružuje, Bo  že.
 
 D             G
   Želim samo to,
      A
 Gospode,
-      A/C# D D/C D/H
+      A/C# D D/C D/B
 želim samo to.
                  G
      Silno želim to,
@@ -5145,7 +5145,7 @@ TEBI BOŽE, NA TVOJ OLTAR PRINOSIM.
 
 	 E    			           
 KAKO ČUDESAN JE DODIR TVOJ
-	   Cm#
+	   C#m
 NEMAM RIJEČI DA OPIŠEM TO 
 	 A 
 TI SI ŽIVOT MOJ PROMIJENIO
@@ -5289,11 +5289,11 @@ KROZ PJESMU MI PRONOSIMO,
      E7                     A
 TVOJA SILNA DIJELA MI NAVJEŠTAMO.
 
- E7             A   Cm# D Bm
+ E7             A   C#m D Bm
 SLAVLJEN NEK’ JE BOG SVEMOGUĆI
    E7              A
 JER PONOVO ĆE DOĆI ON.
-E7              A   Cm# D Bm
+E7              A   C#m D Bm
 SLAVLJEN NEK’ JE BOG SVEMOGUĆI
     E7    E    A
 JER VJEČNO VLADA ON.', 'A');
