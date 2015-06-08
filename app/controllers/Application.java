@@ -12,8 +12,6 @@ import models.UserAccount;
 import models.helpers.SongPrint;
 import models.json.JsonSongbook;
 
-import org.apache.commons.lang3.StringUtils;
-
 import play.Logger;
 import play.Routes;
 import play.data.Form;
@@ -382,6 +380,7 @@ public class Application extends Controller {
 
 	public static Result init() {
 		try {
+			//SongImporter.restoreFromSQLDump();
 			SongImporter.importFromDb();
 			XLSHelper.importAndUpdateSongs();
 			UserAccount test = new UserAccount("test@test.com", "test", "test");
@@ -399,6 +398,14 @@ public class Application extends Controller {
 		System.out.println("TEST!");
 		// newSongbookPdf
 		return ok();
+	}
+	
+	public static Result test2() {
+		System.out.println("TEST!");
+		// newSongbookPdf
+		Ebean.delete(Song.all());
+		SongImporter.restoreFromSQLDump();
+		return redirect(routes.Application.table());
 	}
 
 	public static Result updateFromXLS() {
