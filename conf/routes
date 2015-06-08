@@ -38,7 +38,7 @@ GET      /getxls                      controllers.Application.getXLS()
 POST     /updatefromspreadsheet       controllers.Application.updateFromOnlineSpreadsheet()
 
 #simple echo test
-GET      /test                        controllers.Application.test()
+POST     /test                        controllers.Application.test()
 
 # getting paginated data fost data table
 GET      /getsongsdatatable           controllers.Application.getsongsdatatable()
