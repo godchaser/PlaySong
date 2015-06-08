@@ -168,7 +168,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 		this.document.add(intro);
 
 		for (int i = 0; i < songPrintObjects.size(); i++) {
-			String songTitle = songPrintObjects.get(i).getSong().songName;
+			final String songTitle = songPrintObjects.get(i).getSong().songName;
 			// final String songTitle = songPrintObjects.get(i).getSong();
 
 			final Chunk chunk = new Chunk(i + ". " + songTitle, fonts.NORMAL)
