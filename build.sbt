@@ -23,7 +23,8 @@ libraryDependencies ++= Seq( javaJdbc , javaEbean , cache , javaWs ,
   "org.webjars.bower" % "typeahead.js" % "0.10.5",
   "org.webjars.bower" % "startbootstrap-sb-admin-2" % "1.0.0",
   "org.webjars" % "metisMenu" % "1.1.3",
-  "org.webjars" % "handsontable" % "0.15.0-beta2"
+  "org.webjars" % "handsontable" % "0.15.0-beta2",
+  "org.yaml" % "snakeyaml" % "1.15"
   )
 
 unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )  

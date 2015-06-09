@@ -383,6 +383,17 @@ public class Application extends Controller {
 			//SongImporter.restoreFromSQLDump();
 			SongImporter.importFromDb();
 			XLSHelper.importAndUpdateSongs();
+		} catch (Exception e) {
+			Logger.error("Exception occured during init" + e.getStackTrace());
+			e.printStackTrace();
+			System.out.print(e.getStackTrace());
+			System.out.print(e.getMessage());
+		}
+		return redirect(routes.Application.index());
+	}
+
+	public static Result inituser() {
+		try {
 			UserAccount test = new UserAccount("test@test.com", "test", "test");
 			test.save();
 		} catch (Exception e) {
@@ -399,9 +410,21 @@ public class Application extends Controller {
 		// newSongbookPdf
 		return ok();
 	}
-	
-	public static Result test2() {
-		System.out.println("TEST!");
+
+    public static Result yamlbackup() {
+        System.out.println("yamlbackup!");
+        SongImporter.songToYaml();
+        return redirect(routes.Application.index());
+    }
+
+    public static Result yamlrestore() {
+        System.out.println("yamlrestore!");
+        SongImporter.yamlToSong();
+        return redirect(routes.Application.index());
+    }
+
+	public static Result sqlinit() {
+		System.out.println("SQL INIT!");
 		// newSongbookPdf
 		Ebean.delete(Song.all());
 		SongImporter.restoreFromSQLDump();
