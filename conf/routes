@@ -68,6 +68,7 @@ GET           /songbook                         controllers.Application.songbook
 GET           /songeditor/:id                   controllers.Application.songeditor(id: Long)
 GET           /newsongeditor                    controllers.Application.newsongeditor()
 GET           /songview/:id                     controllers.Application.songview(id: Long)
+GET           /songsbackup                    	controllers.Application.songs()
 
 GET           /assets/javascripts/routes        controllers.Application.javascriptRoutes()
 # Map static resources from the /public folder to the /assets URL path

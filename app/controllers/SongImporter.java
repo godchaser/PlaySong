@@ -18,6 +18,8 @@ import org.yaml.snakeyaml.Yaml;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.*;
 import java.sql.Connection;
@@ -157,10 +159,27 @@ public class SongImporter {
 	}
 
 	public static void songToYaml(){
+		List<Song> songs = Song.all();
+		ObjectMapper mapper = new ObjectMapper();
+		//mapper.enable(SerializationFeature.INDENT_OUTPUT);
+		try {
+			System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(SongLyrics.get(106L).getsongLyrics()));			
+			mapper.writeValue(new File("conf/songs.json"), SongLyrics.get(106L).getsongLyrics());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		/*
         List<Song> songs = Song.all();
 
         DumperOptions options = new DumperOptions();
-        options.setDefaultScalarStyle(DumperOptions.ScalarStyle.PLAIN);
+        options.setDefaultScalarStyle(DumperOptions.ScalarStyle.SINGLE_QUOTED);
+        //options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        //options.setLineBreak(DumperOptions.LineBreak.UNIX);
+        //options.setWidth(180);
+        //options.
+        //options.setDefaultFlowStyle(DumperOptions.FlowStyle.AUTO);
+       // options.set
         Yaml yaml = new Yaml(options);
         FileWriter writer = null;
 
@@ -182,6 +201,7 @@ public class SongImporter {
                 e.printStackTrace();
             }
         }
+        */
 	}
 
     public static void yamlToSong(){

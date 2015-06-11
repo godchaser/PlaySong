@@ -68,12 +68,4 @@ public class SongLyrics extends Model {
     public void setSong(Song song) {
         this.song = song;
     }
-
-    public String getSongLyrics() {
-        return songLyrics;
-    }
-
-    public void setSongLyrics(String songLyrics) {
-        this.songLyrics = songLyrics;
-    }
 }

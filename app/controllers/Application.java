@@ -410,6 +410,12 @@ public class Application extends Controller {
 		// newSongbookPdf
 		return ok();
 	}
+	
+	public static Result songs() {
+		System.out.println("TEST!");
+		// newSongbookPdf
+		return ok(songs.render(Song.all()));
+	}
 
     public static Result yamlbackup() {
         System.out.println("yamlbackup!");
