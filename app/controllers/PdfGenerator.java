@@ -5,12 +5,16 @@ import com.itextpdf.text.Font.FontFamily;
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 
+import controllers.chords.ChordLineTransposer;
+import controllers.chords.LineTypeChecker;
+
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import play.Logger;
 import models.SongLyrics;
 //import models.Song;
 //import models.SongLyrics;
@@ -44,6 +48,8 @@ public class PdfGenerator extends PdfPageEventHelper {
 	private class SongFonts {
 		String LiberationMonoFontPath = "resources/fonts/LiberationMono-Regular.ttf";
 		String LiberationMonoBoldFontPath = "resources/fonts/LiberationMono-Bold.ttf";
+		String TimesNewRomanFontPath = "resources/fonts/Times_New_Roman.ttf";
+
 		int MONOSPACE_SIZE = 12;
 		Font MONOSPACE;
 		Font NORMAL;
@@ -56,25 +62,27 @@ public class PdfGenerator extends PdfPageEventHelper {
 					.register(LiberationMonoFontPath, LiberationMonoFontPath);
 			FontFactory.register(LiberationMonoBoldFontPath,
 					LiberationMonoBoldFontPath);
+			FontFactory
+					.register(TimesNewRomanFontPath, TimesNewRomanFontPath);
 			// Get the font NB. last parameter indicates font needs to be
 			// embedded
 			MONOSPACE = FontFactory.getFont(LiberationMonoFontPath,
 					BaseFont.CP1250, BaseFont.EMBEDDED);
 			MONOSPACE.setSize(MONOSPACE_SIZE);
 
-			NORMAL = FontFactory.getFont(FontFamily.TIMES_ROMAN.name(),
+			NORMAL = FontFactory.getFont(TimesNewRomanFontPath,
 					BaseFont.CP1250, BaseFont.EMBEDDED);
 			NORMAL.setStyle(Font.NORMAL);
 			NORMAL.setSize(12);
-			BOLD = FontFactory.getFont(FontFamily.TIMES_ROMAN.name(),
+			BOLD = FontFactory.getFont(TimesNewRomanFontPath,
 					BaseFont.CP1250, BaseFont.EMBEDDED);
 			BOLD.setStyle(Font.BOLD);
 			BOLD.setSize(14);
-			ITALIC = FontFactory.getFont(FontFamily.TIMES_ROMAN.name(),
+			ITALIC = FontFactory.getFont(TimesNewRomanFontPath,
 					BaseFont.CP1250, BaseFont.EMBEDDED);
 			ITALIC.setStyle(Font.ITALIC);
 			ITALIC.setSize(12);
-			BOLDITALIC = FontFactory.getFont(FontFamily.TIMES_ROMAN.name(),
+			BOLDITALIC = FontFactory.getFont(TimesNewRomanFontPath,
 					BaseFont.CP1250, BaseFont.EMBEDDED);
 			BOLDITALIC.setStyle(Font.BOLDITALIC);
 			BOLDITALIC.setSize(12);
@@ -162,15 +170,16 @@ public class PdfGenerator extends PdfPageEventHelper {
 	private void createSongsTOC(List<SongPrint> songPrintObjects)
 			throws DocumentException {
 		// add a small introduction chapter the shouldn't be counted.
-		final Chapter intro = new Chapter(new Paragraph("Table Of Content", fonts.BOLD),
-				0);
+		final Chapter intro = new Chapter(new Paragraph("Table Of Content",
+				fonts.BOLD), 0);
 		intro.setNumberDepth(0);
 		this.document.add(intro);
 		int tocLineCount = 0;
 		for (int i = 0; i < songPrintObjects.size(); i++) {
 			tocLineCount++;
 			if (tocLineCount == 41) {
-				final Chapter introBlank = new Chapter(new Paragraph(" ", fonts.NORMAL), 0);
+				final Chapter introBlank = new Chapter(new Paragraph(" ",
+						fonts.NORMAL), 0);
 				introBlank.setNumberDepth(0);
 				this.document.add(introBlank);
 				tocLineCount = 0;
@@ -219,6 +228,16 @@ public class PdfGenerator extends PdfPageEventHelper {
 
 			// String songLyrics = songPrintObjects.get(i).getKey();
 
+			// SONG TRANSPOSE FUNCTION
+
+			String origKey = SongLyrics.get(songPrintObjects.get(i)
+					.getLyricsID()).songKey;
+			String newKey = songPrintObjects.get(i).getKey();
+			Logger.trace("Orig key: " + origKey + " New key: " + newKey);
+			if (!origKey.equals(newKey)) {
+				songLyrics = ChordLineTransposer.transposeLyrics(origKey,
+						newKey, songLyrics);
+			}
 			chapter.addSection(new Paragraph(songLyrics, fonts.MONOSPACE), 0);
 			// chapter.setNumberDepth(0);
 			this.document.add(chapter);
