@@ -118,6 +118,23 @@ public class ChordLineTransposer {
 
         return str;
     }
+    
+	public static String transposeLyrics(String origKey, String newKey, String songText) {
+		String[] songLines = songText.split("[\r\n]+");
+		StringBuilder transposedSong = new StringBuilder();
+		for (String songLine : songLines) {
+			Logger.trace("Checking song lines: " + songLine);
+			String updatedSongLine = songLine;
+			if (LineTypeChecker.isChordLine(songLine)) {
+				// Logger.trace("Transposing by ammount: " + transposeAmmount);
+				ChordLineTransposer clt = new ChordLineTransposer(songLine);
+				updatedSongLine = clt.transpose2(origKey, newKey);
+				Logger.trace(updatedSongLine);
+			}
+			transposedSong.append(updatedSongLine + "\r\n");
+		}
+		return transposedSong.toString();
+	}
 
     public static void main(String args[]) {
         String[] testChords = { "C         D          G   -/F#   Em", "E H/D# C#m   E/H   A     E/H H E  H",
