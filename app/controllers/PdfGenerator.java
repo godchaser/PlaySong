@@ -62,19 +62,19 @@ public class PdfGenerator extends PdfPageEventHelper {
 					BaseFont.CP1250, BaseFont.EMBEDDED);
 			MONOSPACE.setSize(MONOSPACE_SIZE);
 
-			NORMAL = FontFactory.getFont(FontFamily.HELVETICA.name(),
+			NORMAL = FontFactory.getFont(FontFamily.TIMES_ROMAN.name(),
 					BaseFont.CP1250, BaseFont.EMBEDDED);
 			NORMAL.setStyle(Font.NORMAL);
 			NORMAL.setSize(12);
-			BOLD = FontFactory.getFont(FontFamily.HELVETICA.name(),
+			BOLD = FontFactory.getFont(FontFamily.TIMES_ROMAN.name(),
 					BaseFont.CP1250, BaseFont.EMBEDDED);
 			BOLD.setStyle(Font.BOLD);
 			BOLD.setSize(14);
-			ITALIC = FontFactory.getFont(FontFamily.HELVETICA.name(),
+			ITALIC = FontFactory.getFont(FontFamily.TIMES_ROMAN.name(),
 					BaseFont.CP1250, BaseFont.EMBEDDED);
 			ITALIC.setStyle(Font.ITALIC);
 			ITALIC.setSize(12);
-			BOLDITALIC = FontFactory.getFont(FontFamily.HELVETICA.name(),
+			BOLDITALIC = FontFactory.getFont(FontFamily.TIMES_ROMAN.name(),
 					BaseFont.CP1250, BaseFont.EMBEDDED);
 			BOLDITALIC.setStyle(Font.BOLDITALIC);
 			BOLDITALIC.setSize(12);
@@ -162,12 +162,20 @@ public class PdfGenerator extends PdfPageEventHelper {
 	private void createSongsTOC(List<SongPrint> songPrintObjects)
 			throws DocumentException {
 		// add a small introduction chapter the shouldn't be counted.
-		final Chapter intro = new Chapter(new Paragraph("Sadržaj", fonts.BOLD),
+		final Chapter intro = new Chapter(new Paragraph("Table Of Content", fonts.BOLD),
 				0);
 		intro.setNumberDepth(0);
 		this.document.add(intro);
-
+		int tocLineCount = 0;
 		for (int i = 0; i < songPrintObjects.size(); i++) {
+			tocLineCount++;
+			if (tocLineCount == 41) {
+				final Chapter introBlank = new Chapter(new Paragraph(" ", fonts.NORMAL), 0);
+				introBlank.setNumberDepth(0);
+				this.document.add(introBlank);
+				tocLineCount = 0;
+			}
+
 			final String songTitle = songPrintObjects.get(i).getSong().songName;
 			// final String songTitle = songPrintObjects.get(i).getSong();
 
