@@ -1,0 +1,38 @@
+{
+    "songs": [
+        {
+            "song": {
+                "id": "259",
+                "lyricsID": "259",
+		        "key": "D"
+            }
+        },
+        {
+            "song": {
+                "id": "142",
+                "lyricsID": "142",
+		        "key": "G"
+            }
+        },
+        {
+            "song": {
+                "id": "142",
+                "lyricsID": "142",
+		        "key": "A"
+            }
+        }
+    ],
+    "fonts": {
+        "titleFont": "Arial",
+        "lyricsFont": "Courier New"
+    },
+    "sizes": {
+        "titleSize": "18",
+        "lyricsSize": "12"
+    },
+    "frontpage": {
+        "title": "Songbook",
+        "subtitle": "2015"
+    },
+    "format" : "pdf"
+}

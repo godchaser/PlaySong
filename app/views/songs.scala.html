@@ -2,26 +2,33 @@
 
 <html>
 <body>
+<div name="songs">	
 @songs.map { song =>
+<div name="song">	
 <h3>Song</h3>
-<p id="songName">@song.songName</p>
-<p id="songOriginalTitle">@song.songOriginalTitle</p>
-<p id="songAuthor">@song.songAuthor</p>
-<p id="songLink">@song.songLink</p>
-<p id="songImporter">@song.songImporter</p>
-<p id="songLastModifiedBy">@song.songLastModifiedBy</p>
-<p id="dateCreated">@song.dateCreated</p>
-<p id="dateModified">@song.dateModified</p>
-<p id="id">@song.id</p>
+<p name="songName">@song.songName</p>
+<p name="songOriginalTitle">@song.songOriginalTitle</p>
+<p name="songAuthor">@song.songAuthor</p>
+<p name="songLink">@song.songLink</p>
+<p name="songImporter">@song.songImporter</p>
+<p name="songLastModifiedBy">@song.songLastModifiedBy</p>
+<p name="dateCreated">@song.dateCreated</p>
+<p name="dateModified">@song.dateModified</p>
+<p name="songBookId">@song.songBookId</p>
+<p name="id">@song.id</p>
+
 
 <h4>Lyrics</h4>
 @song.songLyrics.zipWithIndex.map{ case (songlyrics, i) =>
-<p id="songLyrics.id">@songlyrics.id</p>
-<p id="songKey">@songlyrics.songKey</p>
-<pre id="songLyrics">
+<span name="lyrics">
+<p name="songLyrics.id">@songlyrics.id</p>
+<p name="songKey">@songlyrics.songKey</p>
+<pre name="songLyrics">
 @songlyrics.songLyrics</pre>
 }
+</span>
+</div>
 }
-
+</div>
 </body>
 </html>
