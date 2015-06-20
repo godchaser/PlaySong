@@ -191,6 +191,8 @@ public class PdfGenerator extends PdfPageEventHelper {
 			final Chunk chunk = new Chunk(i + ". " + songTitle, fonts.NORMAL)
 					.setLocalGoto(songTitle);
 			this.document.add(new Paragraph(chunk));
+			
+			String songTitleId = songTitle + i;
 
 			// Add a placeholder for the page reference
 			this.document.add(new VerticalPositionMark() {
@@ -200,7 +202,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 						final float y) {
 					final PdfTemplate createTemplate = canvas.createTemplate(
 							50, 50);
-					PdfGenerator.this.tocPlaceholder.put(songTitle,
+					PdfGenerator.this.tocPlaceholder.put(songTitleId,
 							createTemplate);
 
 					canvas.addTemplate(createTemplate, urx - 50, y);
@@ -226,7 +228,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 			String songLyrics = SongLyrics.get(songPrintObjects.get(i)
 					.getLyricsID()).songLyrics;
 			
-			System.out.println(songLyrics);
+			//System.out.println(songLyrics);
 
 			// String songLyrics = songPrintObjects.get(i).getKey();
 
@@ -243,9 +245,11 @@ public class PdfGenerator extends PdfPageEventHelper {
 			chapter.addSection(new Paragraph(songLyrics, fonts.MONOSPACE), 0);
 			// chapter.setNumberDepth(0);
 			this.document.add(chapter);
+			
+			String songTitleId = songTitle + i;
 
 			// When we wrote the chapter, we now the pagenumber
-			final PdfTemplate template = this.tocPlaceholder.get(songTitle);
+			final PdfTemplate template = this.tocPlaceholder.get(songTitleId);
 			template.beginText();
 			template.setFontAndSize(fonts.MONOSPACE.getBaseFont(), 12);
 			template.setTextMatrix(
