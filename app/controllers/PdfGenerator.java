@@ -49,8 +49,11 @@ public class PdfGenerator extends PdfPageEventHelper {
 		String LiberationMonoFontPath = "resources/fonts/LiberationMono-Regular.ttf";
 		String LiberationMonoBoldFontPath = "resources/fonts/LiberationMono-Bold.ttf";
 		String TimesNewRomanFontPath = "resources/fonts/Times_New_Roman.ttf";
+		String TimesNewRomanBoldFontPath = "resources/fonts/Times_New_Roman_Bold.ttf";
 
 		int MONOSPACE_SIZE = 12;
+		int NORMAL_SIZE = 12;
+		int BOLD_SIZE = 14;
 		Font MONOSPACE;
 		Font NORMAL;
 		Font BOLD;
@@ -62,8 +65,9 @@ public class PdfGenerator extends PdfPageEventHelper {
 					.register(LiberationMonoFontPath, LiberationMonoFontPath);
 			FontFactory.register(LiberationMonoBoldFontPath,
 					LiberationMonoBoldFontPath);
-			FontFactory
-					.register(TimesNewRomanFontPath, TimesNewRomanFontPath);
+			FontFactory.register(TimesNewRomanFontPath, TimesNewRomanFontPath);
+			FontFactory.register(TimesNewRomanBoldFontPath,
+					TimesNewRomanFontPath);
 			// Get the font NB. last parameter indicates font needs to be
 			// embedded
 			MONOSPACE = FontFactory.getFont(LiberationMonoFontPath,
@@ -73,11 +77,11 @@ public class PdfGenerator extends PdfPageEventHelper {
 			NORMAL = FontFactory.getFont(TimesNewRomanFontPath,
 					BaseFont.CP1250, BaseFont.EMBEDDED);
 			NORMAL.setStyle(Font.NORMAL);
-			NORMAL.setSize(12);
-			BOLD = FontFactory.getFont(TimesNewRomanFontPath,
-					BaseFont.CP1250, BaseFont.EMBEDDED);
+			NORMAL.setSize(NORMAL_SIZE);
+			BOLD = FontFactory.getFont(TimesNewRomanBoldFontPath, BaseFont.CP1250,
+					BaseFont.EMBEDDED);
 			BOLD.setStyle(Font.BOLD);
-			BOLD.setSize(14);
+			BOLD.setSize(BOLD_SIZE);
 			ITALIC = FontFactory.getFont(TimesNewRomanFontPath,
 					BaseFont.CP1250, BaseFont.EMBEDDED);
 			ITALIC.setStyle(Font.ITALIC);
@@ -191,7 +195,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 			final Chunk chunk = new Chunk(i + ". " + songTitle, fonts.NORMAL)
 					.setLocalGoto(songTitle);
 			this.document.add(new Paragraph(chunk));
-			
+
 			String songTitleId = songTitle + i;
 
 			// Add a placeholder for the page reference
@@ -227,8 +231,8 @@ public class PdfGenerator extends PdfPageEventHelper {
 
 			String songLyrics = SongLyrics.get(songPrintObjects.get(i)
 					.getLyricsID()).songLyrics;
-			
-			//System.out.println(songLyrics);
+
+			// System.out.println(songLyrics);
 
 			// String songLyrics = songPrintObjects.get(i).getKey();
 
@@ -245,15 +249,15 @@ public class PdfGenerator extends PdfPageEventHelper {
 			chapter.addSection(new Paragraph(songLyrics, fonts.MONOSPACE), 0);
 			// chapter.setNumberDepth(0);
 			this.document.add(chapter);
-			
+
 			String songTitleId = songTitle + i;
 
 			// When we wrote the chapter, we now the pagenumber
 			final PdfTemplate template = this.tocPlaceholder.get(songTitleId);
 			template.beginText();
-			template.setFontAndSize(fonts.MONOSPACE.getBaseFont(), 12);
+			template.setFontAndSize(fonts.NORMAL.getBaseFont(), 12);
 			template.setTextMatrix(
-					50 - fonts.MONOSPACE.getBaseFont().getWidthPoint(
+					50 - fonts.NORMAL.getBaseFont().getWidthPoint(
 							String.valueOf(this.writer.getPageNumber()), 12), 0);
 			template.showText(String.valueOf(this.writer.getPageNumber()));
 			template.endText();
