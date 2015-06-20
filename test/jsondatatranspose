@@ -2,13 +2,6 @@
     "songs": [
         {
             "song": {
-                "id": "259",
-                "lyricsID": "259",
-		        "key": "D"
-            }
-        },
-        {
-            "song": {
                 "id": "142",
                 "lyricsID": "142",
 		        "key": "G"

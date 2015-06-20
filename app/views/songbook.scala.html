@@ -198,7 +198,7 @@
         $('#song_table .json-song-id').each(function(){
                 songData.push($(this).text());
             });
-        var songIds = []
+        var songIds = [];
         for (var i=0;i<lyricsData.length;i++){
             var songObject = new Object();
             var songValue = new Object();
@@ -245,7 +245,7 @@
                     success: function (data) {
                         var link = "@routes.Application.downloadAndDeleteFile()";
                         link = link.concat("?hash=" + data);
-                        link = link.concat("&format=" + format)
+                        link = link.concat("&format=" + format);
                         window.location=link;
                     },
                     contentType : 'application/json'

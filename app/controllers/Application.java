@@ -5,13 +5,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import controllers.chords.ChordLineTransposer;
 import controllers.songbook.XLSHelper;
 import models.Song;
 import models.SongLyrics;
 import models.UserAccount;
 import models.helpers.SongPrint;
 import models.json.JsonSongbook;
-
 import play.Logger;
 import play.Routes;
 import play.data.Form;
@@ -408,6 +408,7 @@ public class Application extends Controller {
 	public static Result test() {
 		System.out.println("TEST!");
 		// newSongbookPdf
+		ChordLineTransposer.test();
 		return ok();
 	}
 	

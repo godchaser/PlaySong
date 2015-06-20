@@ -225,6 +225,8 @@ public class PdfGenerator extends PdfPageEventHelper {
 
 			String songLyrics = SongLyrics.get(songPrintObjects.get(i)
 					.getLyricsID()).songLyrics;
+			
+			System.out.println(songLyrics);
 
 			// String songLyrics = songPrintObjects.get(i).getKey();
 
