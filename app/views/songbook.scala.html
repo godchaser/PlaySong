@@ -176,7 +176,8 @@
 			        row.next().after(row);
 			});
             songBookPrepared = true;
-            $('#submit-button').addClass("btn btn-success");
+            $('#submit-button').removeClass('btn-warning');           
+            $('#submit-button').addClass('btn-success');
             $('#submit-button').html('Download Songbook ' + '<i class="glyphicon glyphicon-download-alt"></i>');
         }
         }
