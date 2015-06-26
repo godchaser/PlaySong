@@ -81,7 +81,7 @@ public class LineTypeChecker {
             Logger.debug("Checking song lines: " + songLine);
             if (LineTypeChecker.isChordLine(songLine)) {
                 Logger.trace("Checking chords " + songLine);
-                if (songLine.startsWith(".")) {
+                if (songLine.trim().startsWith(".")) {
                     Logger.debug("removing all full stops (.) with blanks");
                     songLine = songLine.replace(".", "");
                 }

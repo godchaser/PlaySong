@@ -31,7 +31,7 @@ import play.Logger;
  */
 public class ChordLineTransposer {
 
-	private String line;
+	private String chordLine;
 	ChordHelper chordHelper = new ChordHelper();
 
 	/**
@@ -41,15 +41,23 @@ public class ChordLineTransposer {
 	 *            the line to transpose.
 	 */
 	public ChordLineTransposer(String line) {
-		this.line = sanitizeLine(line);
+		setChordLine(sanitizeLine(line));
 	}
 
 	private String sanitizeLine(String line) {
-		if (line.startsWith(".")) {
+		if (line.trim().startsWith(".")) {
 			Logger.debug("removing all full stops (.) with blanks");
 			line = line.replace(".", " ");
 		}
 		return line;
+	}
+
+	public String getChordLine() {
+		return chordLine;
+	}
+
+	public void setChordLine(String line) {
+		this.chordLine = line;
 	}
 
 	/**
@@ -65,16 +73,16 @@ public class ChordLineTransposer {
 	 * @return the transposed line.
 	 */
 	public String transpose(int semitones, String newKey) {
-		boolean startSpace = line.startsWith(" ");
-		boolean chordsComment = line.endsWith("//chords");
+		boolean startSpace = chordLine.startsWith(" ");
+		boolean chordsComment = chordLine.endsWith("//chords");
 		if (!startSpace) {
-			line = " " + line;
+			chordLine = " " + chordLine;
 		}
 		if (chordsComment) {
-			line = line.substring(0, line.indexOf("//chords"));
+			chordLine = chordLine.substring(0, chordLine.indexOf("//chords"));
 		}
-		String[] chords = line.split("\\s+");
-		String[] whitespace = line.split("[A-Za-z0-9#/]+");
+		String[] chords = chordLine.split("\\s+");
+		String[] whitespace = chordLine.split("[A-Za-z0-9#/]+");
 		StringBuilder ret = new StringBuilder();
 		for (int i = 0; i < chords.length; i++) {
 			ret.append(new ChordTransposer(chords[i]).transpose(semitones,
@@ -84,29 +92,29 @@ public class ChordLineTransposer {
 			}
 		}
 		if (!startSpace) {
-			line = line.substring(1);
+			chordLine = chordLine.substring(1);
 		}
 		String str = ret.toString();
 		if (!startSpace) {
 			str = str.substring(1);
 		}
 		if (chordsComment) {
-			line = line + "//chords";
+			chordLine = chordLine + "//chords";
 		}
 		return str;
 	}
 
 	public String transpose2(String currentKey, String targetKey) {
 
-		boolean startSpace = line.startsWith(" ");
+		boolean startSpace = chordLine.startsWith(" ");
 		if (!startSpace) {
-			line = " " + line;
+			chordLine = " " + chordLine;
 		}
 
-		String[] chords = line.split("\\s+");
-		String[] whitespace = line.split("[A-Za-z0-9#/]+");
+		String[] chords = chordLine.split("\\s+");
+		String[] whitespace = chordLine.split("[A-Za-z0-9#/]+");
 		StringBuilder ret = new StringBuilder();
-		Logger.debug("LINE: " + line);
+		Logger.debug("LINE: " + chordLine);
 
 		for (int i = 0; i < chords.length; i++) {
 			// I am skipping empty string
