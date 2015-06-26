@@ -80,7 +80,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 			NORMAL.setSize(NORMAL_SIZE);
 			BOLD = FontFactory.getFont(TimesNewRomanBoldFontPath, BaseFont.CP1250,
 					BaseFont.EMBEDDED);
-			BOLD.setStyle(Font.BOLD);
+			BOLD.setStyle(Font.NORMAL);
 			BOLD.setSize(BOLD_SIZE);
 			ITALIC = FontFactory.getFont(TimesNewRomanFontPath,
 					BaseFont.CP1250, BaseFont.EMBEDDED);
