@@ -159,7 +159,7 @@
 
 				songList.initialize();
 
-				$('#scrollable-dropdown-menu .typeahead').typeahead(null, {
+				$('.typeahead').typeahead(null, {
 					name : 'songs',
 					displayKey : 'value',
 					minLength : '2',
@@ -168,7 +168,7 @@
 				});
 
 				//typeahead callback function
-				$('#scrollable-dropdown-menu .typeahead').bind('typeahead:selected', function(obj, datum, name) {
+				$('.typeahead').bind('typeahead:selected', function(obj, datum, name) {
 					// you can print datum to see json avps
 					var id = datum.key;
 					var songViewerUrl = jsRoutes.controllers.Application.songview(id).url;
