@@ -11,6 +11,7 @@ import models.Song;
 import models.SongLyrics;
 import models.UserAccount;
 import models.helpers.SongPrint;
+import models.helpers.XMLSongsParser;
 import models.json.JsonSongbook;
 import play.Logger;
 import play.Routes;
@@ -436,6 +437,11 @@ public class Application extends Controller {
 		Ebean.delete(Song.all());
 		SongImporter.restoreFromSQLDump();
 		return redirect(routes.Application.table());
+	}
+	
+	public static Result xmlupdate() {
+		XMLSongsParser.updateFromXML();
+		return ok();
 	}
 
 	public static Result updateFromXLS() {

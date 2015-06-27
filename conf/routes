@@ -45,6 +45,9 @@ GET      /sqlinit                     controllers.Application.sqlinit()
 GET      /yamlbackup                  controllers.Application.yamlbackup()
 GET      /yamlrestore                 controllers.Application.yamlrestore()
 
+# update from xml
+GET      /xmlupdate                   controllers.Application.xmlupdate()
+
 # getting paginated data fost data table
 GET      /getsongsdatatable           controllers.Application.getsongsdatatable()
 GET      /admin                       controllers.Application.admin()
