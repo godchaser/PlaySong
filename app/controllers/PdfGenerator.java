@@ -95,6 +95,8 @@ public class PdfGenerator extends PdfPageEventHelper {
 
 	public PdfGenerator(String outputPdfPath) throws Exception {
 		this.document = new Document(songPageSize);
+		this.document.setMargins(50, 50, 60, 40);
+		this.document.setMarginMirroring(false);
 		this.writer = PdfWriter.getInstance(this.document,
 				new FileOutputStream(outputPdfPath));
 		this.writer.setPageEvent(this);
@@ -178,17 +180,9 @@ public class PdfGenerator extends PdfPageEventHelper {
 				fonts.BOLD), 0);
 		intro.setNumberDepth(0);
 		this.document.add(intro);
-		int tocLineCount = 0;
+		
 		for (int i = 0; i < songPrintObjects.size(); i++) {
-			tocLineCount++;
-			if (tocLineCount == 41) {
-				final Chapter introBlank = new Chapter(new Paragraph(" ",
-						fonts.NORMAL), 0);
-				introBlank.setNumberDepth(0);
-				this.document.add(introBlank);
-				tocLineCount = 0;
-			}
-
+			
 			final String songTitle = songPrintObjects.get(i).getSong().songName;
 			// final String songTitle = songPrintObjects.get(i).getSong();
 
