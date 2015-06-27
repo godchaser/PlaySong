@@ -30,7 +30,7 @@
 	</div>
 	<form class="btn-group" id="songbook-form">
 		<div class="btn-group">
-			<select id="song-selector" class="btn-group btn-primary active" multiple="multiple">
+			<select id="song-selector" class="btn-group btn-info active" multiple="multiple">
 				@songs.map { song =>
 				@song.songLyrics.zipWithIndex.map{ case (songlyrics, i) =>
 				@if(i==0){
