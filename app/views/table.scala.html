@@ -11,7 +11,11 @@
 	<h2>Song Database</h2>
 	<div class="panel panel-default">
 		<div class="panel-heading"  id="song_table_header">
-			<i class="glyphicon glyphicon-stats"></i> @numberOfSongsInDatabase songs
+			<i class="glyphicon glyphicon-stats pull-left"></i> @numberOfSongsInDatabase songs			
+			<button id="addsongbutton" class="songbuttons btn btn-info pull-right">
+				<i class="glyphicon glyphicon-plus"></i> Add new song
+			</button>
+			<div class="clearfix"></div>
 		</div>
 		<div class="col-lg-6"  id="song_table_div">
 			<div class="panel-body">
@@ -46,9 +50,6 @@
 			<div class="row">
 				<button id="editsongbutton" class="songbuttons btn btn-primary btn-warning" href="#">
 					<i class="glyphicon glyphicon-edit"></i> Edit song
-				</button>
-				<button id="addsongbutton" class="songbuttons btn btn-primary btn-info">
-					<i class="glyphicon glyphicon-plus"></i> Add new song
 				</button>
 				<button id="deletesongbutton" class="songbuttons btn btn-primary btn-danger">
 					<i class="glyphicon glyphicon-trash"></i> Delete song
