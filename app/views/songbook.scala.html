@@ -28,9 +28,9 @@
 			</div>
 		</div>
 	</div>
-	<form class="btn-group" id="songbook-form">
-		<div class="btn-group">
-			<select id="song-selector" class="btn-group btn-info active" multiple="multiple">
+	<form class="btn-group form-inline" role="form" id="songbook-form">
+		<div class="form-group">
+			<select id="song-selector" class="btn btn-group btn-info active form-control" multiple="multiple">
 				@songs.map { song =>
 				@song.songLyrics.zipWithIndex.map{ case (songlyrics, i) =>
 				@if(i==0){
@@ -44,26 +44,26 @@
 				}
 				}
 			</select>
-			<select id="title-font" class="btn btn-group btn-default">
+			<select id="title-font" class="btn btn-group btn-default form-control">
 				<option label="Title font">Title font</option>
 				<option value="1">Arial</option>
 				<option value="2">Droid Sans</option>
 				<option value="3">Courier New</option>
 			</select>
-			<select id="lyrics-font" class="btn btn-group btn-default">
+			<select id="lyrics-font" class="btn btn-group btn-default form-control">
 				<option label="Lyrics font">Lyrics font</option>
 				<option value="1">Courier New</option>
 				<option value="2">Droid Sans Mono</option>
 				<option value="3">Consolas</option>
 			</select>
-			<select id="document-format" class="btn-group selectpicker">
+			<select id="document-format" class="btn btn-group btn-default selectpicker form-control">
 				<option value="1" data-content="<i class='fa fa-file-pdf-o fa-lg'></i> pdf">pdf</option>
 				<option value="2" data-content="<i class='fa fa-file-word-o fa-lg'></i> word">word</option>
 			</select>
-		</div>
-		<button type="button" id="submit-button" class="btn btn-warning">
+		<button type="button" id="submit-button" class="btn btn-group btn-warning form-control">
 			<i class="fa fa-book fa-fw"></i>Prepare songbook
 		</button>
+		</div>
 	</form>
 	<div>
 		<table id="song_table" class="table table-striped table-bordered" width="100%" cellspacing="0"></table>

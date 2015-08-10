@@ -37,7 +37,7 @@ import java.text.Collator;
 import java.util.*;
 
 import com.avaje.ebean.Expr;
-import com.avaje.ebean.Page;
+import com.avaje.ebean.PagedList;
 
 import java.util.AbstractMap.SimpleEntry;
 
@@ -483,8 +483,8 @@ public class Application extends Controller {
 		 * Get page to show from database It is important to set setFetchAhead
 		 * to false, since it doesn't benefit a stateless application at all.
 		 */
-		Page<Song> songPage = Song.find
-				.where(Expr.or(Expr.ilike("songName", "%" + filter + "%"), Expr
+		//Song.find.where()
+		PagedList<Song> songPage = Song.find.where(Expr.or(Expr.ilike("songName", "%" + filter + "%"), Expr
 						.or(Expr.ilike("songAuthor", "%" + filter + "%"),
 								Expr.icontains("songLyrics.songLyrics", "%"
 										+ filter + "%"))))

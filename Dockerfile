@@ -23,9 +23,9 @@ RUN apt-get -y update
 #RUN apt-get -y install ttf-mscorefonts-installer --quiet
 RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
 RUN apt-get -y install oracle-java8-installer
-RUN wget http://downloads.typesafe.com/typesafe-activator/1.3.2/typesafe-activator-1.3.2.zip
-RUN unzip typesafe-activator-1.3.2.zip -d / && rm typesafe-activator-1.3.2.zip && chmod a+x /activator-1.3.2/activator
-ENV PATH $PATH:/activator-1.3.2
+RUN wget http://downloads.typesafe.com/typesafe-activator/1.3.5/typesafe-activator-1.3.2.zip
+RUN unzip typesafe-activator-1.3.5.zip -d / && rm typesafe-activator-1.3.5.zip && chmod a+x /activator-1.3.5/activator
+ENV PATH $PATH:/activator-1.3.5
 RUN git clone https://github.com/godchaser/PlaySong.git
 WORKDIR "/PlaySong"
 EXPOSE 9000 8888

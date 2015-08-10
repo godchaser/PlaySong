@@ -6,7 +6,13 @@ lazy val `playsong` = (project in file(".")).enablePlugins(PlayJava)
 
 scalaVersion := "2.11.1"
 
-libraryDependencies ++= Seq( javaJdbc , javaEbean , cache , javaWs ,
+// Compile the project before generating Eclipse files, so that generated .scala or .class files for views and routes are present
+EclipseKeys.preTasks := Seq(compile in Compile)
+
+lazy val myProject = (project in file("."))
+  .enablePlugins(PlayJava, PlayEbean)
+
+libraryDependencies ++= Seq( javaJdbc , cache , javaWs , evolutions,
   "org.hsqldb" % "hsqldb" % "2.3.2",
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
   "org.apache.poi" % "poi" % "3.10-FINAL",
