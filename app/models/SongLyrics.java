@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import com.avaje.ebean.Model;
+import play.db.ebean.Model;
 /**
  * Created by samuel on 3/31/15.
  */

@@ -1,14 +1,11 @@
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 import play.Application;
 import play.GlobalSettings;
 import play.libs.Akka;
 import scala.concurrent.duration.FiniteDuration;
-
-import java.lang.reflect.Method;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by samuel on 4/8/15.

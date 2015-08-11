@@ -1,7 +1,5 @@
 package models;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.persistence.*;
@@ -9,9 +7,7 @@ import javax.persistence.*;
 import controllers.chords.LineTypeChecker;
 import play.data.format.Formats;
 import play.data.validation.Constraints.Required;
-import com.avaje.ebean.Model;
-
-import static java.util.Collections.*;
+import play.db.ebean.Model;
 
 /**
  * Created by samuel on 19.02.15..
@@ -60,7 +56,7 @@ public class Song extends Model implements Comparator<Song>{
 
     public static void updateOrCreateSong(Song song) {
         //delete empty lyrics
-        List removedList = new ArrayList();
+        List<SongLyrics> removedList = new ArrayList<SongLyrics>();
         for (int i=0;i<song.songLyrics.size();i++){
              if (song.songLyrics.get(i).getsongLyrics().length()<2){
                 removedList.add(song.songLyrics.get(i));
@@ -72,13 +68,13 @@ public class Song extends Model implements Comparator<Song>{
             songLyrics.setSongKey(songKey);
         }
         if (song.id != null && song.id>0){
-            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+            //DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
             Date date = new Date();
             song.setDateModified(date);
             song.update();
         } else {
             song.id = null;
-            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+            //DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
             Date date = new Date();
             song.setDateCreated(date);
             song.save();
@@ -89,12 +85,14 @@ public class Song extends Model implements Comparator<Song>{
         find.ref(id).delete();
     }
 
-    public static boolean contains(Long id) {
+    public boolean contains(Long id) {
+    	//find.where()
         return find.ref(id).contains(id);
     }
 
 
-    public static Finder<Long, Song> find = new Finder(Long.class, Song.class);
+    public static play.db.ebean.Model.Finder<Long, Song> find = new play.db.ebean.Model.Finder<Long, Song>(Song.class);
+    
 
     @Override
     public int compare(Song song1, Song song2) {

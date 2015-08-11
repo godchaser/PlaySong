@@ -37,6 +37,7 @@ import java.text.Collator;
 import java.util.*;
 
 import com.avaje.ebean.Expr;
+import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.PagedList;
 
 import java.util.AbstractMap.SimpleEntry;
@@ -64,12 +65,12 @@ public class Application extends Controller {
 		}
 	}
 
-	public static Result index() {
+	public Result index() {
 		return redirect(routes.Application.table());
 	}
 
 	@Security.Authenticated(Secured.class)
-	public static Result admin() {
+	public Result admin() {
 		Html welcome = new Html("");
 		UserAccount user = null;
 		if (request().cookies().get("PLAY_SESSION") != null) {
@@ -93,7 +94,7 @@ public class Application extends Controller {
 	}
 
 	@Security.Authenticated(Secured.class)
-	public static Result upload() {
+	public Result upload() {
 		UserAccount user = null;
 		if (request().username() != null) {
 			user = UserAccount.find.byId(request().username());
@@ -123,7 +124,6 @@ public class Application extends Controller {
 			}
 			Logger.trace("Updating songs");
 			XLSHelper.importAndUpdateSongs3();
-
 			return redirect(routes.Application.admin());
 		} else {
 			String message = "File not uploaded - missing  file";
@@ -133,7 +133,7 @@ public class Application extends Controller {
 	}
 
 	@Security.Authenticated(Secured.class)
-	public static Result addUser() {
+	public Result addUser() {
 		Form<UserAccount> filledForm = userForm.bindFromRequest();
 		UserAccount user = null;
 		if (request().username() != null) {
@@ -163,7 +163,7 @@ public class Application extends Controller {
 	}
 
 	@Security.Authenticated(Secured.class)
-	public static Result getUser(String email) {
+	public Result getUser(String email) {
 		UserAccount foundUser = null;
 		if (email != null) {
 			foundUser = UserAccount.find.byId(email);
@@ -179,7 +179,7 @@ public class Application extends Controller {
 	}
 
 	@Security.Authenticated(Secured.class)
-	public static Result deleteUser(String email) {
+	public Result deleteUser(String email) {
 		UserAccount foundUser = null;
 		if (email != null) {
 			foundUser = UserAccount.find.byId(email);
@@ -196,7 +196,7 @@ public class Application extends Controller {
 	}
 
 	@Security.Authenticated(Secured.class)
-	public static Result updateUser(String email) {
+	public Result updateUser(String email) {
 		Form<UserAccount> filledForm = userForm.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			String message = "Invalid user update form";
@@ -211,7 +211,7 @@ public class Application extends Controller {
 	}
 
 	@Security.Authenticated(Secured.class)
-	public static Result getXLS() {
+	public Result getXLS() {
 		XLSHelper.dumpSongs((Song.find.all()));
 		String message = "Getting xls songs";
 		Logger.trace(message);
@@ -233,7 +233,7 @@ public class Application extends Controller {
 		return ok(fin);
 	}
 
-	public static Result table() {
+	public Result table() {
 		UserAccount user = null;
 		if (request().cookies().get("PLAY_SESSION") != null) {
 			Logger.debug("Found PLAY_SESSION cookie");
@@ -254,7 +254,7 @@ public class Application extends Controller {
 	}
 
 	@Security.Authenticated(Secured.class)
-	public static Result songeditor(Long id) {
+	public Result songeditor(Long id) {
 		UserAccount user = null;
 		if (request().username() != null) {
 			user = UserAccount.find.byId(request().username());
@@ -266,12 +266,12 @@ public class Application extends Controller {
 	}
 
 	@Security.Authenticated(Secured.class)
-	public static Result newsongeditor() {
+	public Result newsongeditor() {
 		Long id = -1L;
 		return redirect(routes.Application.songeditor(id));
 	}
 
-	public static Result songview(Long id) {
+	public Result songview(Long id) {
 		UserAccount user = null;
 		if (request().cookies().get("PLAY_SESSION") != null) {
 			Logger.debug("Found PLAY_SESSION cookie");
@@ -291,7 +291,7 @@ public class Application extends Controller {
 		return ok(songviewer.render(id, user));
 	}
 
-	public static Result songbook() {
+	public Result songbook() {
 		Html welcome = new Html("");
 		HR_COLLATOR.setStrength(Collator.PRIMARY);
 		List<Song> sortedSongs = Song.all();
@@ -320,11 +320,11 @@ public class Application extends Controller {
 		return ok(songbook.render(sortedSongs, user));
 	}
 
-	public static Result getsongs() {
+	public Result getsongs() {
 		return ok(Json.toJson(Song.all()));
 	}
 
-	public static Result getsongdata() {
+	public Result getsongdata() {
 		List<Song> songs = Song.all();
 		ArrayList<ObjectNode> songsJson = new ArrayList<>();
 
@@ -336,19 +336,19 @@ public class Application extends Controller {
 	}
 
 	@Security.Authenticated(Secured.class)
-	public static Result updateFromOnlineSpreadsheet() {
+	public Result updateFromOnlineSpreadsheet() {
 		JsonNode data = request().body().asJson();
 		Logger.debug("Online spreadsheet data: " + data.asText());
 		return ok();
 	}
 
-	public static Result getsongjson(Long id) {
+	public Result getsongjson(Long id) {
 		Song s = Song.get(id);
 		ObjectNode songJson = SongToJson.convert(s);
 		return ok(Json.toJson(songJson));
 	}
 
-	public static Result getsonglyricsjson(Long id) {
+	public Result getsonglyricsjson(Long id) {
 		SongLyrics lyricsObject = SongLyrics.find.byId(id);
 		String lyrics = lyricsObject.getsongLyrics();
 		ObjectNode lyricsResult = Json.newObject();
@@ -357,12 +357,12 @@ public class Application extends Controller {
 	}
 
 	@Security.Authenticated(Secured.class)
-	public static Result deletesong(Long id) {
+	public Result deletesong(Long id) {
 		Song.delete(id);
 		return ok();
 	}
 
-	public static Result newsong() {
+	public Result newsong() {
 		Form<Song> filledForm = songForm.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			return badRequest(views.html.error.render());
@@ -373,15 +373,15 @@ public class Application extends Controller {
 		}
 	}
 
-	public static Result emptyDb() {
+	public Result emptyDb() {
 		Ebean.createSqlUpdate("delete from song_lyrics").execute();
 		Ebean.createSqlUpdate("delete from song").execute();
 		return ok();
 	}
 
-	public static Result init() {
+	public Result init() {
 		try {
-			//SongImporter.restoreFromSQLDump();
+			// SongImporter.restoreFromSQLDump();
 			SongImporter.importFromDb();
 			XLSHelper.importAndUpdateSongs();
 		} catch (Exception e) {
@@ -393,7 +393,7 @@ public class Application extends Controller {
 		return redirect(routes.Application.index());
 	}
 
-	public static Result inituser() {
+	public Result inituser() {
 		try {
 			UserAccount test = new UserAccount("test@test.com", "test", "test");
 			test.save();
@@ -406,50 +406,50 @@ public class Application extends Controller {
 		return redirect(routes.Application.index());
 	}
 
-	public static Result test() {
+	public Result test() {
 		System.out.println("TEST!");
 		// newSongbookPdf
 		ChordLineTransposer.test();
 		return ok();
 	}
-	
-	public static Result songs() {
+
+	public Result songs() {
 		System.out.println("TEST!");
 		// newSongbookPdf
 		return ok(songs.render(Song.all()));
 	}
 
-    public static Result yamlbackup() {
-        System.out.println("yamlbackup!");
-        SongImporter.songToYaml();
-        return redirect(routes.Application.index());
-    }
+	public Result yamlbackup() {
+		System.out.println("yamlbackup!");
+		SongImporter.songToYaml();
+		return redirect(routes.Application.index());
+	}
 
-    public static Result yamlrestore() {
-        System.out.println("yamlrestore!");
-        SongImporter.yamlToSong();
-        return redirect(routes.Application.index());
-    }
+	public Result yamlrestore() {
+		System.out.println("yamlrestore!");
+		SongImporter.yamlToSong();
+		return redirect(routes.Application.index());
+	}
 
-	public static Result sqlinit() {
+	public Result sqlinit() {
 		System.out.println("SQL INIT!");
 		// newSongbookPdf
 		Ebean.delete(Song.all());
 		SongImporter.restoreFromSQLDump();
 		return redirect(routes.Application.table());
 	}
-	
-	public static Result xmlupdate() {
+
+	public Result xmlupdate() {
 		XMLSongsParser.updateFromXML();
 		return ok();
 	}
 
-	public static Result updateFromXLS() {
+	public Result updateFromXLS() {
 		XLSHelper.importAndUpdateSongs();
 		return ok();
 	}
 
-	public static Result getsongsdatatable() {
+	public Result getsongsdatatable() {
 		/**
 		 * Get needed params
 		 */
@@ -483,8 +483,10 @@ public class Application extends Controller {
 		 * Get page to show from database It is important to set setFetchAhead
 		 * to false, since it doesn't benefit a stateless application at all.
 		 */
+		//ExpressionList<T>
 		//Song.find.where()
-		PagedList<Song> songPage = Song.find.where(Expr.or(Expr.ilike("songName", "%" + filter + "%"), Expr
+		PagedList<Song> songPage = Song.find
+				.where(Expr.or(Expr.ilike("songName", "%" + filter + "%"), Expr
 						.or(Expr.ilike("songAuthor", "%" + filter + "%"),
 								Expr.icontains("songLyrics.songLyrics", "%"
 										+ filter + "%"))))
@@ -510,7 +512,7 @@ public class Application extends Controller {
 		return ok(result);
 	}
 
-	public static Result songsuggestions() {
+	public Result songsuggestions() {
 		/**
 		 * Get needed params
 		 */
@@ -537,7 +539,7 @@ public class Application extends Controller {
 		return ok(Json.toJson(songSuggestionsList));
 	}
 
-	public static Result downloadAndDeleteFile() {
+	public Result downloadAndDeleteFile() {
 		final Set<Map.Entry<String, String[]>> entries = request()
 				.queryString().entrySet();
 		String hashValue = null;
@@ -585,7 +587,7 @@ public class Application extends Controller {
 		return ok(fin);
 	}
 
-	public static Result generateSongbook() {
+	public Result generateSongbook() {
 		JsonNode jsonNode = request().body().asJson();
 		ArrayList<SongPrint> songsForPrint = new ArrayList<>();
 		DocumentWriter docWriter = null;
@@ -631,7 +633,7 @@ public class Application extends Controller {
 				// String out = "resources/" + Integer.toString(hash) + ".pdf";
 				// PdfConverter.convert(in, out);
 				String outputPdfPath = "resources/pdf/"
-						+ Integer.toString(hash)+".pdf";
+						+ Integer.toString(hash) + ".pdf";
 				try {
 					Logger.debug("Writing PDF: " + outputPdfPath);
 					PdfGenerator.writeSongs(outputPdfPath, songsForPrint);
@@ -646,11 +648,11 @@ public class Application extends Controller {
 		return ok(Integer.toString(hash));
 	}
 
-	public static Result login() {
+	public Result login() {
 		return ok(login.render(form(Login.class)));
 	}
 
-	public static Result authenticate() {
+	public Result authenticate() {
 		Form<Login> loginForm = form(Login.class).bindFromRequest();
 		if (loginForm.hasErrors()) {
 			return badRequest(login.render(loginForm));
@@ -661,13 +663,13 @@ public class Application extends Controller {
 		}
 	}
 
-	public static Result logout() {
+	public Result logout() {
 		session().clear();
 		flash("success", "You've been logged out");
 		return redirect(routes.Application.index());
 	}
 
-	public static Result javascriptRoutes() {
+	public Result javascriptRoutes() {
 		response().setContentType("text/javascript");
 		return ok(Routes.javascriptRouter("jsRoutes",
 				controllers.routes.javascript.Application.songview(),
