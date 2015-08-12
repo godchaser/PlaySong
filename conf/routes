@@ -5,13 +5,14 @@
 # Home page
 GET      /                            controllers.Application.index()
 
+# Authentication routes
 GET      /login                       controllers.Application.login()
 POST     /login                       controllers.Application.authenticate()
 GET      /logout                      controllers.Application.logout()
-# Songs RESTFUL API
+
+## Songs RESTFUL API
 # not used currently - sending all (unfiltered) songs as json
 GET      /songs                       controllers.Application.getsongdata()
-
 # POST add song - from form - not JSON
 POST     /songs                       controllers.Application.newsong()
 DELETE   /songs/:id                   controllers.Application.deletesong(id: Long)
@@ -25,39 +26,34 @@ GET      /songlyricsjson/:id          controllers.Application.getsonglyricsjson(
 # used for dashboard search engine
 GET      /songsuggestions             controllers.Application.songsuggestions()
 
-# used for db init
-GET      /init                        controllers.Application.init()
-GET      /inituser                    controllers.Application.inituser()
-
-# used for clearing all data from db
-GET      /empty                       controllers.Application.emptyDb()
-
 #used for update through xls file
 GET      /update                      controllers.Application.updateFromXLS()
 GET      /getxls                      controllers.Application.getXLS()
-
 POST     /updatefromspreadsheet       controllers.Application.updateFromOnlineSpreadsheet()
 
-#simple echo test
-GET      /test                        controllers.Application.test()
-
+##db operations
+# used for db init
+GET      /init                        controllers.Application.init()
+GET      /inituser                    controllers.Application.inituser()
 GET      /sqlinit                     controllers.Application.sqlinit()
 GET      /yamlbackup                  controllers.Application.yamlbackup()
 GET      /yamlrestore                 controllers.Application.yamlrestore()
+# used for clearing all data from db
+GET      /empty                       controllers.Application.emptyDb()
+# db sanitize - update song keys (chords)
+GET      /sanitize                    controllers.Application.sanitizesongs()
 
 # update from xml
 GET      /xmlupdate                   controllers.Application.xmlupdate()
+# upload xls
+POST     /upload                      controllers.Application.upload()
 
-# getting paginated data fost data table
+# getting paginated data for data table
 GET      /getsongsdatatable           controllers.Application.getsongsdatatable()
-GET      /admin                       controllers.Application.admin()
 
 # download songbook
 GET      /downloadsongbook            controllers.Application.downloadAndDeleteFile()
 POST     /generatesongbook            controllers.Application.generateSongbook()
-
-# upload xls
-POST     /upload                      controllers.Application.upload()
 
 # REST user account management
 POST     /user                        controllers.Application.addUser()
@@ -66,6 +62,7 @@ DELETE   /user/:email                 controllers.Application.deleteUser(email: 
 PUT      /user/:email                 controllers.Application.updateUser(email: String)
 
 # views
+GET      /admin                       controllers.Application.admin()
 GET      /table                       controllers.Application.table()
 GET      /songbook                    controllers.Application.songbook()
 GET      /songeditor/:id              controllers.Application.songeditor(id: Long)
@@ -76,3 +73,6 @@ GET      /songsbackup                 controllers.Application.songs()
 GET      /assets/javascripts/routes   controllers.Application.javascriptRoutes()
 # Map static resources from the /public folder to the /assets URL path
 GET      /assets/*file                controllers.Assets.at(path="/public", file)
+
+#simple echo test
+GET      /test                        controllers.Application.test()

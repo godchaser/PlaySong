@@ -381,7 +381,7 @@ public class Application extends Controller {
 
 	public static Result init() {
 		try {
-			//SongImporter.restoreFromSQLDump();
+			// SongImporter.restoreFromSQLDump();
 			SongImporter.importFromDb();
 			XLSHelper.importAndUpdateSongs();
 		} catch (Exception e) {
@@ -406,30 +406,23 @@ public class Application extends Controller {
 		return redirect(routes.Application.index());
 	}
 
-	public static Result test() {
-		System.out.println("TEST!");
-		// newSongbookPdf
-		ChordLineTransposer.test();
-		return ok();
-	}
-	
 	public static Result songs() {
 		System.out.println("TEST!");
 		// newSongbookPdf
 		return ok(songs.render(Song.all()));
 	}
 
-    public static Result yamlbackup() {
-        System.out.println("yamlbackup!");
-        SongImporter.songToYaml();
-        return redirect(routes.Application.index());
-    }
+	public static Result yamlbackup() {
+		System.out.println("yamlbackup!");
+		SongImporter.songToYaml();
+		return redirect(routes.Application.index());
+	}
 
-    public static Result yamlrestore() {
-        System.out.println("yamlrestore!");
-        SongImporter.yamlToSong();
-        return redirect(routes.Application.index());
-    }
+	public static Result yamlrestore() {
+		System.out.println("yamlrestore!");
+		SongImporter.yamlToSong();
+		return redirect(routes.Application.index());
+	}
 
 	public static Result sqlinit() {
 		System.out.println("SQL INIT!");
@@ -438,7 +431,7 @@ public class Application extends Controller {
 		SongImporter.restoreFromSQLDump();
 		return redirect(routes.Application.table());
 	}
-	
+
 	public static Result xmlupdate() {
 		XMLSongsParser.updateFromXML();
 		return ok();
@@ -631,7 +624,7 @@ public class Application extends Controller {
 				// String out = "resources/" + Integer.toString(hash) + ".pdf";
 				// PdfConverter.convert(in, out);
 				String outputPdfPath = "resources/pdf/"
-						+ Integer.toString(hash)+".pdf";
+						+ Integer.toString(hash) + ".pdf";
 				try {
 					Logger.debug("Writing PDF: " + outputPdfPath);
 					PdfGenerator.writeSongs(outputPdfPath, songsForPrint);
@@ -681,5 +674,20 @@ public class Application extends Controller {
 				controllers.routes.javascript.Application.getUser(),
 				controllers.routes.javascript.Application.deleteUser(),
 				controllers.routes.javascript.Application.updateUser()));
+	}
+
+	public static Result test() {
+		System.out.println("TEST!");
+		// newSongbookPdf
+		ChordLineTransposer.test();
+		return ok();
+	}
+
+	public static Result sanitizesongs() {
+		System.out.println("sanitizesongs!");
+		for (Song s : Song.all()) {
+			Song.updateOrCreateSong(s);
+		}
+		return ok();
 	}
 }
