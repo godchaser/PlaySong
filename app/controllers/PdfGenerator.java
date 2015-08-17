@@ -226,7 +226,6 @@ public class PdfGenerator extends PdfPageEventHelper {
 			String songLyrics = SongLyrics.get(songPrintObjects.get(i)
 					.getLyricsID()).songLyrics;
 
-			// System.out.println(songLyrics);
 
 			// String songLyrics = songPrintObjects.get(i).getKey();
 
@@ -242,6 +241,8 @@ public class PdfGenerator extends PdfPageEventHelper {
 			}
 			chapter.addSection(new Paragraph(songLyrics, fonts.MONOSPACE), 0);
 			// chapter.setNumberDepth(0);
+			System.out.println("PDF +++++++++++++");
+			System.out.println(songLyrics);
 			this.document.add(chapter);
 
 			String songTitleId = songTitle + i;

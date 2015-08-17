@@ -320,10 +320,12 @@ public class Application extends Controller {
 		return ok(songbook.render(sortedSongs, user));
 	}
 
+	@Security.Authenticated(Secured.class)
 	public static Result getsongs() {
 		return ok(Json.toJson(Song.all()));
 	}
 
+	@Security.Authenticated(Secured.class)
 	public static Result getsongdata() {
 		List<Song> songs = Song.all();
 		ArrayList<ObjectNode> songsJson = new ArrayList<>();
@@ -362,6 +364,7 @@ public class Application extends Controller {
 		return ok();
 	}
 
+	@Security.Authenticated(Secured.class)
 	public static Result newsong() {
 		Form<Song> filledForm = songForm.bindFromRequest();
 		if (filledForm.hasErrors()) {
@@ -373,12 +376,14 @@ public class Application extends Controller {
 		}
 	}
 
+	@Security.Authenticated(Secured.class)
 	public static Result emptyDb() {
 		Ebean.createSqlUpdate("delete from song_lyrics").execute();
 		Ebean.createSqlUpdate("delete from song").execute();
 		return ok();
 	}
 
+	@Security.Authenticated(Secured.class)
 	public static Result init() {
 		try {
 			// SongImporter.restoreFromSQLDump();
@@ -412,18 +417,21 @@ public class Application extends Controller {
 		return ok(songs.render(Song.all()));
 	}
 
+	@Security.Authenticated(Secured.class)
 	public static Result yamlbackup() {
 		System.out.println("yamlbackup!");
 		SongImporter.songToYaml();
 		return redirect(routes.Application.index());
 	}
 
+	@Security.Authenticated(Secured.class)
 	public static Result yamlrestore() {
 		System.out.println("yamlrestore!");
 		SongImporter.yamlToSong();
 		return redirect(routes.Application.index());
 	}
 
+	@Security.Authenticated(Secured.class)
 	public static Result sqlinit() {
 		System.out.println("SQL INIT!");
 		// newSongbookPdf
@@ -432,11 +440,13 @@ public class Application extends Controller {
 		return redirect(routes.Application.table());
 	}
 
+	@Security.Authenticated(Secured.class)
 	public static Result xmlupdate() {
 		XMLSongsParser.updateFromXML();
 		return ok();
 	}
 
+	@Security.Authenticated(Secured.class)
 	public static Result updateFromXLS() {
 		XLSHelper.importAndUpdateSongs();
 		return ok();
@@ -683,11 +693,25 @@ public class Application extends Controller {
 		return ok();
 	}
 
+	@Security.Authenticated(Secured.class)
 	public static Result sanitizesongs() {
 		System.out.println("sanitizesongs!");
+		/*
+		// Sanitizing all lyrics
+		for (SongLyrics sl : SongLyrics.all()) {
+			//removing all tabs
+			String sanitizedLyrics = sl.getsongLyrics().replaceAll("\\t",
+					"    ");
+			sl.setsongLyrics(sanitizedLyrics);
+			sl.save();
+		}
+		*/
+		// Sanitizing all songs
 		for (Song s : Song.all()) {
 			Song.updateOrCreateSong(s);
 		}
+		
 		return ok();
 	}
+
 }

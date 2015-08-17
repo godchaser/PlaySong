@@ -10,7 +10,6 @@ import controllers.chords.LineTypeChecker;
 import play.data.format.Formats;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
-
 import static java.util.Collections.*;
 
 /**
@@ -71,6 +70,10 @@ public class Song extends Model implements Comparator<Song> {
 			String songKey = LineTypeChecker.getSongKey(songLyrics
 					.getsongLyrics());
 			songLyrics.setSongKey(songKey);
+			// sanitizing songlyrics - removing all tabs
+			String sanitizedLyrics = songLyrics.getsongLyrics().replaceAll(
+					"\\t", "    ");
+			songLyrics.setsongLyrics(sanitizedLyrics);
 		}
 		if (song.id != null && song.id > 0) {
 			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
