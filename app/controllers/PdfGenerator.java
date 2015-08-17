@@ -228,6 +228,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 
 
 			// String songLyrics = songPrintObjects.get(i).getKey();
+			System.out.println(songLyrics);
 
 			// SONG TRANSPOSE FUNCTION
 
@@ -241,8 +242,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 			}
 			chapter.addSection(new Paragraph(songLyrics, fonts.MONOSPACE), 0);
 			// chapter.setNumberDepth(0);
-			System.out.println("PDF +++++++++++++");
-			System.out.println(songLyrics);
+
 			this.document.add(chapter);
 
 			String songTitleId = songTitle + i;
