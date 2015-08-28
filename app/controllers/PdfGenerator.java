@@ -190,7 +190,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 					.setLocalGoto(songTitle);
 			this.document.add(new Paragraph(chunk));
 
-			String songTitleId = songTitle + i;
+			final String songTitleId = songTitle + i;
 
 			// Add a placeholder for the page reference
 			this.document.add(new VerticalPositionMark() {
