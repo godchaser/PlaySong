@@ -28,7 +28,9 @@
 									<div class="form-group">
 										<input class="form-control" placeholder="Password" name="password" type="password" value="">
 									</div>
-
+									<div class="form-group" hidden>
+										<input class="form-control" placeholder="RedirectUrl" name="redirecturl" value="@flash.get("url")">
+									</div>
 									@if(form.hasGlobalErrors) {
 									<p class="error">
 										@form.globalError.message

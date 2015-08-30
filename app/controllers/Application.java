@@ -42,6 +42,7 @@ import com.avaje.ebean.Page;
 import java.util.AbstractMap.SimpleEntry;
 
 import play.twirl.api.Html;
+
 import static play.data.Form.form;
 
 public class Application extends Controller {
@@ -55,6 +56,7 @@ public class Application extends Controller {
 
 		public String email;
 		public String password;
+		public String redirecturl;
 
 		public String validate() {
 			if (UserAccount.authenticate(email, password) == null) {
@@ -75,9 +77,7 @@ public class Application extends Controller {
 		if (request().cookies().get("PLAY_SESSION") != null) {
 			Logger.debug("Found PLAY_SESSION cookie");
 			String cookieVal = request().cookies().get("PLAY_SESSION").value();
-			String userId = cookieVal
-					.substring(cookieVal.indexOf("email=") + 6).replace("%40",
-							"@");
+			String userId = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
 			Logger.debug("PLAY_SESSION User ID: " + userId);
 			if (userId != null) {
 				user = UserAccount.find.byId(userId);
@@ -109,14 +109,12 @@ public class Application extends Controller {
 			String fileName = uploadedFile.getFilename();
 			String contentType = uploadedFile.getContentType();
 			File file = uploadedFile.getFile();
-			String message = "File successfully uploaded: "
-					+ file.getAbsolutePath() + " " + contentType;
+			String message = "File successfully uploaded: " + file.getAbsolutePath() + " " + contentType;
 			Logger.trace(message);
 			File target = new File("resources/upload/songs.xlsx");
 
 			try {
-				Files.copy(file.toPath(), target.toPath(),
-						StandardCopyOption.REPLACE_EXISTING);
+				Files.copy(file.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -146,8 +144,7 @@ public class Application extends Controller {
 		if (filledForm.hasErrors()) {
 			String message = "Invalid user form";
 			Logger.trace(message);
-			return badRequest(admin.render(user, userForm,
-					UserAccount.find.all(), message));
+			return badRequest(admin.render(user, userForm, UserAccount.find.all(), message));
 		}
 
 		UserAccount newUser = filledForm.get();
@@ -216,9 +213,7 @@ public class Application extends Controller {
 		String message = "Getting xls songs";
 		Logger.trace(message);
 		File tmpFile = new File("resources/xlsx/songs.xlsx");
-		response()
-				.setHeader(CONTENT_TYPE,
-						"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+		response().setHeader(CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 
 		Logger.debug("File: " + tmpFile.getAbsolutePath());
 		FileInputStream fin = null;
@@ -228,8 +223,7 @@ public class Application extends Controller {
 			e.printStackTrace();
 		}
 
-		response().setHeader("Content-disposition",
-				"attachment;filename=" + tmpFile.getName());
+		response().setHeader("Content-disposition", "attachment;filename=" + tmpFile.getName());
 		return ok(fin);
 	}
 
@@ -238,9 +232,7 @@ public class Application extends Controller {
 		if (request().cookies().get("PLAY_SESSION") != null) {
 			Logger.debug("Found PLAY_SESSION cookie");
 			String cookieVal = request().cookies().get("PLAY_SESSION").value();
-			String userId = cookieVal
-					.substring(cookieVal.indexOf("email=") + 6).replace("%40",
-							"@");
+			String userId = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
 			Logger.debug("PLAY_SESSION User ID: " + userId);
 			if (userId != null) {
 				user = UserAccount.find.byId(userId);
@@ -276,9 +268,7 @@ public class Application extends Controller {
 		if (request().cookies().get("PLAY_SESSION") != null) {
 			Logger.debug("Found PLAY_SESSION cookie");
 			String cookieVal = request().cookies().get("PLAY_SESSION").value();
-			String userId = cookieVal
-					.substring(cookieVal.indexOf("email=") + 6).replace("%40",
-							"@");
+			String userId = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
 			Logger.debug("PLAY_SESSION User ID: " + userId);
 			if (userId != null) {
 				user = UserAccount.find.byId(userId);
@@ -305,9 +295,7 @@ public class Application extends Controller {
 		if (request().cookies().get("PLAY_SESSION") != null) {
 			Logger.debug("Found PLAY_SESSION cookie");
 			String cookieVal = request().cookies().get("PLAY_SESSION").value();
-			String userId = cookieVal
-					.substring(cookieVal.indexOf("email=") + 6).replace("%40",
-							"@");
+			String userId = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
 			Logger.debug("PLAY_SESSION User ID: " + userId);
 			if (userId != null) {
 				user = UserAccount.find.byId(userId);
@@ -412,8 +400,6 @@ public class Application extends Controller {
 	}
 
 	public static Result songs() {
-		System.out.println("TEST!");
-		// newSongbookPdf
 		return ok(songs.render(Song.all()));
 	}
 
@@ -434,7 +420,6 @@ public class Application extends Controller {
 	@Security.Authenticated(Secured.class)
 	public static Result sqlinit() {
 		System.out.println("SQL INIT!");
-		// newSongbookPdf
 		Ebean.delete(Song.all());
 		SongImporter.restoreFromSQLDump();
 		return redirect(routes.Application.table());
@@ -461,8 +446,7 @@ public class Application extends Controller {
 		Integer iTotalRecords = Song.find.findRowCount();
 		String filter = params.get("sSearch")[0];
 		Integer pageSize = Integer.valueOf(params.get("iDisplayLength")[0]);
-		Integer page = Integer.valueOf(params.get("iDisplayStart")[0])
-				/ pageSize;
+		Integer page = Integer.valueOf(params.get("iDisplayStart")[0]) / pageSize;
 
 		/**
 		 * Get sorting order and column
@@ -487,12 +471,10 @@ public class Application extends Controller {
 		 * to false, since it doesn't benefit a stateless application at all.
 		 */
 		Page<Song> songPage = Song.find
-				.where(Expr.or(Expr.ilike("songName", "%" + filter + "%"), Expr
-						.or(Expr.ilike("songAuthor", "%" + filter + "%"),
-								Expr.icontains("songLyrics.songLyrics", "%"
-										+ filter + "%"))))
-				.orderBy(sortBy + " " + order).findPagingList(pageSize)
-				.setFetchAhead(false).getPage(page);
+				.where(Expr.or(Expr.ilike("songName", "%" + filter + "%"),
+						Expr.or(Expr.ilike("songAuthor", "%" + filter + "%"),
+								Expr.icontains("songLyrics.songLyrics", "%" + filter + "%"))))
+				.orderBy(sortBy + " " + order).findPagingList(pageSize).setFetchAhead(false).getPage(page);
 		Integer iTotalDisplayRecords = songPage.getTotalRowCount();
 
 		/**
@@ -526,11 +508,10 @@ public class Application extends Controller {
 		 * Get sorting order and column
 		 */
 		String sortBy = "songName";
-		List<Song> songs = Song.find.where(
-				Expr.or(Expr.ilike("songName", "%" + filter + "%"), Expr.or(
-						Expr.ilike("songAuthor", "%" + filter + "%"),
-						Expr.icontains("songLyrics.songLyrics", "%" + filter
-								+ "%")))).findList();
+		List<Song> songs = Song.find.where(Expr.or(Expr.ilike("songName", "%" + filter + "%"),
+				Expr.or(Expr.ilike("songAuthor", "%" + filter + "%"),
+						Expr.icontains("songLyrics.songLyrics", "%" + filter + "%"))))
+				.findList();
 
 		List<SimpleEntry> songSuggestionsList = new ArrayList<>();
 		for (Song song : songs) {
@@ -541,8 +522,7 @@ public class Application extends Controller {
 	}
 
 	public static Result downloadAndDeleteFile() {
-		final Set<Map.Entry<String, String[]>> entries = request()
-				.queryString().entrySet();
+		final Set<Map.Entry<String, String[]>> entries = request().queryString().entrySet();
 		String hashValue = null;
 		String formatValue = null;
 		File tmpFile = null;
@@ -564,9 +544,8 @@ public class Application extends Controller {
 			break;
 		case "word":
 			tmpFile = new File("resources/" + hashValue + ".docx");
-			response()
-					.setHeader(CONTENT_TYPE,
-							"application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+			response().setHeader(CONTENT_TYPE,
+					"application/vnd.openxmlformats-officedocument.wordprocessingml.document");
 			break;
 		}
 		Logger.debug("File: " + tmpFile.getAbsolutePath());
@@ -577,8 +556,7 @@ public class Application extends Controller {
 			e.printStackTrace();
 		}
 
-		response().setHeader("Content-disposition",
-				"attachment;filename=" + tmpFile.getName());
+		response().setHeader("Content-disposition", "attachment;filename=" + tmpFile.getName());
 		// response().setHeader(CONTENT_TYPE, "application/zip");
 
 		// response().setHeader(CONTENT_LENGTH, tmpFile.length() + "");
@@ -597,23 +575,18 @@ public class Application extends Controller {
 		String format = "word";
 
 		try {
-			JsonSongbook jsonSongbook = mapper.treeToValue(jsonNode,
-					JsonSongbook.class);
+			JsonSongbook jsonSongbook = mapper.treeToValue(jsonNode, JsonSongbook.class);
 			format = jsonSongbook.getFormat();
 			List<models.json.Song> songsJson = jsonSongbook.getSongs();
 			for (models.json.Song songJson : songsJson) {
-				songsForPrint.add(new SongPrint(Song.get(Long
-						.parseLong(songJson.getSong().getId())), Long
-						.parseLong(songJson.getSong().getLyricsID()), songJson
-						.getSong().getKey()));
+				songsForPrint.add(new SongPrint(Song.get(Long.parseLong(songJson.getSong().getId())),
+						Long.parseLong(songJson.getSong().getLyricsID()), songJson.getSong().getKey()));
 			}
 			if ("word".equals(format)) {
 				docWriter = new DocumentWriter();
 				try {
-					docWriter.setSongLyricsFont(jsonSongbook.getFonts()
-							.getLyricsFont());
-					docWriter.setSongTitleFont(jsonSongbook.getFonts()
-							.getTitleFont());
+					docWriter.setSongLyricsFont(jsonSongbook.getFonts().getLyricsFont());
+					docWriter.setSongTitleFont(jsonSongbook.getFonts().getTitleFont());
 				} catch (NullPointerException e) {
 				} finally {
 				}
@@ -627,14 +600,12 @@ public class Application extends Controller {
 
 		try {
 			if ("word".equals(format)) {
-				docWriter.newSongbookWordDoc(Integer.toString(hash),
-						songsForPrint);
+				docWriter.newSongbookWordDoc(Integer.toString(hash), songsForPrint);
 			} else if ("pdf".equals(format)) {
 				// String in = "resources/" + Integer.toString(hash) + ".docx";
 				// String out = "resources/" + Integer.toString(hash) + ".pdf";
 				// PdfConverter.convert(in, out);
-				String outputPdfPath = "resources/pdf/"
-						+ Integer.toString(hash) + ".pdf";
+				String outputPdfPath = "resources/pdf/" + Integer.toString(hash) + ".pdf";
 				try {
 					Logger.debug("Writing PDF: " + outputPdfPath);
 					PdfGenerator.writeSongs(outputPdfPath, songsForPrint);
@@ -650,21 +621,38 @@ public class Application extends Controller {
 	}
 
 	public static Result login() {
+		String redirecturl = flash().get("url");
+		Logger.debug("Login flash redirect url: " + redirecturl);
+		if (redirecturl != null) {
+			flash().put("url", redirecturl);
+		}
 		return ok(login.render(form(Login.class)));
 	}
 
 	public static Result authenticate() {
 		Form<Login> loginForm = form(Login.class).bindFromRequest();
+		String redirecturl = request().body().asFormUrlEncoded().get("redirecturl")[0];
+		Logger.debug("Authenticate redirect url: " + redirecturl);
 		if (loginForm.hasErrors()) {
+			if (redirecturl != null) {
+				flash().put("url", redirecturl);
+			}
 			return badRequest(login.render(loginForm));
 		} else {
 			session().clear();
 			session("email", loginForm.get().email);
-			return redirect(routes.Application.index());
+			redirecturl = loginForm.get().redirecturl;
+			Logger.debug("Authenticate form redirect url: " + redirecturl);
+			return redirect(redirecturl);
 		}
 	}
 
 	public static Result logout() {
+		if (request().cookies().get("PLAY_SESSION") != null) {
+			String cookieVal = request().cookies().get("PLAY_SESSION").value();
+			String userId = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
+			Logger.debug("User logged out: " + userId);
+		}
 		session().clear();
 		flash("success", "You've been logged out");
 		return redirect(routes.Application.index());
@@ -672,15 +660,14 @@ public class Application extends Controller {
 
 	public static Result javascriptRoutes() {
 		response().setContentType("text/javascript");
-		return ok(Routes.javascriptRouter("jsRoutes",
-				controllers.routes.javascript.Application.songview(),
+		return ok(Routes.javascriptRouter("jsRoutes", controllers.routes.javascript.Application.songview(),
+				controllers.routes.javascript.Application.login(),
 				controllers.routes.javascript.Application.deletesong(),
 				controllers.routes.javascript.Application.getsongjson(),
 				controllers.routes.javascript.Application.songeditor(),
 				controllers.routes.javascript.Application.songsuggestions(),
 				controllers.routes.javascript.Application.getsonglyricsjson(),
-				controllers.routes.javascript.Application.upload(),
-				controllers.routes.javascript.Application.addUser(),
+				controllers.routes.javascript.Application.upload(), controllers.routes.javascript.Application.addUser(),
 				controllers.routes.javascript.Application.getUser(),
 				controllers.routes.javascript.Application.deleteUser(),
 				controllers.routes.javascript.Application.updateUser()));
@@ -688,7 +675,6 @@ public class Application extends Controller {
 
 	public static Result test() {
 		System.out.println("TEST!");
-		// newSongbookPdf
 		ChordLineTransposer.test();
 		return ok();
 	}
@@ -697,20 +683,16 @@ public class Application extends Controller {
 	public static Result sanitizesongs() {
 		System.out.println("sanitizesongs!");
 		/*
-		// Sanitizing all lyrics
-		for (SongLyrics sl : SongLyrics.all()) {
-			//removing all tabs
-			String sanitizedLyrics = sl.getsongLyrics().replaceAll("\\t",
-					"    ");
-			sl.setsongLyrics(sanitizedLyrics);
-			sl.save();
-		}
-		*/
+		 * // Sanitizing all lyrics for (SongLyrics sl : SongLyrics.all()) {
+		 * //removing all tabs String sanitizedLyrics =
+		 * sl.getsongLyrics().replaceAll("\\t", "    ");
+		 * sl.setsongLyrics(sanitizedLyrics); sl.save(); }
+		 */
 		// Sanitizing all songs
 		for (Song s : Song.all()) {
 			Song.updateOrCreateSong(s);
 		}
-		
+
 		return ok();
 	}
 
