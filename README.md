@@ -5,7 +5,7 @@
 ------------
 
 **PlaySong** is a simple open source song/songbook (with chords) manager web service.
-It has simple straightforward user interface and functionality that I've found lacking
+It has simple user interface and functionality that I've found lacking
 in other song management software - e.g. [OpenSong](http://www.opensong.org/) 
 (it is only local desktop application, no database sync, revisioning, 
 bad multi-platform support, isn't easily customizable, no export to editable formats, 
@@ -14,7 +14,7 @@ no songbook management...).
 PlaySong main advantage is chord manipulation and centralized database that could be 
 used for collaboration of multiple users which could add new songs to database.
 
-Please have in mind that this whole project is still under heavy development and has lots 
+Please have in mind that this whole project is still under development and has lots 
 of bugs, discrepancies and possible/mandatory improvements. So I will continue to work on 
 it as time allows me.
 
@@ -23,6 +23,7 @@ it as time allows me.
 * SCRUD functionality - search through song lyrics, read/add/delete/update songs
 * Song export 2 docx and pdf functionality - export single song or export selection of songs
 to create consistent and formatted songbook with numeration and song content
+* Responsive design (suitable for mobile devices)
 
 ## Planned features:
 * Import from other song format (currently opensongbook format works quick & dirty way)
@@ -31,14 +32,18 @@ to create consistent and formatted songbook with numeration and song content
 * Song revisions
 * User management
 * Integration tests
-* Many other goodies... :)
+* Many other goodies...
 
 PlaySong 
 
 ### Used stack
 #### Development
 * [Java 8](https://www.java.com/)
-* [Play Framework](https://www.playframework.com) 
+* [Play Framework](https://www.playframework.com)
+* [Ebean](http://www.avaje.org/)
+* [Apache POI](https://poi.apache.org/)
+* [iText](http://itextpdf.com/)
+* [Bootstrap](http://getbootstrap.com/)
 * [Eclipse](https://eclipse.org/)
 * [Docker](https://www.docker.com/)
 
