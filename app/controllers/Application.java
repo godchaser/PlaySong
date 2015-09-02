@@ -75,10 +75,18 @@ public class Application extends Controller {
 		Html welcome = new Html("");
 		UserAccount user = null;
 		if (request().cookies().get("PLAY_SESSION") != null) {
-			//Logger.debug("Found PLAY_SESSION cookie");
+			// Logger.debug("Found PLAY_SESSION cookie");
+			String uuid = null;
 			String cookieVal = request().cookies().get("PLAY_SESSION").value();
 			String userId = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
-			Logger.debug("PLAY_SESSION User ID: " + userId);
+			if (request().cookies().get("PLAYSONG-UUID") != null) {
+				uuid = request().cookies().get("PLAYSONG-UUID").value();
+			} else {
+				uuid = UUID.randomUUID().toString();
+				response().setCookie("PLAYSONG-UUID", uuid);
+			}
+
+			Logger.debug(uuid + ": User ID: " + userId);
 			if (userId != null) {
 				user = UserAccount.find.byId(userId);
 			}
@@ -230,10 +238,18 @@ public class Application extends Controller {
 	public static Result table() {
 		UserAccount user = null;
 		if (request().cookies().get("PLAY_SESSION") != null) {
-			//Logger.debug("Found PLAY_SESSION cookie");
+			// Logger.debug("Found PLAY_SESSION cookie");
 			String cookieVal = request().cookies().get("PLAY_SESSION").value();
 			String userId = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
-			Logger.debug("PLAY_SESSION User ID: " + userId);
+			String uuid = null;
+			if (request().cookies().get("PLAYSONG-UUID") != null) {
+				uuid = request().cookies().get("PLAYSONG-UUID").value();
+			} else {
+				uuid = UUID.randomUUID().toString();
+				response().setCookie("PLAYSONG-UUID", uuid);
+			}
+
+			Logger.debug(uuid + ": User ID: " + userId);
 			if (userId != null) {
 				user = UserAccount.find.byId(userId);
 			}
@@ -266,10 +282,18 @@ public class Application extends Controller {
 	public static Result songview(Long id) {
 		UserAccount user = null;
 		if (request().cookies().get("PLAY_SESSION") != null) {
-			//Logger.debug("Found PLAY_SESSION cookie");
+			// Logger.debug("Found PLAY_SESSION cookie");
 			String cookieVal = request().cookies().get("PLAY_SESSION").value();
 			String userId = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
-			Logger.debug("PLAY_SESSION User ID: " + userId);
+			String uuid = null;
+			if (request().cookies().get("PLAYSONG-UUID") != null) {
+				uuid = request().cookies().get("PLAYSONG-UUID").value();
+			} else {
+				uuid = UUID.randomUUID().toString();
+				response().setCookie("PLAYSONG-UUID", uuid);
+			}
+
+			Logger.debug(uuid + ": User ID: " + userId);
 			if (userId != null) {
 				user = UserAccount.find.byId(userId);
 			}
@@ -293,10 +317,18 @@ public class Application extends Controller {
 		});
 		UserAccount user = null;
 		if (request().cookies().get("PLAY_SESSION") != null) {
-			//Logger.debug("Found PLAY_SESSION cookie");
+			// Logger.debug("Found PLAY_SESSION cookie");
 			String cookieVal = request().cookies().get("PLAY_SESSION").value();
 			String userId = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
-			Logger.debug("PLAY_SESSION User ID: " + userId);
+			String uuid = null;
+			if (request().cookies().get("PLAYSONG-UUID") != null) {
+				uuid = request().cookies().get("PLAYSONG-UUID").value();
+			} else {
+				uuid = UUID.randomUUID().toString();
+				response().setCookie("PLAYSONG-UUID", uuid);
+			}
+
+			Logger.debug(uuid + ": User ID: " + userId);
 			if (userId != null) {
 				user = UserAccount.find.byId(userId);
 			}
@@ -360,6 +392,17 @@ public class Application extends Controller {
 		} else {
 			String cookieVal = request().cookies().get("PLAY_SESSION").value();
 			String userEmail = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
+
+			String uuid = null;
+			if (request().cookies().get("PLAYSONG-UUID") != null) {
+				uuid = request().cookies().get("PLAYSONG-UUID").value();
+			} else {
+				uuid = UUID.randomUUID().toString();
+				response().setCookie("PLAYSONG-UUID", uuid);
+			}
+
+			Logger.debug(uuid + ": User ID: " + userEmail);
+
 			String userName = UserAccount.getNameFromEmail(userEmail);
 			Song updatedSong = filledForm.get();
 			updatedSong.setSongLastModifiedBy(userName);
@@ -637,7 +680,7 @@ public class Application extends Controller {
 	public static Result authenticate() {
 		Form<Login> loginForm = form(Login.class).bindFromRequest();
 		String redirecturl = request().body().asFormUrlEncoded().get("redirecturl")[0];
-		Logger.debug("Authenticate redirect url: " + redirecturl);
+		Logger.debug("Authenticate forwarded redirect url: " + redirecturl);
 		if (loginForm.hasErrors()) {
 			if (redirecturl != null) {
 				flash().put("url", redirecturl);
@@ -647,7 +690,10 @@ public class Application extends Controller {
 			session().clear();
 			session("email", loginForm.get().email);
 			redirecturl = loginForm.get().redirecturl;
-			Logger.debug("Authenticate form redirect url: " + redirecturl);
+			if (redirecturl.isEmpty()) {
+				redirecturl = "/";
+			}
+			Logger.debug("Redirecting to: " + redirecturl);
 			return redirect(redirecturl);
 		}
 	}
