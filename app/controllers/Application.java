@@ -75,7 +75,7 @@ public class Application extends Controller {
 		Html welcome = new Html("");
 		UserAccount user = null;
 		if (request().cookies().get("PLAY_SESSION") != null) {
-			Logger.debug("Found PLAY_SESSION cookie");
+			//Logger.debug("Found PLAY_SESSION cookie");
 			String cookieVal = request().cookies().get("PLAY_SESSION").value();
 			String userId = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
 			Logger.debug("PLAY_SESSION User ID: " + userId);
@@ -230,7 +230,7 @@ public class Application extends Controller {
 	public static Result table() {
 		UserAccount user = null;
 		if (request().cookies().get("PLAY_SESSION") != null) {
-			Logger.debug("Found PLAY_SESSION cookie");
+			//Logger.debug("Found PLAY_SESSION cookie");
 			String cookieVal = request().cookies().get("PLAY_SESSION").value();
 			String userId = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
 			Logger.debug("PLAY_SESSION User ID: " + userId);
@@ -266,7 +266,7 @@ public class Application extends Controller {
 	public static Result songview(Long id) {
 		UserAccount user = null;
 		if (request().cookies().get("PLAY_SESSION") != null) {
-			Logger.debug("Found PLAY_SESSION cookie");
+			//Logger.debug("Found PLAY_SESSION cookie");
 			String cookieVal = request().cookies().get("PLAY_SESSION").value();
 			String userId = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
 			Logger.debug("PLAY_SESSION User ID: " + userId);
@@ -293,7 +293,7 @@ public class Application extends Controller {
 		});
 		UserAccount user = null;
 		if (request().cookies().get("PLAY_SESSION") != null) {
-			Logger.debug("Found PLAY_SESSION cookie");
+			//Logger.debug("Found PLAY_SESSION cookie");
 			String cookieVal = request().cookies().get("PLAY_SESSION").value();
 			String userId = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
 			Logger.debug("PLAY_SESSION User ID: " + userId);
@@ -358,7 +358,12 @@ public class Application extends Controller {
 		if (filledForm.hasErrors()) {
 			return badRequest(views.html.error.render());
 		} else {
-			System.out.println("updateOrCreateSong ");
+			String cookieVal = request().cookies().get("PLAY_SESSION").value();
+			String userEmail = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
+			String userName = UserAccount.getNameFromEmail(userEmail);
+			Song updatedSong = filledForm.get();
+			updatedSong.setSongLastModifiedBy(userName);
+			Logger.debug("Update or create song");
 			Song.updateOrCreateSong(filledForm.get());
 			return redirect(routes.Application.table());
 		}

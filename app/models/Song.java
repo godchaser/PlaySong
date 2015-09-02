@@ -7,6 +7,7 @@ import java.util.*;
 import javax.persistence.*;
 
 import controllers.chords.LineTypeChecker;
+import play.Logger;
 import play.data.format.Formats;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
@@ -76,17 +77,19 @@ public class Song extends Model implements Comparator<Song> {
 			songLyrics.setsongLyrics(sanitizedLyrics);
 		}
 		if (song.id != null && song.id > 0) {
-			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+			//DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
 			Date date = new Date();
 			song.setDateModified(date);
 			song.update();
 		} else {
 			song.id = null;
-			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+			//DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
 			Date date = new Date();
 			song.setDateCreated(date);
 			song.save();
 		}
+		Logger.debug("Song updated by user: " + song.songLastModifiedBy);
+		Logger.debug("Song updated on: " + song.getDateModified().toString());
 	}
 
 	public static void delete(Long id) {
