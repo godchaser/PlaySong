@@ -10,11 +10,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import play.api.mvc.EssentialFilter;
+import play.filters.gzip.GzipFilter;
+
 /**
  * Created by samuel on 4/8/15.
  */
 
 public class Global extends GlobalSettings {
+    public <T extends EssentialFilter> Class<T>[] filters() {
+        return new Class[]{GzipFilter.class};
+    }
     @Override
     public void onStart(Application app) {
         Long delayInSeconds;
