@@ -734,17 +734,26 @@ public class Application extends Controller {
 	public static Result sanitizesongs() {
 		System.out.println("sanitizesongs!");
 		/*
-		 * // Sanitizing all lyrics for (SongLyrics sl : SongLyrics.all()) {
-		 * //removing all tabs String sanitizedLyrics =
-		 * sl.getsongLyrics().replaceAll("\\t", "    ");
-		 * sl.setsongLyrics(sanitizedLyrics); sl.save(); }
-		 */
+		for (SongLyrics sl : SongLyrics.all()) {
+			StringBuilder sb = new StringBuilder();
+			// removing all tabs String sanitizedLyrics
+			String[] lines = sl.getsongLyrics().split("\n");
+			for (String line : lines) {
+				sb.append(StringUtils.stripEnd(line," "));
+				sb.append("\n");
+			}
+			// String sanitizedLyrics = sl.getsongLyrics().trim();
+			sl.setsongLyrics(sb.toString());
+			sl.save();
+		}
+		*/
+
 		// Sanitizing all songs
 		for (Song s : Song.all()) {
 			Song.updateOrCreateSong(s);
 		}
 
-		return ok();
+		return redirect(routes.Application.index());
 	}
 
 }
