@@ -734,22 +734,25 @@ public class Application extends Controller {
 	public static Result sanitizesongs() {
 		System.out.println("sanitizesongs!");
 		/*
-		for (SongLyrics sl : SongLyrics.all()) {
-			StringBuilder sb = new StringBuilder();
-			// removing all tabs String sanitizedLyrics
-			String[] lines = sl.getsongLyrics().split("\n");
-			for (String line : lines) {
-				sb.append(StringUtils.stripEnd(line," "));
-				sb.append("\n");
-			}
-			// String sanitizedLyrics = sl.getsongLyrics().trim();
-			sl.setsongLyrics(sb.toString());
-			sl.save();
+		 * for (SongLyrics sl : SongLyrics.all()) { StringBuilder sb = new
+		 * StringBuilder(); // removing all tabs String sanitizedLyrics String[]
+		 * lines = sl.getsongLyrics().split("\n"); for (String line : lines) {
+		 * sb.append(StringUtils.stripEnd(line," ")); sb.append("\n"); } //
+		 * String sanitizedLyrics = sl.getsongLyrics().trim();
+		 * sl.setsongLyrics(sb.toString()); sl.save(); }
+		 */
+
+		// Logger.debug("Found PLAY_SESSION cookie");
+		String cookieVal = request().cookies().get("PLAY_SESSION").value();
+		String userId = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
+		UserAccount ua = null;
+		if (userId != null) {
+			ua = UserAccount.find.byId(userId);
 		}
-		*/
 
 		// Sanitizing all songs
 		for (Song s : Song.all()) {
+			s.setSongLastModifiedBy(ua.name.toString());
 			Song.updateOrCreateSong(s);
 		}
 
