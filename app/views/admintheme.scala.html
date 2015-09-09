@@ -154,7 +154,8 @@
 					remote : {
 						url : songSuggestionUrl + '?q=%QUERY',
 						wildcard : '%QUERY'
-					}
+					},
+				limit : 15
 				});
 
 				songList.initialize();
@@ -162,8 +163,7 @@
 				$('.typeahead').typeahead(null, {
 					name : 'songs',
 					displayKey : 'value',
-					minLength : '2',
-					delay : '1',
+					minLength : '1',
 					source : songList.ttAdapter()
 				});
 

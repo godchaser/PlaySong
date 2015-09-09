@@ -10,6 +10,7 @@ import controllers.songbook.XLSHelper;
 import models.Song;
 import models.SongLyrics;
 import models.UserAccount;
+import models.helpers.ArrayHelper;
 import models.helpers.SongPrint;
 import models.helpers.XMLSongsParser;
 import models.json.JsonSongbook;
@@ -38,6 +39,8 @@ import java.util.*;
 
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.Page;
+import com.avaje.ebean.SqlQuery;
+import com.avaje.ebean.SqlRow;
 
 import java.util.AbstractMap.SimpleEntry;
 
@@ -381,7 +384,7 @@ public class Application extends Controller {
 	@Security.Authenticated(Secured.class)
 	public static Result deletesong(Long id) {
 		Song.delete(id);
-		return ok();
+		return redirect(routes.Application.table());
 	}
 
 	@Security.Authenticated(Secured.class)
@@ -552,22 +555,32 @@ public class Application extends Controller {
 		Map<String, String[]> params = request().queryString();
 		String filter = params.get("q")[0];
 		// Logger.info("Filter param" + filter);
-		/**
-		 * Get sorting order and column
-		 */
-		String sortBy = "songName";
-		List<Song> songs = Song.find.where(Expr.or(Expr.ilike("songName", "%" + filter + "%"),
-				Expr.or(Expr.ilike("songAuthor", "%" + filter + "%"),
-						Expr.icontains("songLyrics.songLyrics", "%" + filter + "%"))))
+
+		List<SqlRow> result = Ebean
+				.createSqlQuery("(SELECT t0.id" + " FROM song t0"
+						+ " WHERE lower(t0.song_name) like :songnamefilter) UNION ALL"
+						+ " (SELECT t0.id" + " FROM song t0" + " JOIN song_lyrics u1 on u1.song_id = t0.id"
+						+ " WHERE lower(u1.song_lyrics) like :songlyricsfilter) UNION ALL"
+						+ "(SELECT t0.id" + " FROM song t0"
+						+ " WHERE lower(t0.song_author) like :songauthorfilter)")
+				.setParameter("songnamefilter", filter + "%")
+				.setParameter("songlyricsfilter", "%"+filter+"%")
+				.setParameter("songauthorfilter", "%"+filter+"%")
 				.findList();
-
-		List<SimpleEntry> songSuggestionsList = new ArrayList<>();
-		for (Song song : songs) {
-			songSuggestionsList.add(new SimpleEntry(song.id, song.songName));
+		ArrayList <Long> ids = new ArrayList<>();
+		for (SqlRow res : result) {
+			ids.add(res.getLong("id"));
 		}
-
+		ids = ArrayHelper.removeDuplicates(ids);
+		List<SimpleEntry> songSuggestionsList = new ArrayList<>();
+		for (Long id : ids){
+			songSuggestionsList.add(new SimpleEntry<Long, String>(id, Song.get(id).getSongName()));
+		}
+		//System.out.println(Json.toJson(songSuggestionsList).toString().toString());
 		return ok(Json.toJson(songSuggestionsList));
 	}
+	
+
 
 	public static Result downloadAndDeleteFile() {
 		final Set<Map.Entry<String, String[]>> entries = request().queryString().entrySet();
