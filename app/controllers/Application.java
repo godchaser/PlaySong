@@ -559,11 +559,14 @@ public class Application extends Controller {
 		List<SqlRow> result = Ebean
 				.createSqlQuery("(SELECT t0.id" + " FROM song t0"
 						+ " WHERE lower(t0.song_name) like :songnamefilter) UNION ALL"
+						+ "(SELECT t0.id" + " FROM song t0"
+						+ " WHERE lower(t0.song_name) like :songnameinlinefilter) UNION ALL"
 						+ " (SELECT t0.id" + " FROM song t0" + " JOIN song_lyrics u1 on u1.song_id = t0.id"
 						+ " WHERE lower(u1.song_lyrics) like :songlyricsfilter) UNION ALL"
 						+ "(SELECT t0.id" + " FROM song t0"
 						+ " WHERE lower(t0.song_author) like :songauthorfilter)")
 				.setParameter("songnamefilter", filter + "%")
+				.setParameter("songnameinlinefilter", "%" + filter + "%")
 				.setParameter("songlyricsfilter", "%"+filter+"%")
 				.setParameter("songauthorfilter", "%"+filter+"%")
 				.findList();
@@ -572,7 +575,7 @@ public class Application extends Controller {
 			ids.add(res.getLong("id"));
 		}
 		ids = ArrayHelper.removeDuplicates(ids);
-		List<SimpleEntry> songSuggestionsList = new ArrayList<>();
+		List<SimpleEntry<Long, String>> songSuggestionsList = new ArrayList<>();
 		for (Long id : ids){
 			songSuggestionsList.add(new SimpleEntry<Long, String>(id, Song.get(id).getSongName()));
 		}

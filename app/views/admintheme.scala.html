@@ -144,39 +144,49 @@
 		<script src="@routes.Assets.at("lib/typeahead.js/dist/typeahead.bundle.min.js")" type="text/javascript"></script>
 
 		<script type="text/javascript">
-			$(document).ready(function() {
+			$(document)
+					.ready(
+							function() {
 
-				var songSuggestionUrl = jsRoutes.controllers.Application.songsuggestions().url;
-				var songList = new Bloodhound({
-					datumTokenizer : Bloodhound.tokenizers.obj.whitespace('value'),
-					queryTokenizer : Bloodhound.tokenizers.whitespace,
-					//prefetch: '../data/films/post_1960.json',
-					remote : {
-						url : songSuggestionUrl + '?q=%QUERY',
-						wildcard : '%QUERY'
-					},
-				limit : 15
-				});
+								var songSuggestionUrl = jsRoutes.controllers.Application
+										.songsuggestions().url;
+								var songList = new Bloodhound(
+										{
+											datumTokenizer : Bloodhound.tokenizers.obj
+													.whitespace('value'),
+											queryTokenizer : Bloodhound.tokenizers.whitespace,
+											//prefetch: '../data/films/post_1960.json',
+											remote : {
+												url : songSuggestionUrl
+														+ '?q=%QUERY',
+												wildcard : '%QUERY'
+											},
+											delay : 1,
+											limit : 15
+										});
 
-				songList.initialize();
+								songList.initialize();
 
-				$('.typeahead').typeahead(null, {
-					name : 'songs',
-					displayKey : 'value',
-					minLength : '1',
-					source : songList.ttAdapter()
-				});
+								$('.typeahead').typeahead(null, {
+									name : 'songs',
+									displayKey : 'value',
+									minLength : '1',
+									source : songList.ttAdapter()
+								});
 
-				//typeahead callback function
-				$('.typeahead').bind('typeahead:selected', function(obj, datum, name) {
-					// you can print datum to see json avps
-					var id = datum.key;
-					var songViewerUrl = jsRoutes.controllers.Application.songview(id).url;
-					window.location.href = songViewerUrl;
-				});
+								//typeahead callback function
+								$('.typeahead')
+										.bind(
+												'typeahead:selected',
+												function(obj, datum, name) {
+													// you can print datum to see json avps
+													var id = datum.key;
+													var songViewerUrl = jsRoutes.controllers.Application
+															.songview(id).url;
+													window.location.href = songViewerUrl;
+												});
 
-			});
-
+							});
 		</script>
 
 		<!-- Transposer  -->
