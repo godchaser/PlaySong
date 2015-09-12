@@ -24,7 +24,6 @@ libraryDependencies ++= Seq( javaJdbc , javaEbean , cache , javaWs , filters,
   "org.webjars.bower" % "typeahead.js" % "0.11.1",
   "org.webjars" % "startbootstrap-sb-admin-2" % "1.0.7",
   "org.webjars.bower" % "font-awesome" % "4.4.0",
-  "org.webjars.bower" % "metisMenu" % "2.1.0",
   "org.webjars" % "handsontable" % "0.15.0-beta2",
   "org.yaml" % "snakeyaml" % "1.15"
   )
