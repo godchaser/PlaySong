@@ -553,7 +553,7 @@ public class Application extends Controller {
 		// TODO: check for null pointers
 		// dont send whole song object, only songname and id
 		Map<String, String[]> params = request().queryString();
-		String filter = params.get("q")[0];
+		String filter = params.get("q")[0].toLowerCase();
 		// Logger.info("Filter param" + filter);
 
 		List<SqlRow> result = Ebean
