@@ -43,6 +43,7 @@ import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
 
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Map.Entry;
 
 import play.twirl.api.Html;
 
@@ -495,7 +496,8 @@ public class Application extends Controller {
 		Map<String, String[]> params = request().queryString();
 
 		Integer iTotalRecords = Song.find.findRowCount();
-		String filter = params.get("sSearch")[0];
+		String filter = params.get("sSearch")[0].toLowerCase();
+		;
 		Integer pageSize = Integer.valueOf(params.get("iDisplayLength")[0]);
 		Integer page = Integer.valueOf(params.get("iDisplayStart")[0]) / pageSize;
 
@@ -521,13 +523,79 @@ public class Application extends Controller {
 		 * Get page to show from database It is important to set setFetchAhead
 		 * to false, since it doesn't benefit a stateless application at all.
 		 */
+		/*
 		Page<Song> songPage = Song.find
 				.where(Expr.or(Expr.ilike("songName", "%" + filter + "%"),
 						Expr.or(Expr.ilike("songAuthor", "%" + filter + "%"),
 								Expr.icontains("songLyrics.songLyrics", "%" + filter + "%"))))
 				.orderBy(sortBy + " " + order).findPagingList(pageSize).setFetchAhead(false).getPage(page);
-		Integer iTotalDisplayRecords = songPage.getTotalRowCount();
+		// int iTotalDisplayRecords = songPage.getTotalRowCount();
+		*/
+		List<SqlRow> queryResult = Ebean
+				.createSqlQuery(
+						"(select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id from song t0 join song_lyrics u1 on u1.song_id = t0.id  where lower(t0.song_name) like :songnamefilter) UNION ALL"
+								+ " (select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id from song t0 join song_lyrics u1 on u1.song_id = t0.id  where lower(t0.song_name) like :songnameinlinefilter) UNION ALL"
+								+ " (select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id from song t0 join song_lyrics u1 on u1.song_id = t0.id  where lower(u1.song_lyrics) like :songlyricsfilter) UNION ALL"
+								+ " (select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id from song t0 join song_lyrics u1 on u1.song_id = t0.id  where lower(t0.song_author) like :songauthorfilter)")
+				.setParameter("songnamefilter", filter + "%").setParameter("songnameinlinefilter", "%" + filter + "%")
+				.setParameter("songlyricsfilter", "%" + filter + "%")
+				.setParameter("songauthorfilter", "%" + filter + "%").findList();
 
+		/*
+		 * String songName, String songLink, String songOriginalTitle, String
+		 * songAuthor, Long id, String songImporter, ArrayNode
+		 * songLyricsIDsArray
+		 * 
+		 */
+
+		class tablesong {
+			private String song_name;
+			private String song_original_title;
+			private String song_author;
+			private String song_link;
+			private String song_importer;
+			private ArrayList<String> l_id;
+
+			public tablesong() {
+				l_id = new ArrayList<String>();
+			}
+		}
+
+		Map<Long, tablesong> tableSongsMap = new LinkedHashMap<Long, tablesong>();
+
+		for (SqlRow res : queryResult) {
+			//System.out.println(res);
+			// System.out.println(res.getLong("id"));
+			System.out.println(res.getString("song_name"));
+			// System.out.println(res.getString("song_original_title"));
+			// System.out.println(res.getString("song_author"));
+			// System.out.println(res.getString("song_link"));
+			// System.out.println(res.getString("song_importer"));
+			// System.out.println(res.getLong("l_id"));
+
+			Long songId = res.getLong("id");
+			String lyricsId = res.getLong("l_id").toString();
+
+			// search through existing songs
+			if (tableSongsMap.containsKey(songId)) {
+				tablesong ts = tableSongsMap.get(songId);
+				// update additional lyrics
+				if (!(ts.l_id.contains(lyricsId))) {
+					ts.l_id.add(lyricsId);
+				}
+			} else {
+				// create new tablesong
+				tablesong ts = new tablesong();
+				ts.song_name = res.getString("song_name");
+				ts.song_original_title = res.getString("song_original_title");
+				ts.song_author = res.getString("song_author");
+				ts.song_link = res.getString("song_link");
+				ts.song_importer = res.getString("song_importer");
+				ts.l_id.add(lyricsId);
+				tableSongsMap.put(songId, ts);
+			}
+		}
+		int iTotalDisplayRecords = tableSongsMap.size();
 		/**
 		 * Construct the JSON to return
 		 */
@@ -539,10 +607,20 @@ public class Application extends Controller {
 
 		ArrayNode an = result.putArray("aaData");
 
-		for (Song s : songPage.getList()) {
-			ObjectNode songJson = SongToJson.convert(s);
+		for (Entry<Long, tablesong> item : tableSongsMap.entrySet()) {
+			Long songId = item.getKey();
+			tablesong ts = item.getValue();
+			// String songName, String songLink, String songOriginalTitle,
+			// String songAuthor,
+			// Long id, String songImporter, ArrayNode songLyricsIDsArray
+			ObjectNode songJson = SongToJson.convert(ts.song_name, ts.song_link, ts.song_original_title, ts.song_author,
+					songId, ts.song_importer, ts.l_id);
 			an.add(songJson);
 		}
+		/*
+		 * for (Song s : songPage.getList()) { ObjectNode songJson =
+		 * SongToJson.convert(s); an.add(songJson); }
+		 */
 		return ok(result);
 	}
 
@@ -558,32 +636,26 @@ public class Application extends Controller {
 
 		List<SqlRow> result = Ebean
 				.createSqlQuery("(SELECT t0.id" + " FROM song t0"
-						+ " WHERE lower(t0.song_name) like :songnamefilter) UNION ALL"
-						+ "(SELECT t0.id" + " FROM song t0"
-						+ " WHERE lower(t0.song_name) like :songnameinlinefilter) UNION ALL"
+						+ " WHERE lower(t0.song_name) like :songnamefilter) UNION ALL" + "(SELECT t0.id"
+						+ " FROM song t0" + " WHERE lower(t0.song_name) like :songnameinlinefilter) UNION ALL"
 						+ " (SELECT t0.id" + " FROM song t0" + " JOIN song_lyrics u1 on u1.song_id = t0.id"
-						+ " WHERE lower(u1.song_lyrics) like :songlyricsfilter) UNION ALL"
-						+ "(SELECT t0.id" + " FROM song t0"
-						+ " WHERE lower(t0.song_author) like :songauthorfilter)")
-				.setParameter("songnamefilter", filter + "%")
-				.setParameter("songnameinlinefilter", "%" + filter + "%")
-				.setParameter("songlyricsfilter", "%"+filter+"%")
-				.setParameter("songauthorfilter", "%"+filter+"%")
-				.findList();
-		ArrayList <Long> ids = new ArrayList<>();
+						+ " WHERE lower(u1.song_lyrics) like :songlyricsfilter) UNION ALL" + "(SELECT t0.id"
+						+ " FROM song t0" + " WHERE lower(t0.song_author) like :songauthorfilter)")
+				.setParameter("songnamefilter", filter + "%").setParameter("songnameinlinefilter", "%" + filter + "%")
+				.setParameter("songlyricsfilter", "%" + filter + "%")
+				.setParameter("songauthorfilter", "%" + filter + "%").findList();
+		ArrayList<Long> ids = new ArrayList<>();
 		for (SqlRow res : result) {
 			ids.add(res.getLong("id"));
 		}
 		ids = ArrayHelper.removeDuplicates(ids);
 		List<SimpleEntry<Long, String>> songSuggestionsList = new ArrayList<>();
-		for (Long id : ids){
+		for (Long id : ids) {
 			songSuggestionsList.add(new SimpleEntry<Long, String>(id, Song.get(id).getSongName()));
 		}
-		//System.out.println(Json.toJson(songSuggestionsList).toString().toString());
+		// System.out.println(Json.toJson(songSuggestionsList).toString().toString());
 		return ok(Json.toJson(songSuggestionsList));
 	}
-	
-
 
 	public static Result downloadAndDeleteFile() {
 		final Set<Map.Entry<String, String[]>> entries = request().queryString().entrySet();
