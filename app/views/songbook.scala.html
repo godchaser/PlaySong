@@ -167,8 +167,6 @@
 							"title" : "LyricsId"
 						}, {
 							"title" : "Key"
-						}, {
-							"title" : "Move"
 						}],
 						"bDestroy" : true,
 						"fnRowCallback" : function(nRow, aData, iDisplayIndex) {
@@ -181,8 +179,8 @@
 							var rowId = 'row_' + aData[2];
 							$(nRow).attr('id', aData.RowOrder);
 							$(rowId + " select").val(aData[3]);
-							var songNameWithSort = '<button type="button" class="move up"><i class="fa fa-sort-up"></i></button><button type="button" class="move down"><i class="fa fa-sort-down"></i></button>';
-							$('td:eq(4)', nRow).html(songNameWithSort);
+							var songNameWithSort = '<button type="button" class="move up"><i class="fa fa-sort-up"></i></button><button type="button" class="move down"><i class="fa fa-sort-down"></i></button>  ';			
+							$('td:eq(0)', nRow).html(songNameWithSort + aData[0]);
 							return nRow;
 						}
 					});
