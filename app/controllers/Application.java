@@ -12,6 +12,7 @@ import models.SongLyrics;
 import models.UserAccount;
 import models.helpers.ArrayHelper;
 import models.helpers.SongPrint;
+import models.helpers.SongTableData;
 import models.helpers.XMLSongsParser;
 import models.json.JsonSongbook;
 import play.Logger;
@@ -37,12 +38,10 @@ import java.nio.file.StandardCopyOption;
 import java.text.Collator;
 import java.util.*;
 
-import com.avaje.ebean.Expr;
-import com.avaje.ebean.Page;
-import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
 
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Map.Entry;
 
 import play.twirl.api.Html;
 
@@ -75,7 +74,6 @@ public class Application extends Controller {
 
 	@Security.Authenticated(Secured.class)
 	public static Result admin() {
-		Html welcome = new Html("");
 		UserAccount user = null;
 		if (request().cookies().get("PLAY_SESSION") != null) {
 			// Logger.debug("Found PLAY_SESSION cookie");
@@ -117,7 +115,6 @@ public class Application extends Controller {
 		MultipartFormData body = request().body().asMultipartFormData();
 		FilePart uploadedFile = body.getFile("uploadedfile");
 		if (uploadedFile != null) {
-			String fileName = uploadedFile.getFilename();
 			String contentType = uploadedFile.getContentType();
 			File file = uploadedFile.getFile();
 			String message = "File successfully uploaded: " + file.getAbsolutePath() + " " + contentType;
@@ -309,7 +306,6 @@ public class Application extends Controller {
 	}
 
 	public static Result songbook() {
-		Html welcome = new Html("");
 		HR_COLLATOR.setStrength(Collator.PRIMARY);
 		List<Song> sortedSongs = Song.all();
 		Collections.sort(sortedSongs, new Comparator<Song>() {
@@ -494,55 +490,122 @@ public class Application extends Controller {
 		 */
 		Map<String, String[]> params = request().queryString();
 
-		Integer iTotalRecords = Song.find.findRowCount();
-		String filter = params.get("sSearch")[0];
-		Integer pageSize = Integer.valueOf(params.get("iDisplayLength")[0]);
-		Integer page = Integer.valueOf(params.get("iDisplayStart")[0]) / pageSize;
+		int iTotalRecords = Song.find.findRowCount();
+		String filter = params.get("sSearch")[0].toLowerCase();
 
 		/**
 		 * Get sorting order and column
 		 */
-		String sortBy = "songName";
-		String order = params.get("sSortDir_0")[0];
+		String sortBy = "song_name";
+		String order = "asc";
+
+		if (params.get("sSortDir_0")[0].equals("desc")) {
+			order = "desc";
+		}
 
 		switch (Integer.valueOf(params.get("iSortCol_0")[0])) {
 		case 0:
-			sortBy = "songName";
+			sortBy = "song_name";
 			break;
 		case 1:
-			sortBy = "songOriginalTitle";
+			sortBy = "song_original_title";
 			break;
 		case 2:
-			sortBy = "songAuthor";
+			sortBy = "song_author";
 			break;
 		}
 
-		/**
-		 * Get page to show from database It is important to set setFetchAhead
-		 * to false, since it doesn't benefit a stateless application at all.
-		 */
-		Page<Song> songPage = Song.find
-				.where(Expr.or(Expr.ilike("songName", "%" + filter + "%"),
-						Expr.or(Expr.ilike("songAuthor", "%" + filter + "%"),
-								Expr.icontains("songLyrics.songLyrics", "%" + filter + "%"))))
-				.orderBy(sortBy + " " + order).findPagingList(pageSize).setFetchAhead(false).getPage(page);
-		Integer iTotalDisplayRecords = songPage.getTotalRowCount();
+		List<SqlRow> queryResult;
 
+		if (filter.isEmpty()) {
+			queryResult = Ebean.createSqlQuery(
+					"select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id from song t0 join song_lyrics u1 on u1.song_id = t0.id order by "
+							+ sortBy + " " + order)
+					.findList();
+		} else {
+			queryResult = Ebean
+					.createSqlQuery(
+							"(select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id from song t0 join song_lyrics u1 on u1.song_id = t0.id  where lower(t0.song_name) like :songnamefilter) UNION ALL"
+									+ " (select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id from song t0 join song_lyrics u1 on u1.song_id = t0.id  where lower(t0.song_name) like :songnameinlinefilter) UNION ALL"
+									+ " (select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id from song t0 join song_lyrics u1 on u1.song_id = t0.id  where lower(u1.song_lyrics) like :songlyricsfilter) UNION ALL"
+									+ " (select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id from song t0 join song_lyrics u1 on u1.song_id = t0.id  where lower(t0.song_author) like :songauthorfilter)")
+					.setParameter("songnamefilter", filter + "%")
+					.setParameter("songnameinlinefilter", "%" + filter + "%")
+					.setParameter("songlyricsfilter", "%" + filter + "%")
+					.setParameter("songauthorfilter", "%" + filter + "%").findList();
+		}
+
+		Map<Long, SongTableData> songTableDataMap = new LinkedHashMap<Long, SongTableData>();
+
+		for (SqlRow res : queryResult) {
+			// System.out.println(res);
+
+			Long songId = res.getLong("id");
+			String lyricsId = res.getLong("l_id").toString();
+
+			// search through existing songs
+			if (songTableDataMap.containsKey(songId)) {
+				SongTableData tableData = songTableDataMap.get(songId);
+				// update additional lyrics
+				if (!(tableData.getLyrics_id().contains(lyricsId))) {
+					tableData.getLyrics_id().add(lyricsId);
+				}
+			} else {
+				// create new SongTableData
+				SongTableData ts = new SongTableData();
+				ts.setSong_name(res.getString("song_name"));
+				ts.setSong_original_title(res.getString("song_original_title"));
+				ts.setSong_author(res.getString("song_author"));
+				ts.setSong_link(res.getString("song_link"));
+				ts.setSong_importer(res.getString("song_importer"));
+				ts.getLyrics_id().add(lyricsId);
+				songTableDataMap.put(songId, ts);
+			}
+		}
+		
 		/**
 		 * Construct the JSON to return
 		 */
 		ObjectNode result = Json.newObject();
 
+		ArrayNode an = result.putArray("aaData");
+
+		// usually fixed to 10 entries
+		int pageLenght = Integer.valueOf(params.get("iDisplayLength")[0]);
+		// starts from 0 then 10 ...
+		int pageStart = Integer.valueOf(params.get("iDisplayStart")[0]);
+
+		int iTotalDisplayRecords = songTableDataMap.size();
+		
+		int pageFilledCounter = 0;
+		int counter = 0;
+		
+		Map<Long, SongTableData> smallMap = new LinkedHashMap<Long, SongTableData>();
+		
+		for (Entry<Long, SongTableData> item : songTableDataMap.entrySet()) {
+			counter++;
+			if (counter >= pageStart || iTotalDisplayRecords <= counter) {
+				smallMap.put(item.getKey(), item.getValue());
+				pageFilledCounter++;
+			}
+			if (pageFilledCounter == pageLenght || iTotalDisplayRecords <= counter) {
+				// process small map
+				for (Entry<Long, SongTableData> inneritem : smallMap.entrySet()) {
+					Long songId = inneritem.getKey();
+					SongTableData ts = inneritem.getValue();
+					ObjectNode songJson = SongToJson.convert(ts.getSong_name(), ts.getSong_link(),
+							ts.getSong_original_title(), ts.getSong_author(), songId, ts.getSong_importer(),
+							ts.getLyrics_id());
+					an.add(songJson);
+				}
+				break;
+			}
+		}
+		
 		result.put("sEcho", Integer.valueOf(params.get("sEcho")[0]));
 		result.put("iTotalRecords", iTotalRecords);
 		result.put("iTotalDisplayRecords", iTotalDisplayRecords);
 
-		ArrayNode an = result.putArray("aaData");
-
-		for (Song s : songPage.getList()) {
-			ObjectNode songJson = SongToJson.convert(s);
-			an.add(songJson);
-		}
 		return ok(result);
 	}
 
@@ -550,40 +613,32 @@ public class Application extends Controller {
 		/**
 		 * Get needed params
 		 */
-		// TODO: check for null pointers
-		// dont send whole song object, only songname and id
+
 		Map<String, String[]> params = request().queryString();
 		String filter = params.get("q")[0].toLowerCase();
-		// Logger.info("Filter param" + filter);
 
 		List<SqlRow> result = Ebean
 				.createSqlQuery("(SELECT t0.id" + " FROM song t0"
-						+ " WHERE lower(t0.song_name) like :songnamefilter) UNION ALL"
-						+ "(SELECT t0.id" + " FROM song t0"
-						+ " WHERE lower(t0.song_name) like :songnameinlinefilter) UNION ALL"
+						+ " WHERE lower(t0.song_name) like :songnamefilter) UNION ALL" + "(SELECT t0.id"
+						+ " FROM song t0" + " WHERE lower(t0.song_name) like :songnameinlinefilter) UNION ALL"
 						+ " (SELECT t0.id" + " FROM song t0" + " JOIN song_lyrics u1 on u1.song_id = t0.id"
-						+ " WHERE lower(u1.song_lyrics) like :songlyricsfilter) UNION ALL"
-						+ "(SELECT t0.id" + " FROM song t0"
-						+ " WHERE lower(t0.song_author) like :songauthorfilter)")
-				.setParameter("songnamefilter", filter + "%")
-				.setParameter("songnameinlinefilter", "%" + filter + "%")
-				.setParameter("songlyricsfilter", "%"+filter+"%")
-				.setParameter("songauthorfilter", "%"+filter+"%")
-				.findList();
-		ArrayList <Long> ids = new ArrayList<>();
+						+ " WHERE lower(u1.song_lyrics) like :songlyricsfilter) UNION ALL" + "(SELECT t0.id"
+						+ " FROM song t0" + " WHERE lower(t0.song_author) like :songauthorfilter)")
+				.setParameter("songnamefilter", filter + "%").setParameter("songnameinlinefilter", "%" + filter + "%")
+				.setParameter("songlyricsfilter", "%" + filter + "%")
+				.setParameter("songauthorfilter", "%" + filter + "%").findList();
+		ArrayList<Long> ids = new ArrayList<>();
 		for (SqlRow res : result) {
 			ids.add(res.getLong("id"));
 		}
 		ids = ArrayHelper.removeDuplicates(ids);
 		List<SimpleEntry<Long, String>> songSuggestionsList = new ArrayList<>();
-		for (Long id : ids){
+		for (Long id : ids) {
 			songSuggestionsList.add(new SimpleEntry<Long, String>(id, Song.get(id).getSongName()));
 		}
-		//System.out.println(Json.toJson(songSuggestionsList).toString().toString());
+
 		return ok(Json.toJson(songSuggestionsList));
 	}
-	
-
 
 	public static Result downloadAndDeleteFile() {
 		final Set<Map.Entry<String, String[]>> entries = request().queryString().entrySet();
