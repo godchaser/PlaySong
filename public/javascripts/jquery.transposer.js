@@ -1,14 +1,13 @@
 /**
  * Created by samuel on 23.02.15..
  */
-/*!
- * jQuery Chord Transposer plugin v1.0
+/*
+ * ! jQuery Chord Transposer plugin v1.0
  * http://codegavin.com/projects/transposer
- *
- * Copyright 2010, Jesse Gavin
- * Dual licensed under the MIT or GPL Version 2 licenses.
- * http://codegavin.com/license
- *
+ * 
+ * Copyright 2010, Jesse Gavin Dual licensed under the MIT or GPL Version 2
+ * licenses. http://codegavin.com/license
+ * 
  * Date: Sat Jun 26 21:27:00 2010 -0600
  */
 (function($) {
@@ -201,7 +200,7 @@
                     return firstChord;
                 }
             }
-            //default
+            // default
             var firstChord = getKeyByName("C");
             return firstChord;
         };
@@ -227,8 +226,20 @@
                     }
                     output.push("<span class='chordLine'>" + wrapChords(line) + "</span>")
                 }
-            else
+            // check if this is verse type
+            else if (line.charAt(line.length-1) == "]") {
+            	 switch(line.charAt(1)) {
+	                 case "C": line = line.replace("C", "Chorus "); break;
+	                 case "V": line = line.replace("V", "Verse "); break;
+	                 case "B": line = line.replace("B", "Bridge "); break;
+	                 case "I": line = line.replace("I", "Intro "); break;
+	                 case "E": line = line.replace("E", "Ending "); break;
+	                 default:  break;
+            	 }
+            	output.push("<span class='verseType'>" + line.substring(1,line.length-1).trim() + "</span>");
+            } else {
                 output.push("<span class='lyrics'>" + line + "</span>");
+            }
             };
 
             if (!initialChordSet){

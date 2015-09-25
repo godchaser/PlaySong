@@ -22,6 +22,13 @@ span.lyrics {
     font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
 }
 
+span.verseType {
+	font-style: italic;
+	font-weight: bold;
+    color: #ffffff;
+	background-color: #729fcf;
+    }
+
 
 .transpose-keys {
     margin: 10px 0;
