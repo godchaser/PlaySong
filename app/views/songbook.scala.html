@@ -27,7 +27,7 @@
 			</div>
 		</div>
 	</div>
-	<form class="btn-group" id="songbook-form">
+	<form class="btn-group form-inline" id="songbook-form">
 		<div class="btn-group">
 			<select id="song-selector" class="btn-group btn-info active" multiple="multiple">
 				@songs.map { song =>
@@ -61,9 +61,13 @@
 			</select>
 		</div>
 		@if(user.email != "Guest"){
-		<div class="checkbox">
- 			<label><input id="publish-service-checkbox" type="checkbox" value="">Publish service</label>
-		</div>
+		<div class="form-inline">
+			<label for="songbook-name">Songbook name:</label>
+			<input type="text" class="form-control" id="songbook-name">
+			<div class="checkbox">
+				  <label><input type="checkbox" id="publish-service-checkbox" value="">Publish?</label>
+			</div>
+		</div>	
 		}
 		<button type="button" id="submit-button" class="btn btn-warning">
 			<i class="fa fa-book fa-fw"></i> Prepare songbook
@@ -244,10 +248,15 @@
 				}
 				songFont.lyricsFont = lyricsFont;
 				songBookData.fonts = songFont;
-				songBookData.publishService = document.getElementById('publish-service-checkbox').checked;
-
+				
 				var format = $('#document-format' + ' option:selected').text();
 				songBookData.format = format;
+				
+				@if(user.email != "Guest"){
+				songBookData.publishService = document.getElementById('publish-service-checkbox').checked;
+				songBookData.songBookName = $('#songbook-name').val();
+				}
+								
 				console.log("HERE IS JSON OBJECT:");
 				console.log(songBookData);
 

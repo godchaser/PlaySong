@@ -11,9 +11,9 @@
 			<div class="col-lg-12">
 				<h3>Services </h3>
 				<ul>
-					@services.map { service =>
+					@services.reverse.map { service =>
 					<li>
-						@service.id @service.dateCreated
+						@service.serviceName : @service.dateCreated
 						<a href="@routes.Application.generateService(service.id)" download="service">Download</a>
 						@if(user.email != "Guest"){
 						<button class="deletebutton" type="button" id=@service.id class="btn btn-default">

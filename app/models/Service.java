@@ -2,13 +2,10 @@ package models;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.*;
 
-import models.helpers.SongPrint;
 import play.data.format.Formats;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.*;
@@ -25,8 +22,9 @@ public class Service extends Model {
 	public String userName;
 
 	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
-	@OrderColumn(name = "index")
 	public List<ServiceSong> songs = new ArrayList<>();
+	
+	public String serviceName;
 
 	public String getUserEmail() {
 		return userEmail;
@@ -59,6 +57,15 @@ public class Service extends Model {
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
 	}
+	
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
+
 
 	@Formats.DateTime(pattern = "dd-MM-yyyy_hhmm")
 	public Date dateCreated = new Date();

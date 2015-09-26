@@ -1,5 +1,7 @@
 package models;
 
+import java.util.Comparator;
+
 import javax.persistence.*;
 
 import models.helpers.PdfPrintable;
@@ -7,13 +9,10 @@ import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
 
 @Entity
-public class ServiceSong extends Model implements PdfPrintable {
+public class ServiceSong extends Model implements PdfPrintable, Comparable<ServiceSong> {
 
 	@Id
 	public int id;
-	
-	@Required
-	int index;
 
 	@Required
 	public String songName;
@@ -91,12 +90,10 @@ public class ServiceSong extends Model implements PdfPrintable {
 		String songLyrics = getSongLyrics();
 		return songLyrics;
 	}
-	
-	public int getIndex() {
-		return index;
+
+	@Override
+	public int compareTo(ServiceSong otherSong) {
+		return Integer.compare(this.id, otherSong.id);
 	}
 
-	public void setIndex(int index) {
-		this.index = index;
-	}
 }

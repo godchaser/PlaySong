@@ -371,7 +371,13 @@ public class Application extends Controller {
 			user = new UserAccount("Guest", "", "");
 		}
 
-		return ok(services.render(Service.find.all(), user));
+		// Manual sorting because of JPA OrderBy bidirectional relationship bug
+		List<Service> serviceList = Service.find.all();
+		for (Service service : serviceList) {
+			Collections.sort(service.getSongs());
+		}
+
+		return ok(services.render(serviceList, user));
 	}
 
 	@Security.Authenticated(Secured.class)
@@ -759,13 +765,19 @@ public class Application extends Controller {
 		String format = "word";
 
 		boolean publishService = false;
+		String songBookName = null;
 
 		try {
 			JsonSongbook jsonSongbook = mapper.treeToValue(jsonNode, JsonSongbook.class);
 			format = jsonSongbook.getFormat();
 			Map<String, Object> additionalProperties = jsonSongbook.getAdditionalProperties();
 			if (additionalProperties != null) {
-				publishService = Boolean.parseBoolean(additionalProperties.get("publishService").toString());
+				if (additionalProperties.get("publishService")!=null){
+					publishService = Boolean.parseBoolean(additionalProperties.get("publishService").toString());
+				}
+				if (additionalProperties.get("songBookName")!=null){
+					songBookName = additionalProperties.get("songBookName").toString();
+				}
 			}
 			List<models.json.Song> songsJson = jsonSongbook.getSongs();
 			for (models.json.Song songJson : songsJson) {
@@ -786,13 +798,19 @@ public class Application extends Controller {
 		}
 
 		Random rand = new Random();
-		int hash = rand.nextInt(100);
+		
+		
+		//int hash = rand.nextInt(100);
+		
+		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_hhmmss");
+		Date date = new Date();
+		String hash = (dateFormat.format(date));
 
 		try {
 			if ("word".equals(format)) {
-				docWriter.newSongbookWordDoc(Integer.toString(hash), songsForPrint);
+				docWriter.newSongbookWordDoc(hash, songsForPrint);
 			} else if ("pdf".equals(format)) {
-				String outputPdfPath = "resources/pdf/" + Integer.toString(hash) + ".pdf";
+				String outputPdfPath = "resources/pdf/" + hash + ".pdf";
 				try {
 					Logger.debug("Writing PDF: " + outputPdfPath);
 					PdfGenerator.writeListContent(outputPdfPath, songsForPrint);
@@ -809,7 +827,6 @@ public class Application extends Controller {
 		if (!("Guest".equals(user.name)) && publishService) {
 			Service service = new Service();
 			ArrayList<ServiceSong> serviceSongList = new ArrayList<ServiceSong>();
-			int idx = 0;
 			for (SongPrint sp : songsForPrint) {
 				ServiceSong servicesong = new ServiceSong();
 				servicesong.setSongName(sp.getSong().getSongName());
@@ -817,18 +834,19 @@ public class Application extends Controller {
 				servicesong.setLyricsId(sp.getLyricsID());
 				servicesong.setSongKey(sp.getKey());
 				servicesong.setSongLyrics(SongLyrics.find.byId((sp.getLyricsID())).songLyrics);
-				servicesong.setIndex(idx);
 				serviceSongList.add(servicesong);
-				idx++;
 			}
 			service.setSongs(serviceSongList);
 			service.setDateCreated(new Date());
 			service.setUserEmail(user.email);
 			service.setUserName(user.name);
+			if (songBookName!=null){
+				service.setServiceName(songBookName);
+			}
 			service.save();
 			Logger.debug("Publishing service: " + service.getDateCreated());
 		}
-		return ok(Integer.toString(hash));
+		return ok(hash);
 	}
 
 	public static Result generateService(Long id) {
@@ -865,8 +883,10 @@ public class Application extends Controller {
 		}
 		DateFormat df = new SimpleDateFormat("dd-MM-yyyy_hhmm");
 		String date = (df.format(service.getDateCreated()));
-
-		String outputPdfPath = "resources/pdf/services/" + date + ".pdf";
+		
+		String normalizedFileName = service.serviceName.replaceAll("\\W+", "");
+		
+		String outputPdfPath = "resources/pdf/services/" + normalizedFileName +"_" + date + ".pdf";
 		try {
 			Logger.debug("Writing PDF: " + outputPdfPath);
 			PdfGenerator.writeListContent(outputPdfPath, splist);
