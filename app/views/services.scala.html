@@ -15,9 +15,11 @@
 					<li>
 						@service.id @service.dateCreated
 						<a href="@routes.Application.generateService(service.id)" download="service">Download</a>
+						@if(user.email != "Guest"){
 						<button class="deletebutton" type="button" id=@service.id class="btn btn-default">
 							<i class="fa fa-times"></i>
 						</button>
+						}
 						<ul>
 						@service.songs.map { song =>											
 							<li>@song.songName</li>

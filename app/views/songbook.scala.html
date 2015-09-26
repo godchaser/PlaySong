@@ -60,9 +60,11 @@
 				<option value="2" data-content="<i class='fa fa-file-word-o fa-lg'></i> word">word</option>
 			</select>
 		</div>
+		@if(user.email != "Guest"){
 		<div class="checkbox">
  			<label><input id="publish-service-checkbox" type="checkbox" value="">Publish service</label>
 		</div>
+		}
 		<button type="button" id="submit-button" class="btn btn-warning">
 			<i class="fa fa-book fa-fw"></i> Prepare songbook
 		</button>

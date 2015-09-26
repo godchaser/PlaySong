@@ -42,10 +42,11 @@
 				<button id="editsongbutton" class="songbuttons btn btn-primary btn-warning" href="#">
 					<i class="glyphicon glyphicon-edit"></i> Edit song
 				</button>
+				@if(user.email != "Guest"){
 				<button id="deletesongbutton" class="songbuttons btn btn-primary btn-danger">
 					<i class="glyphicon glyphicon-trash"></i> Delete song
 				</button>
-
+				}
 				<div class="alert alert-block alert-error fade in" id="cert-error" style="display:none;">
 					<button type="button" class="close" data-dismiss="alert"></button>
 					<h4 class="alert-heading">Delete success</h4>
