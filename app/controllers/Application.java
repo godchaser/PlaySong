@@ -886,7 +886,7 @@ public class Application extends Controller {
 		
 		String normalizedFileName = service.serviceName.replaceAll("\\W+", "");
 		
-		String outputPdfPath = "resources/pdf/services/" + normalizedFileName +"_" + date + ".pdf";
+		String outputPdfPath = "resources/pdf/" + normalizedFileName +"_" + date + ".pdf";
 		try {
 			Logger.debug("Writing PDF: " + outputPdfPath);
 			PdfGenerator.writeListContent(outputPdfPath, splist);
