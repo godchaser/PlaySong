@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 import play.Logger;
+import models.ServiceSong;
 import models.SongLyrics;
+import models.helpers.PdfPrintable;
 //import models.Song;
 //import models.SongLyrics;
 import models.helpers.SongPrint;
@@ -173,7 +175,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 		total = writer.getDirectContent().createTemplate(30, 16);
 	}
 
-	private void createSongsTOC(List<SongPrint> songPrintObjects)
+	private void createSongsTOC(List<? extends PdfPrintable> printObject)
 			throws DocumentException {
 		// add a small introduction chapter the shouldn't be counted.
 		final Chapter intro = new Chapter(new Paragraph("Table Of Content",
@@ -181,16 +183,16 @@ public class PdfGenerator extends PdfPageEventHelper {
 		intro.setNumberDepth(0);
 		this.document.add(intro);
 		
-		for (int i = 0; i < songPrintObjects.size(); i++) {
+		for (int i = 0; i < printObject.size(); i++) {
 			
-			final String songTitle = songPrintObjects.get(i).getSong().songName;
+			final String title = printObject.get(i).getTitle();
 			// final String songTitle = songPrintObjects.get(i).getSong();
 
-			final Chunk chunk = new Chunk(i + ". " + songTitle, fonts.NORMAL)
-					.setLocalGoto(songTitle);
+			final Chunk chunk = new Chunk(i + ". " + title, fonts.NORMAL)
+					.setLocalGoto(title);
 			this.document.add(new Paragraph(chunk));
 
-			final String songTitleId = songTitle + i;
+			final String songTitleId = title + i;
 
 			// Add a placeholder for the page reference
 			this.document.add(new VerticalPositionMark() {
@@ -209,12 +211,12 @@ public class PdfGenerator extends PdfPageEventHelper {
 		}
 	}
 
-	private void createSongsChapters(List<SongPrint> songPrintObjects)
+	private void createSongsChapters(List<? extends PdfPrintable> printObject)
 			throws DocumentException {
 
-		for (int i = 0; i < songPrintObjects.size(); i++) {
+		for (int i = 0; i < printObject.size(); i++) {
 			// append the chapter
-			String songTitle = songPrintObjects.get(i).getSong().songName;
+			String songTitle = printObject.get(i).getTitle();
 			// final String songTitle = songPrintObjects.get(i).getSong();
 
 			final Chunk chunk = new Chunk(songTitle, fonts.BOLD)
@@ -223,24 +225,12 @@ public class PdfGenerator extends PdfPageEventHelper {
 			final Chapter chapter = new Chapter(new Paragraph(chunk), i);
 			// chapter.setNumberDepth(0);
 
-			String songLyrics = SongLyrics.get(songPrintObjects.get(i)
-					.getLyricsID()).songLyrics;
+			String content = printObject.get(i).getContent();
 
+			System.out.println(content);
 
-			// String songLyrics = songPrintObjects.get(i).getKey();
-			System.out.println(songLyrics);
-
-			// SONG TRANSPOSE FUNCTION
-
-			String origKey = SongLyrics.get(songPrintObjects.get(i)
-					.getLyricsID()).songKey;
-			String newKey = songPrintObjects.get(i).getKey();
-			Logger.trace("Orig key: " + origKey + " New key: " + newKey);
-			if (!origKey.equals(newKey)) {
-				songLyrics = ChordLineTransposer.transposeLyrics(origKey,
-						newKey, songLyrics);
-			}
-			chapter.addSection(new Paragraph(songLyrics, fonts.MONOSPACE), 0);
+			
+			chapter.addSection(new Paragraph(content, fonts.MONOSPACE), 0);
 			// chapter.setNumberDepth(0);
 
 			this.document.add(chapter);
@@ -259,9 +249,9 @@ public class PdfGenerator extends PdfPageEventHelper {
 
 		}
 	}
-
-	public static void writeSongs(String outputPdfPath,
-			List<SongPrint> songPrintObjects) {
+	
+	public static void writeListContent(String outputPdfPath,
+			List<? extends PdfPrintable> songPrintObjects) {
 		PdfGenerator pdfGenerator;
 		try {
 			pdfGenerator = new PdfGenerator(outputPdfPath);
@@ -273,7 +263,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 			e.printStackTrace();
 		}
 	}
-
+	
 	public static void simpleTest() {
 		PdfGenerator pdfGenerator;
 		try {

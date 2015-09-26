@@ -1,0 +1,62 @@
+@(services: List[Service], user: UserAccount)
+
+@admintheme("Services", user){
+<link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap-select/dist/css/bootstrap-select.min.css")">
+<link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/handsontable/handsontable.full.min.css")">
+<script src="@routes.Application.javascriptRoutes()" type="text/javascript"></script>
+
+<div hidden id="service_wrapper">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12">
+				<h3>Services </h3>
+				<ul>
+					@services.map { service =>
+					<li>
+						@service.id @service.dateCreated
+						<a href="@routes.Application.generateService(service.id)" download="service">Download</a>
+						<button class="deletebutton" type="button" id=@service.id class="btn btn-default">
+							<i class="fa fa-times"></i>
+						</button>
+						<ul>
+						@service.songs.map { song =>											
+							<li>@song.songName</li>
+						}
+						</ul>
+					</li>
+					}
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="@routes.Assets.at("lib/jquery/dist/jquery.min.js")" type="text/javascript"></script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#dynamiccontent').html($('#service_wrapper').html());
+		$('#service_wrapper').remove();
+	
+		function deleteService(id) {
+			console.log("Delete service : " + id);
+			jsRoutes.controllers.Application.deleteservice(id).ajax({
+				type : 'DELETE',
+				success : function() {
+					var link = "@routes.Application.services()";
+					window.location = link;
+				},
+				error : function() {
+					console.log("Error: ajax failure");
+				}
+			});
+		}
+
+		$('.deletebutton').click(function(event) {
+			var id = this.id;
+			deleteService(id);
+		});
+		
+	}); 
+</script>
+}

@@ -5,6 +5,16 @@
 # Home page
 GET      /                            controllers.Application.index()
 
+# views
+GET      /admin                       controllers.Application.admin()
+GET      /table                       controllers.Application.table()
+GET      /songbook                    controllers.Application.songbook()
+GET      /songeditor/:id              controllers.Application.songeditor(id: Long)
+GET      /newsongeditor               controllers.Application.newsongeditor()
+GET      /songview/:id                controllers.Application.songview(id: Long)
+GET      /songsbackup                 controllers.Application.songs()
+GET      /services                    controllers.Application.services()
+
 # Authentication routes
 GET      /login                       controllers.Application.login()
 POST     /login                       controllers.Application.authenticate()
@@ -16,6 +26,9 @@ GET      /songs                       controllers.Application.getsongdata()
 # POST add song - from form - not JSON
 POST     /songs                       controllers.Application.newsong()
 DELETE   /songs/:id                   controllers.Application.deletesong(id: Long)
+
+DELETE   /services/:id                controllers.Application.deleteservice(id: Long)
+GET      /services/:id                controllers.Application.generateService(id: Long)
 
 # used for retrieving specific song info in json format
 GET      /songs/:id                   controllers.Application.getsongjson(id: Long)
@@ -60,15 +73,6 @@ POST     /user                        controllers.Application.addUser()
 GET      /user/:email                 controllers.Application.getUser(email: String)
 DELETE   /user/:email                 controllers.Application.deleteUser(email: String)
 PUT      /user/:email                 controllers.Application.updateUser(email: String)
-
-# views
-GET      /admin                       controllers.Application.admin()
-GET      /table                       controllers.Application.table()
-GET      /songbook                    controllers.Application.songbook()
-GET      /songeditor/:id              controllers.Application.songeditor(id: Long)
-GET      /newsongeditor               controllers.Application.newsongeditor()
-GET      /songview/:id                controllers.Application.songview(id: Long)
-GET      /songsbackup                 controllers.Application.songs()
 
 GET      /assets/javascripts/routes   controllers.Application.javascriptRoutes()
 # Map static resources from the /public folder to the /assets URL path

@@ -7,16 +7,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import controllers.chords.ChordLineTransposer;
 import controllers.songbook.XLSHelper;
+import models.Service;
+import models.ServiceSong;
 import models.Song;
 import models.SongLyrics;
 import models.UserAccount;
 import models.helpers.ArrayHelper;
+import models.helpers.PdfPrintable;
 import models.helpers.SongPrint;
 import models.helpers.SongTableData;
 import models.helpers.XMLSongsParser;
 import models.json.JsonSongbook;
 import play.Logger;
 import play.Routes;
+
 import play.data.Form;
 import play.libs.Json;
 import play.mvc.Controller;
@@ -36,6 +40,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.text.Collator;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.avaje.ebean.SqlRow;
@@ -46,6 +52,8 @@ import java.util.Map.Entry;
 import play.twirl.api.Html;
 
 import static play.data.Form.form;
+
+import play.libs.Akka;
 
 public class Application extends Controller {
 
@@ -339,6 +347,39 @@ public class Application extends Controller {
 		return ok(songbook.render(sortedSongs, user));
 	}
 
+	public static Result services() {
+		UserAccount user = null;
+		if (request().cookies().get("PLAY_SESSION") != null) {
+			// Logger.debug("Found PLAY_SESSION cookie");
+			String cookieVal = request().cookies().get("PLAY_SESSION").value();
+			String userId = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
+			String uuid = null;
+			if (request().cookies().get("PLAYSONG-UUID") != null) {
+				uuid = request().cookies().get("PLAYSONG-UUID").value();
+			} else {
+				uuid = UUID.randomUUID().toString();
+				response().setCookie("PLAYSONG-UUID", uuid);
+			}
+
+			Logger.debug(uuid + ": User ID: " + userId);
+			if (userId != null) {
+				user = UserAccount.find.byId(userId);
+			}
+		}
+		if (user == null) {
+			Logger.debug("Using guest session");
+			user = new UserAccount("Guest", "", "");
+		}
+
+		return ok(services.render(Service.find.all(), user));
+	}
+
+	@Security.Authenticated(Secured.class)
+	public static Result deleteservice(Long id) {
+		Service.delete(id);
+		return ok();
+	}
+
 	@Security.Authenticated(Secured.class)
 	public static Result getsongs() {
 		return ok(Json.toJson(Song.all()));
@@ -562,7 +603,7 @@ public class Application extends Controller {
 				songTableDataMap.put(songId, ts);
 			}
 		}
-		
+
 		/**
 		 * Construct the JSON to return
 		 */
@@ -576,12 +617,12 @@ public class Application extends Controller {
 		int pageStart = Integer.valueOf(params.get("iDisplayStart")[0]);
 
 		int iTotalDisplayRecords = songTableDataMap.size();
-		
+
 		int pageFilledCounter = 0;
 		int counter = 0;
-		
+
 		Map<Long, SongTableData> smallMap = new LinkedHashMap<Long, SongTableData>();
-		
+
 		for (Entry<Long, SongTableData> item : songTableDataMap.entrySet()) {
 			counter++;
 			if (counter >= pageStart || iTotalDisplayRecords <= counter) {
@@ -601,7 +642,7 @@ public class Application extends Controller {
 				break;
 			}
 		}
-		
+
 		result.put("sEcho", Integer.valueOf(params.get("sEcho")[0]));
 		result.put("iTotalRecords", iTotalRecords);
 		result.put("iTotalDisplayRecords", iTotalDisplayRecords);
@@ -662,7 +703,7 @@ public class Application extends Controller {
 			response().setHeader(CONTENT_TYPE, "application/pdf");
 			break;
 		case "word":
-			tmpFile = new File("resources/" + hashValue + ".docx");
+			tmpFile = new File("resources/docx/" + hashValue + ".docx");
 			response().setHeader(CONTENT_TYPE,
 					"application/vnd.openxmlformats-officedocument.wordprocessingml.document");
 			break;
@@ -686,16 +727,46 @@ public class Application extends Controller {
 	}
 
 	public static Result generateSongbook() {
+
+		UserAccount user = null;
+		if (request().cookies().get("PLAY_SESSION") != null) {
+			// Logger.debug("Found PLAY_SESSION cookie");
+			String cookieVal = request().cookies().get("PLAY_SESSION").value();
+			String userId = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
+			String uuid = null;
+			if (request().cookies().get("PLAYSONG-UUID") != null) {
+				uuid = request().cookies().get("PLAYSONG-UUID").value();
+			} else {
+				uuid = UUID.randomUUID().toString();
+				response().setCookie("PLAYSONG-UUID", uuid);
+			}
+
+			Logger.debug(uuid + ": User ID: " + userId);
+			if (userId != null) {
+				user = UserAccount.find.byId(userId);
+			}
+		}
+		if (user == null) {
+			Logger.debug("Using guest session");
+			user = new UserAccount("Guest", "", "");
+		}
+
 		JsonNode jsonNode = request().body().asJson();
-		ArrayList<SongPrint> songsForPrint = new ArrayList<>();
+		List<SongPrint> songsForPrint = new ArrayList<>();
 		DocumentWriter docWriter = null;
 		Logger.trace("Songbook generator json string: " + jsonNode);
 		ObjectMapper mapper = new ObjectMapper();
 		String format = "word";
 
+		boolean publishService = false;
+
 		try {
 			JsonSongbook jsonSongbook = mapper.treeToValue(jsonNode, JsonSongbook.class);
 			format = jsonSongbook.getFormat();
+			Map<String, Object> additionalProperties = jsonSongbook.getAdditionalProperties();
+			if (additionalProperties != null) {
+				publishService = Boolean.parseBoolean(additionalProperties.get("publishService").toString());
+			}
 			List<models.json.Song> songsJson = jsonSongbook.getSongs();
 			for (models.json.Song songJson : songsJson) {
 				songsForPrint.add(new SongPrint(Song.get(Long.parseLong(songJson.getSong().getId())),
@@ -721,13 +792,10 @@ public class Application extends Controller {
 			if ("word".equals(format)) {
 				docWriter.newSongbookWordDoc(Integer.toString(hash), songsForPrint);
 			} else if ("pdf".equals(format)) {
-				// String in = "resources/" + Integer.toString(hash) + ".docx";
-				// String out = "resources/" + Integer.toString(hash) + ".pdf";
-				// PdfConverter.convert(in, out);
 				String outputPdfPath = "resources/pdf/" + Integer.toString(hash) + ".pdf";
 				try {
 					Logger.debug("Writing PDF: " + outputPdfPath);
-					PdfGenerator.writeSongs(outputPdfPath, songsForPrint);
+					PdfGenerator.writeListContent(outputPdfPath, songsForPrint);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -736,7 +804,90 @@ public class Application extends Controller {
 			e.printStackTrace();
 		}
 
+		// this should maybe made async somehow, because it is not crucial for
+		// this response
+		if (!("Guest".equals(user.name)) && publishService) {
+			Service service = new Service();
+			ArrayList<ServiceSong> serviceSongList = new ArrayList<ServiceSong>();
+			int idx = 0;
+			for (SongPrint sp : songsForPrint) {
+				ServiceSong servicesong = new ServiceSong();
+				servicesong.setSongName(sp.getSong().getSongName());
+				servicesong.setSongId(sp.getSong().getId());
+				servicesong.setLyricsId(sp.getLyricsID());
+				servicesong.setSongKey(sp.getKey());
+				servicesong.setSongLyrics(SongLyrics.find.byId((sp.getLyricsID())).songLyrics);
+				servicesong.setIndex(idx);
+				serviceSongList.add(servicesong);
+				idx++;
+			}
+			service.setSongs(serviceSongList);
+			service.setDateCreated(new Date());
+			service.setUserEmail(user.email);
+			service.setUserName(user.name);
+			service.save();
+			Logger.debug("Publishing service: " + service.getDateCreated());
+		}
 		return ok(Integer.toString(hash));
+	}
+
+	public static Result generateService(Long id) {
+
+		UserAccount user = null;
+		if (request().cookies().get("PLAY_SESSION") != null) {
+			// Logger.debug("Found PLAY_SESSION cookie");
+			String cookieVal = request().cookies().get("PLAY_SESSION").value();
+			String userId = cookieVal.substring(cookieVal.indexOf("email=") + 6).replace("%40", "@");
+			String uuid = null;
+			if (request().cookies().get("PLAYSONG-UUID") != null) {
+				uuid = request().cookies().get("PLAYSONG-UUID").value();
+			} else {
+				uuid = UUID.randomUUID().toString();
+				response().setCookie("PLAYSONG-UUID", uuid);
+			}
+
+			Logger.debug(uuid + ": User ID: " + userId);
+			if (userId != null) {
+				user = UserAccount.find.byId(userId);
+			}
+		}
+		if (user == null) {
+			Logger.debug("Using guest session");
+			user = new UserAccount("Guest", "", "");
+		}
+
+		Service service = Service.find.byId(id);
+
+		ArrayList<PdfPrintable> splist = new ArrayList<PdfPrintable>();
+
+		for (ServiceSong ss : service.getSongs()) {
+			splist.add(ss);
+		}
+		DateFormat df = new SimpleDateFormat("dd-MM-yyyy_hhmm");
+		String date = (df.format(service.getDateCreated()));
+
+		String outputPdfPath = "resources/pdf/services/" + date + ".pdf";
+		try {
+			Logger.debug("Writing PDF: " + outputPdfPath);
+			PdfGenerator.writeListContent(outputPdfPath, splist);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		File tmpFile = new File(outputPdfPath);
+		response().setHeader(CONTENT_TYPE, "application/pdf");
+
+		Logger.debug("File: " + tmpFile.getAbsolutePath());
+		FileInputStream fin = null;
+		try {
+			fin = new FileInputStream(tmpFile);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		response().setHeader("Content-disposition", "attachment;filename=" + tmpFile.getName());
+
+		return ok(fin);
 	}
 
 	public static Result login() {
@@ -789,6 +940,9 @@ public class Application extends Controller {
 				controllers.routes.javascript.Application.songeditor(),
 				controllers.routes.javascript.Application.songsuggestions(),
 				controllers.routes.javascript.Application.getsonglyricsjson(),
+				controllers.routes.javascript.Application.services(),
+				controllers.routes.javascript.Application.generateService(),
+				controllers.routes.javascript.Application.deleteservice(),
 				controllers.routes.javascript.Application.upload(), controllers.routes.javascript.Application.addUser(),
 				controllers.routes.javascript.Application.getUser(),
 				controllers.routes.javascript.Application.deleteUser(),

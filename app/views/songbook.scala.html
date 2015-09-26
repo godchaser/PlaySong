@@ -60,8 +60,11 @@
 				<option value="2" data-content="<i class='fa fa-file-word-o fa-lg'></i> word">word</option>
 			</select>
 		</div>
+		<div class="checkbox">
+ 			<label><input id="publish-service-checkbox" type="checkbox" value="">Publish service</label>
+		</div>
 		<button type="button" id="submit-button" class="btn btn-warning">
-			<i class="fa fa-book fa-fw"></i>Prepare songbook
+			<i class="fa fa-book fa-fw"></i> Prepare songbook
 		</button>
 	</form>
 	<div>
@@ -178,7 +181,10 @@
 							return nRow;
 						}
 					});
-					oTable.tableDnD();
+					// detect if smaller screen to disable drag & drop
+					if ($(window).width()>=800){
+						oTable.tableDnD();
+					}
 					$('#song_table button.move').click(function() {
 						var row = $(this).closest('tr');
 						if ($(this).hasClass('up'))
@@ -236,6 +242,7 @@
 				}
 				songFont.lyricsFont = lyricsFont;
 				songBookData.fonts = songFont;
+				songBookData.publishService = document.getElementById('publish-service-checkbox').checked;
 
 				var format = $('#document-format' + ' option:selected').text();
 				songBookData.format = format;

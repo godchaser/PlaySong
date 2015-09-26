@@ -81,7 +81,7 @@ public class DocumentWriter {
 			List<SongPrint> songPrintObjects) throws Exception {
 
 		InputStream is = Play.application().resourceAsStream("template.dotx");
-		File outputFile = new File("resources/" + filename + ".docx");
+		File outputFile = new File("resources/docx/" + filename + ".docx");
 		XWPFDocument template = new XWPFDocument(is);
 
 		final XWPFDocument document = new XWPFDocument();
