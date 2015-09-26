@@ -772,10 +772,10 @@ public class Application extends Controller {
 			format = jsonSongbook.getFormat();
 			Map<String, Object> additionalProperties = jsonSongbook.getAdditionalProperties();
 			if (additionalProperties != null) {
-				if (additionalProperties.get("publishService")!=null){
+				if (additionalProperties.get("publishService") != null) {
 					publishService = Boolean.parseBoolean(additionalProperties.get("publishService").toString());
 				}
-				if (additionalProperties.get("songBookName")!=null){
+				if (additionalProperties.get("songBookName") != null) {
 					songBookName = additionalProperties.get("songBookName").toString();
 				}
 			}
@@ -797,11 +797,9 @@ public class Application extends Controller {
 			e.printStackTrace();
 		}
 
-		Random rand = new Random();
-		
-		
-		//int hash = rand.nextInt(100);
-		
+		// Random rand = new Random();
+		// int hash = rand.nextInt(100);
+
 		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_hhmmss");
 		Date date = new Date();
 		String hash = (dateFormat.format(date));
@@ -840,7 +838,7 @@ public class Application extends Controller {
 			service.setDateCreated(new Date());
 			service.setUserEmail(user.email);
 			service.setUserName(user.name);
-			if (songBookName!=null){
+			if (songBookName != null) {
 				service.setServiceName(songBookName);
 			}
 			service.save();
@@ -876,20 +874,23 @@ public class Application extends Controller {
 
 		Service service = Service.find.byId(id);
 
-		ArrayList<PdfPrintable> splist = new ArrayList<PdfPrintable>();
+		ArrayList<PdfPrintable> songPrintList = new ArrayList<PdfPrintable>();
 
-		for (ServiceSong ss : service.getSongs()) {
-			splist.add(ss);
+		// Manual sorting because of JPA OrderBy bidirectional relationship bug
+		Collections.sort(service.getSongs());
+		
+		for (ServiceSong serviceSong : service.getSongs()) {
+			songPrintList.add(serviceSong);
 		}
 		DateFormat df = new SimpleDateFormat("dd-MM-yyyy_hhmm");
 		String date = (df.format(service.getDateCreated()));
-		
+
 		String normalizedFileName = service.serviceName.replaceAll("\\W+", "");
-		
-		String outputPdfPath = "resources/pdf/" + normalizedFileName +"_" + date + ".pdf";
+
+		String outputPdfPath = "resources/pdf/" + normalizedFileName + "_" + date + ".pdf";
 		try {
 			Logger.debug("Writing PDF: " + outputPdfPath);
-			PdfGenerator.writeListContent(outputPdfPath, splist);
+			PdfGenerator.writeListContent(outputPdfPath, songPrintList);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
