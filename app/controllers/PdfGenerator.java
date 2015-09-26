@@ -63,35 +63,28 @@ public class PdfGenerator extends PdfPageEventHelper {
 		Font BOLDITALIC;
 
 		public SongFonts() {
-			FontFactory
-					.register(LiberationMonoFontPath, LiberationMonoFontPath);
-			FontFactory.register(LiberationMonoBoldFontPath,
-					LiberationMonoBoldFontPath);
+			FontFactory.register(LiberationMonoFontPath, LiberationMonoFontPath);
+			FontFactory.register(LiberationMonoBoldFontPath, LiberationMonoBoldFontPath);
 			FontFactory.register(TimesNewRomanFontPath, TimesNewRomanFontPath);
-			FontFactory.register(TimesNewRomanBoldFontPath,
-					TimesNewRomanFontPath);
+			FontFactory.register(TimesNewRomanBoldFontPath, TimesNewRomanFontPath);
 			// Get the font NB. last parameter indicates font needs to be
 			// embedded
-			MONOSPACE = FontFactory.getFont(LiberationMonoFontPath,
-					BaseFont.CP1250, BaseFont.EMBEDDED);
+			MONOSPACE = FontFactory.getFont(LiberationMonoFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
 			MONOSPACE.setSize(MONOSPACE_SIZE);
 
-			NORMAL = FontFactory.getFont(TimesNewRomanFontPath,
-					BaseFont.CP1250, BaseFont.EMBEDDED);
+			NORMAL = FontFactory.getFont(TimesNewRomanFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
 			NORMAL.setStyle(Font.NORMAL);
 			NORMAL.setSize(NORMAL_SIZE);
-			BOLD = FontFactory.getFont(TimesNewRomanBoldFontPath, BaseFont.CP1250,
-					BaseFont.EMBEDDED);
+			BOLD = FontFactory.getFont(TimesNewRomanBoldFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
 			BOLD.setStyle(Font.NORMAL);
 			BOLD.setSize(BOLD_SIZE);
-			ITALIC = FontFactory.getFont(TimesNewRomanFontPath,
-					BaseFont.CP1250, BaseFont.EMBEDDED);
+			ITALIC = FontFactory.getFont(TimesNewRomanFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
 			ITALIC.setStyle(Font.ITALIC);
 			ITALIC.setSize(12);
-			BOLDITALIC = FontFactory.getFont(TimesNewRomanFontPath,
-					BaseFont.CP1250, BaseFont.EMBEDDED);
+			BOLDITALIC = FontFactory.getFont(TimesNewRomanFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
 			BOLDITALIC.setStyle(Font.BOLDITALIC);
 			BOLDITALIC.setSize(12);
+
 		}
 	}
 
@@ -99,20 +92,18 @@ public class PdfGenerator extends PdfPageEventHelper {
 		this.document = new Document(songPageSize);
 		this.document.setMargins(50, 50, 60, 40);
 		this.document.setMarginMirroring(false);
-		this.writer = PdfWriter.getInstance(this.document,
-				new FileOutputStream(outputPdfPath));
+		this.writer = PdfWriter.getInstance(this.document, new FileOutputStream(outputPdfPath));
 		this.writer.setPageEvent(this);
 		this.document.open();
 	}
 
-	public void onChapter(final PdfGenerator writer, final Document document,
-			final float paragraphPosition, final Paragraph title) {
+	public void onChapter(final PdfGenerator writer, final Document document, final float paragraphPosition,
+			final Paragraph title) {
 		this.pageByTitle.put(title.getContent(), this.writer.getPageNumber());
 	}
 
-	public void onSection(final PdfGenerator writer, final Document document,
-			final float paragraphPosition, final int depth,
-			final Paragraph title) {
+	public void onSection(final PdfGenerator writer, final Document document, final float paragraphPosition,
+			final int depth, final Paragraph title) {
 		this.pageByTitle.put(title.getContent(), this.writer.getPageNumber());
 	}
 
@@ -159,10 +150,8 @@ public class PdfGenerator extends PdfPageEventHelper {
 	 *      com.itextpdf.text.Document)
 	 */
 	public void onCloseDocument(PdfWriter writer, Document document) {
-		ColumnText
-				.showTextAligned(total, Element.ALIGN_LEFT,
-						new Phrase(String.valueOf(writer.getPageNumber() - 1)),
-						2, 2, 0);
+		ColumnText.showTextAligned(total, Element.ALIGN_LEFT, new Phrase(String.valueOf(writer.getPageNumber() - 1)), 2,
+				2, 0);
 	}
 
 	/**
@@ -175,21 +164,18 @@ public class PdfGenerator extends PdfPageEventHelper {
 		total = writer.getDirectContent().createTemplate(30, 16);
 	}
 
-	private void createSongsTOC(List<? extends PdfPrintable> printObject)
-			throws DocumentException {
+	private void createSongsTOC(List<? extends PdfPrintable> printObject) throws DocumentException {
 		// add a small introduction chapter the shouldn't be counted.
-		final Chapter intro = new Chapter(new Paragraph("Table Of Content",
-				fonts.BOLD), 0);
+		final Chapter intro = new Chapter(new Paragraph("Table Of Content", fonts.BOLD), 0);
 		intro.setNumberDepth(0);
 		this.document.add(intro);
-		
+
 		for (int i = 0; i < printObject.size(); i++) {
-			
+
 			final String title = printObject.get(i).getTitle();
 			// final String songTitle = songPrintObjects.get(i).getSong();
 
-			final Chunk chunk = new Chunk(i + ". " + title, fonts.NORMAL)
-					.setLocalGoto(title);
+			final Chunk chunk = new Chunk(i + ". " + title, fonts.NORMAL).setLocalGoto(title);
 			this.document.add(new Paragraph(chunk));
 
 			final String songTitleId = title + i;
@@ -197,13 +183,10 @@ public class PdfGenerator extends PdfPageEventHelper {
 			// Add a placeholder for the page reference
 			this.document.add(new VerticalPositionMark() {
 				@Override
-				public void draw(final PdfContentByte canvas, final float llx,
-						final float lly, final float urx, final float ury,
-						final float y) {
-					final PdfTemplate createTemplate = canvas.createTemplate(
-							50, 50);
-					PdfGenerator.this.tocPlaceholder.put(songTitleId,
-							createTemplate);
+				public void draw(final PdfContentByte canvas, final float llx, final float lly, final float urx,
+						final float ury, final float y) {
+					final PdfTemplate createTemplate = canvas.createTemplate(50, 50);
+					PdfGenerator.this.tocPlaceholder.put(songTitleId, createTemplate);
 
 					canvas.addTemplate(createTemplate, urx - 50, y);
 				}
@@ -211,26 +194,56 @@ public class PdfGenerator extends PdfPageEventHelper {
 		}
 	}
 
-	private void createSongsChapters(List<? extends PdfPrintable> printObject)
-			throws DocumentException {
+	private void createSongsChapters(List<? extends PdfPrintable> printObject) throws DocumentException {
 
 		for (int i = 0; i < printObject.size(); i++) {
 			// append the chapter
 			String songTitle = printObject.get(i).getTitle();
 			// final String songTitle = songPrintObjects.get(i).getSong();
 
-			final Chunk chunk = new Chunk(songTitle, fonts.BOLD)
-					.setLocalDestination(songTitle);
+			final Chunk chunk = new Chunk(songTitle, fonts.BOLD).setLocalDestination(songTitle);
 
 			final Chapter chapter = new Chapter(new Paragraph(chunk), i);
 			// chapter.setNumberDepth(0);
 
 			String content = printObject.get(i).getContent();
 
-			System.out.println(content);
+			// System.out.println(content);
 
-			
-			chapter.addSection(new Paragraph(content, fonts.MONOSPACE), 0);
+			for (String line : content.split("\\r?\\n")) {
+				if (line.startsWith("[")) {
+					// VERSETYPE STYLING
+
+					switch ("" + line.charAt(1)) {
+					case "C":
+						line = line.replace("C", "Chorus ");
+						break;
+					case "V":
+						line = line.replace("V", "Verse ");
+						break;
+					case "B":
+						line = line.replace("B", "Bridge ");
+						break;
+					case "I":
+						line = line.replace("I", "Intro ");
+						break;
+					case "E":
+						line = line.replace("E", "Ending ");
+						break;
+					default:
+						break;
+					}
+					fonts.MONOSPACE.setColor(BaseColor.WHITE);
+					Chunk c = new Chunk(line.substring(1,line.length()-1).trim(), fonts.MONOSPACE);
+					c.setBackground(BaseColor.LIGHT_GRAY);
+					Paragraph verseTypeParagraph = new Paragraph(c);
+					chapter.addSection(verseTypeParagraph, 0);
+					fonts.MONOSPACE.setColor(BaseColor.BLACK);
+				} else {
+					chapter.addSection(new Paragraph(line, fonts.MONOSPACE), 0);
+				}
+			}
+
 			// chapter.setNumberDepth(0);
 
 			this.document.add(chapter);
@@ -242,16 +255,49 @@ public class PdfGenerator extends PdfPageEventHelper {
 			template.beginText();
 			template.setFontAndSize(fonts.NORMAL.getBaseFont(), 12);
 			template.setTextMatrix(
-					50 - fonts.NORMAL.getBaseFont().getWidthPoint(
-							String.valueOf(this.writer.getPageNumber()), 12), 0);
+					50 - fonts.NORMAL.getBaseFont().getWidthPoint(String.valueOf(this.writer.getPageNumber()), 12), 0);
 			template.showText(String.valueOf(this.writer.getPageNumber()));
 			template.endText();
 
 		}
 	}
 	
-	public static void writeListContent(String outputPdfPath,
-			List<? extends PdfPrintable> songPrintObjects) {
+	private void createChapters(List<? extends PdfPrintable> printObject) throws DocumentException {
+
+		for (int i = 0; i < printObject.size(); i++) {
+			// append the chapter
+			String title = printObject.get(i).getTitle();
+			// final String songTitle = songPrintObjects.get(i).getSong();
+
+			final Chunk chunk = new Chunk(title, fonts.BOLD).setLocalDestination(title);
+
+			final Chapter chapter = new Chapter(new Paragraph(chunk), i);
+			// chapter.setNumberDepth(0);
+
+			String content = printObject.get(i).getContent();
+
+			// System.out.println(content);
+
+			chapter.addSection(new Paragraph(content, fonts.MONOSPACE), 0);
+			// chapter.setNumberDepth(0);
+
+			this.document.add(chapter);
+
+			String titleId = title + i;
+
+			// When we wrote the chapter, we now the pagenumber
+			final PdfTemplate template = this.tocPlaceholder.get(titleId);
+			template.beginText();
+			template.setFontAndSize(fonts.NORMAL.getBaseFont(), 12);
+			template.setTextMatrix(
+					50 - fonts.NORMAL.getBaseFont().getWidthPoint(String.valueOf(this.writer.getPageNumber()), 12), 0);
+			template.showText(String.valueOf(this.writer.getPageNumber()));
+			template.endText();
+
+		}
+	}
+
+	public static void writeListContent(String outputPdfPath, List<? extends PdfPrintable> songPrintObjects) {
 		PdfGenerator pdfGenerator;
 		try {
 			pdfGenerator = new PdfGenerator(outputPdfPath);
@@ -263,7 +309,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void simpleTest() {
 		PdfGenerator pdfGenerator;
 		try {
@@ -292,19 +338,17 @@ public class PdfGenerator extends PdfPageEventHelper {
 		List<SongPrint> songPrintObjects = new ArrayList<SongPrint>();
 		// Song s = new Song();
 		// s.setSongName("10000 Razloga");
-		String l = "      F    C   G/E    Am\n" + "Slavi Gospoda, dušo moja,\n"
-				+ "F      C     G\n" + "ime Mu sveto je."
-				+ "       F       C   F  G  Am\n"
-				+ "Pjevaj kao nikada, slavi Ga, ";
-		// songPrintObjects.add(new SongPrint("10000 Razloga", 123l, l));
+		String l = "      F    C   G/E    Am\n" + "Slavi Gospoda, dušo moja,\n" + "F      C     G\n"
+				+ "ime Mu sveto je." + "       F       C   F  G  Am\n" + "Pjevaj kao nikada, slavi Ga, ";
+				// songPrintObjects.add(new SongPrint("10000 Razloga", 123l,
+				// l));
 
 		// Song s2 = new Song();
 		// s2.setSongName("Ako Bog nije živ");
-		String l2 = "      F    C   G/E    Am\n"
-				+ "Slavi Gospoda, dušo moja,\n" + "F      C     G\n"
-				+ "ime Mu sveto je.\n" + "       F       C   F  G  Am\n"
-				+ "Pjevaj kao nikada, slavi Ga, ";
-		// songPrintObjects.add(new SongPrint("Ako Bog nije živ", 124l, l2));
+		String l2 = "      F    C   G/E    Am\n" + "Slavi Gospoda, dušo moja,\n" + "F      C     G\n"
+				+ "ime Mu sveto je.\n" + "       F       C   F  G  Am\n" + "Pjevaj kao nikada, slavi Ga, ";
+				// songPrintObjects.add(new SongPrint("Ako Bog nije živ", 124l,
+				// l2));
 
 		// PdfGenerator.writeSongs(songPrintObjects);
 	}
