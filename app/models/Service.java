@@ -25,7 +25,7 @@ public class Service extends Model {
 	public String userName;
 
 	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
-	@OrderColumn(name = "INDEX")
+	@OrderColumn(name = "index")
 	public List<ServiceSong> songs = new ArrayList<>();
 
 	public String getUserEmail() {
