@@ -7,13 +7,13 @@ create table service (
   id                        bigint not null,
   user_email                varchar(255),
   user_name                 varchar(255),
+  service_name              varchar(255),
   date_created              timestamp,
   constraint pk_service primary key (id))
 ;
 
 create table service_song (
   id                        integer not null,
-  index                     integer,
   song_name                 varchar(255),
   song_id                   bigint,
   lyrics_id                 bigint,
@@ -62,28 +62,24 @@ create sequence song_lyrics_seq;
 
 create sequence user_account_seq;
 
-alter table service_song add constraint fk_service_song_service_1 foreign key (service_id) references service (id) on delete restrict on update restrict;
+alter table service_song add constraint fk_service_song_service_1 foreign key (service_id) references service (id);
 create index ix_service_song_service_1 on service_song (service_id);
-alter table song_lyrics add constraint fk_song_lyrics_song_2 foreign key (song_id) references song (id) on delete restrict on update restrict;
+alter table song_lyrics add constraint fk_song_lyrics_song_2 foreign key (song_id) references song (id);
 create index ix_song_lyrics_song_2 on song_lyrics (song_id);
 
 
 
 # --- !Downs
 
-SET REFERENTIAL_INTEGRITY FALSE;
+drop table if exists service cascade;
 
-drop table if exists service;
+drop table if exists service_song cascade;
 
-drop table if exists service_song;
+drop table if exists song cascade;
 
-drop table if exists song;
+drop table if exists song_lyrics cascade;
 
-drop table if exists song_lyrics;
-
-drop table if exists user_account;
-
-SET REFERENTIAL_INTEGRITY TRUE;
+drop table if exists user_account cascade;
 
 drop sequence if exists service_seq;
 
