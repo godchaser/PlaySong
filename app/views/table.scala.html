@@ -174,15 +174,15 @@
 
 		$('.songbuttons').click(function(event) {
 			if ("editsongbutton" == event.target.attributes.id.value) {
-				songActions(1);
+				songActions(1, event);
 			} else if ("addsongbutton" == event.target.attributes.id.value) {
-				songActions(2);
+				songActions(2, event);
 			} else if ("deletesongbutton" == event.target.attributes.id.value) {
-				songActions(3);
+				songActions(3, event);
 			}
 		});
 
-		function songActions(action) {
+		function songActions(action, event) {
 			switch ( action ) {
 			// edit song
 			case 1 :
@@ -198,9 +198,14 @@
 
 			//delete song
 			case 3 :
-				if (selectedSongID != null) {
-					deleteSong(selectedSongID);
-				}
+				if( ! confirm("Do you really want to delete song?") ){
+		            event.preventDefault(); // ! => don't want to do this
+		        } 
+		        else {
+		            if (selectedSongID != null) {
+						deleteSong(selectedSongID);
+					}
+		        }
 				break;
 			}
 		}

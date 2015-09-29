@@ -43,14 +43,16 @@
 				}
 				}
 			</select>
+			<!--  
 			<select id="title-font" class="btn btn-group btn-default">
 				<option label="Title font">Title font</option>
 				<option value="1">Arial</option>
 				<option value="2">Droid Sans</option>
 				<option value="3">Courier New</option>
 			</select>
+			-->
 			<select id="lyrics-font" class="btn btn-group btn-default">
-				<option label="Lyrics font">Lyrics font</option>
+				<option label="Font">Lyrics font</option>
 				<option value="1">Courier New</option>
 				<option value="2">Droid Sans Mono</option>
 				<option value="3">Consolas</option>
@@ -60,18 +62,26 @@
 				<option value="2" data-content="<i class='fa fa-file-word-o fa-lg'></i> word">word</option>
 			</select>
 		</div>
+		<br>
 		@if(user.email != "Guest"){
 		<div class="form-inline">
+			<br>
 			<label for="songbook-name">Songbook name:</label>
+			<br>
 			<input type="text" class="form-control" id="songbook-name">
 			<div class="checkbox">
 				  <label><input type="checkbox" id="publish-service-checkbox" value="">Publish?</label>
 			</div>
 		</div>	
 		}
+		<br>
 		<button type="button" id="submit-button" class="btn btn-warning">
 			<i class="fa fa-book fa-fw"></i> Prepare songbook
 		</button>
+		<button type="button" id="submit-button" onClick="location.reload(); " class="btn btn-danger">
+			<i class="fa fa-refresh fa-fw"></i> Reset
+		</button>	
+		<div id="notificationdiv"></div>
 	</form>
 	<div>
 		<table id="song_table" class="table table-striped table-bordered" width="100%" cellspacing="0"></table>
@@ -112,6 +122,7 @@
 		$('#submit-button').on('click', function() {
 			if (songBookPrepared === false) {
 				console.log("GENERATE SONGBOOK!");
+				$('#notificationdiv').html('<div class="alert alert-info close" data-dismiss="alert">Generated song list</div>');		
 				var songIds = [];
 				$('#song-selector option:selected').each(function() {
 					var songObject = new Object();
@@ -128,10 +139,12 @@
 					dataSet.push(helper);
 					songObject.song = songValue;
 					songIds.push(songObject);
+					console.log(songIds.lenght);
 				});
-				if (songIds === 0) {
+				if (Object.keys(songIds).length < 1) {
+					$('#notificationdiv').html('');
 					window.alert("Select songs first");
-				} else {
+				} else {	
 					songBookData = new Object();
 					songBookData.songs = songIds;
 					var songFont = new Object();
@@ -149,7 +162,7 @@
 					}
 					songFont.lyricsFont = lyricsFont;
 					songBookData.fonts = songFont;
-					console.log(dataSet);
+					//console.log(dataSet);
 					$('#song_table').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="example"></table>');
 					var oTable = $('#song_table').dataTable({
 						"data" : dataSet,
@@ -205,6 +218,7 @@
 				}
 			} else {
 				console.log("DOWNLOAD SONGBOOK!");
+				$('#notificationdiv').html('<div class="alert alert-info close" data-dismiss="alert">Preparing and downloading</div>');				
 				var lyricsData = [];
 				$('#song_table .json-lyrics-id').each(function() {
 					lyricsData.push($(this).text());
@@ -259,7 +273,6 @@
 								
 				console.log("HERE IS JSON OBJECT:");
 				console.log(songBookData);
-
 				$.ajax("@routes.Application.generateSongbook()", {
 					type : 'POST',
 					data : JSON.stringify(songBookData),
@@ -268,6 +281,7 @@
 						link = link.concat("?hash=" + data);
 						link = link.concat("&format=" + format);
 						window.location = link;
+						$('#notificationdiv').html('<div class="alert alert-info close" data-dismiss="alert">Songbook downloaded</div>');		
 					},
 					contentType : 'application/json'
 				});
