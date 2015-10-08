@@ -84,18 +84,13 @@
 
 				<div class="navbar-default sidebar" role="navigation">
 					<div class="sidebar-nav navbar-collapse">
-						<ul class="nav" id="side-menu">
-							<li class="sidebar-search">
-								<div class="input-group custom-search-form form-inline">
-									<input id="scrollable-dropdown-menu" class="form-control typeahead" type="search" placeholder="Song name, lyrics, author...">
-									<span class="input-group-btn">
-										<button class="form-control btn btn-default" type="button" disabled>
-											<i class="fa fa-search"></i>
-										</button></span>
-								</div>
-								<!-- /input-group -->
-							</li>
-
+					  <form role="form" class="navbar-form"> 
+							<div class="form-group has-feedback">
+								<input id="scrollable-dropdown-menu" type="text" class="form-control typeahead" placeholder="Song name, lyrics, author..." />
+									<i class="form-control-feedback glyphicon glyphicon-search"></i>
+							</div>
+						  </form>
+							<ul class="nav" id="side-menu">
 							<li>
 								<a href="@routes.Application.table()"><i class="fa fa-music fa-fw"></i> Songs</a>
 							</li>
