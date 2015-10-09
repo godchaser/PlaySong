@@ -9,6 +9,8 @@
 			<h3 id="songName"></h3>
 			<div id="songOriginalTitle"></div>
 		</div>
+		<div id="ytvideoframe">
+		</div>
 		<!--<p id="songAuthor"></p>-->
 		<!--<p id="songLink"></p>-->
 		<div class="panel-body">
@@ -19,6 +21,7 @@
 		</div>
 	</div>
 </div>
+
 
 <script src="@routes.Assets.at("lib/jquery/dist/jquery.min.js")" type="text/javascript"></script>
 <script src="@routes.Assets.at("javascripts/jquery.transposer.js")" type="text/javascript"></script>
@@ -41,7 +44,7 @@
 
 	//$ ( '#songAuthor' ).html ( data.songAuthor ) ;
 	if (data.songLink && isUrl(data.songLink)){
-	var sYTLink = '<a href="'+data.songLink+'"><i class="glyphicon glyphicon-play-circle"></i></a>';
+	var sYTLink = '<button onclick="openYtLink(event)" type="button" id="'+data.songLink+'"><i class="glyphicon glyphicon-play-circle"></i></button>';
 	//$ ( '#songLink' ).html ( sYTLink ) ;
 	$ ( '#songOriginalTitle' ).html ( data.songOriginalTitle + ", " + data.songAuthor + " " + sYTLink) ;
 	} else {
@@ -74,5 +77,23 @@
 	$('#song_viewer_wrapper' ).remove();
 	}
 	window.onload = songView(id);
+		
+	function openYtLink(event){
+		var ytLink = event.target.attributes.id.value;
+		var ytLinkId = getId(ytLink);
+		var iframeHtml = '<iframe width="320" height="250" frameborder="0" src='+'"'+'//www.youtube.com/embed/'+ytLinkId+'?autoplay=1"'+'></iframe>';
+		$('#ytvideoframe').html(iframeHtml);
+	}
+	
+	function getId(url) {
+		    var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+		    var match = url.match(regExp);
+		
+		    if (match && match[2].length == 11) {
+		        return match[2];
+		    } else {
+		        return 'error';
+		    }
+		}
 </script>
 }

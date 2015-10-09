@@ -7,16 +7,94 @@
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/dataTables.bootstrap.css")">
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/font-awesome/css/font-awesome.css")">
 
-<div hidden id="song_table_wrapper" class="panel panel-default">
+<div hidden id="song_table_wrapper" class="panel panel-default hover" cellspacing="0" width="100%">
 	<h2>Song Database</h2>
-	<div class="panel panel-default">
-		<div class="panel-heading"  id="song_table_header">
-			<i class="glyphicon glyphicon-stats"></i>  @numberOfSongsInDatabase songs			
-			<button id="addsongbutton" class="songbuttons btn btn-info pull-right">
-				<i class="glyphicon glyphicon-plus"></i> Add new song
-			</button>
-			<div class="clearfix"></div>
-		</div>
+	<div>
+                 <div class="row">
+	                <div class="col-lg-3 col-md-6" hidden>
+	                    <div class="panel panel-primary">
+	                        <div class="panel-heading">
+	                            <div class="row">
+	                                <div class="col-xs-3">
+	                                    <i class="fa fa-bell-o fa-2x"></i>
+	                                </div>
+	                                <div class="col-xs-9 text-right">
+	                                    <div class="large">26</div>
+	                                    <div>New Songs!</div>
+	                                </div>
+	                            </div>
+	                        </div>
+	                        <div>
+	                            <div class="panel-footer">
+	                            	<div class="dropdown">     	
+	                                <span id="dropdownMenu1" class="pull-left dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="fa fa-arrow-circle-right"></i> View Songs</span>
+	                                <div class="clearfix"></div>
+	                            	<!-- 
+									  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+									    View Songs
+									    <span class="caret"></span>
+									  </button>
+									   -->
+									  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+									    <li><a href="#">Action</a></li>
+									    <li><a href="#">Another action</a></li>
+									    <li><a href="#">Something else here</a></li>
+									    <li><a href="#">Separated link</a></li>
+									  </ul>
+									</div>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </div>
+	                <div class="col-lg-3 col-md-6" hidden>
+	                    <div class="panel panel-green">
+	                        <div class="panel-heading">
+	                            <div class="row">
+	                                <div class="col-xs-3">
+	                                    <i class="fa fa-pencil fa-2x"></i>
+	                                </div>
+	                                <div class="col-xs-9 text-right">
+	                                    <div class="large">12</div>
+	                                    <div>Updated Songs!</div>
+	                                </div>
+	                            </div>
+	                        </div>
+	                         <div class="panel-footer">
+	                            	<div class="dropdown">     	
+	                                <span id="dropdownMenu1" class="pull-left dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="fa fa-arrow-circle-right"></i> View Songs</span>
+	                                <div class="clearfix"></div>
+	                            	<!-- 
+									  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+									    View Songs
+									    <span class="caret"></span>
+									  </button>
+									   -->
+									  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+									    <li><a href="#">Action</a></li>
+									    <li><a href="#">Another action</a></li>
+									    <li><a href="#">Something else here</a></li>
+									    <li><a href="#">Separated link</a></li>
+									  </ul>
+									</div>
+	                    	</div>
+	                	</div>
+                	</div>
+                	<div id="ytvideoframe" class="col-lg-3 col-md-6">
+                	</div>
+                </div>
+                   
+                	<div class="panel-heading"  id="song_table_header">
+						<div class="large">
+						<i class="glyphicon glyphicon-stats"></i>  @numberOfSongsInDatabase songs			
+						<button id="addsongbutton" class="songbuttons btn btn-info pull-right">
+							<i class="glyphicon glyphicon-plus"></i> Add new song
+						</button>
+						</div>
+						<div class="clearfix"></div>
+					</div>
+            </div>
+		
+
 		<div class="col-lg-6"  id="song_table_div">
 			<div class="panel-body">
 				<div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
@@ -34,27 +112,27 @@
 				</div>
 			</div>
 		</div>
-	</div>
 
-	<div class="panel panel-default col-lg-6" id="song_section_div" hidden>
-		<div class="panel-body">
-			<div class="row">
-				<button id="editsongbutton" class="songbuttons btn btn-primary btn-warning" href="#">
-					<i class="glyphicon glyphicon-edit"></i> Edit song
-				</button>
-				@if(user.email != "Guest"){
-				<button id="deletesongbutton" class="songbuttons btn btn-primary btn-danger">
-					<i class="glyphicon glyphicon-trash"></i> Delete song
-				</button>
-				}
-				<div class="alert alert-block alert-error fade in" id="cert-error" style="display:none;">
-					<button type="button" class="close" data-dismiss="alert"></button>
-					<h4 class="alert-heading">Delete success</h4>
+		<div class="panel panel-default col-lg-6" id="song_section_div" hidden>
+			<div class="panel-body">
+				<div class="row">
+					<button id="editsongbutton" class="songbuttons btn btn-primary btn-warning" href="#">
+						<i class="glyphicon glyphicon-edit"></i> Edit song
+					</button>
+					@if(user.email != "Guest"){
+					<button id="deletesongbutton" class="songbuttons btn btn-primary btn-danger">
+						<i class="glyphicon glyphicon-trash"></i> Delete song
+					</button>
+					}
+					<div class="alert alert-block alert-error fade in" id="cert-error" style="display:none;">
+						<button type="button" class="close" data-dismiss="alert"></button>
+						<h4 class="alert-heading">Delete success</h4>
+					</div>
 				</div>
-			</div>
-
-			<div class="row">
-				<pre id="songLyrics"></pre>
+	
+				<div class="row">
+					<pre id="songLyrics"></pre>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -84,7 +162,7 @@
 			var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
 			return regexp.test(s);
 		}
-
+		
 		/* Table initialisation */
 		$('#song_table').dataTable({
 			"responsive" : true,
@@ -132,7 +210,7 @@
 				sLinks = sLinks.concat('</div>');
 				$('td:eq(0)', nRow).html(sLinks);
 				if (aData.songLink && isUrl(aData.songLink)) {
-					var sYTLink = '<a href="' + aData.songLink + '"><i class="fa fa-play-circle fa-lg"></i></a>';
+					var sYTLink = '<button type="button" class="ytlinkbutton" id='+aData.songLink+'><i class="fa fa-play-circle fa-lg"></i></button>';
 					$('td:eq(1)', nRow).html(sYTLink);
 				} else {
 					$('td:eq(1)', nRow).html("");
@@ -142,9 +220,11 @@
 				return nRow;
 			}
 		});
-
+		
+		
 		//for static row selection events - marking selected/deselected rows
 		$('#song_table tbody').on('click', 'tr', function(event) {
+
 			var hidden = $("#song_section_div").attr("hidden");
 			if (hidden) {
 				$("#song_section_div").toggle();
@@ -166,9 +246,47 @@
 					selectedSongLyricsID = $(this).find('.lyrics-link' )[0].id;
 				}
 				selectedSongID = $(this).attr('id');
-				$('#song_table').DataTable().$('tr.selected').removeClass('selected');
-				$(this).addClass('selected');
+				$('#song_table').DataTable().$('tr.selected-row').removeClass('selected-row');
+				$(this).addClass('selected-row');
 				updateLyrics(selectedSongLyricsID);
+				
+				//now open youtube link
+				if ($(event.target).hasClass("ytlinkbutton")){
+					var ytLink = event.target.attributes.id.value;
+					var ytLinkId = getId(ytLink);
+					var iframeHtml = '<iframe width="320" height="250" frameborder="0" src='+'"'+'//www.youtube.com/embed/'+ytLinkId+'?autoplay=1"'+'></iframe>';
+					$('#ytvideoframe').html(iframeHtml);
+				}
+			}
+		});
+			
+		$('#song_table tbody').on('mouseover', 'tr', function (event) {
+		if ($(window).width()>=800){
+ 			var hidden = $("#song_section_div").attr("hidden");
+				if (hidden) {
+					$("#song_section_div").toggle();
+					$("#song_section_div").removeAttr("hidden");
+				}
+				// ignore responsive expand button trigger
+				if (!$(event.target).hasClass("sorting_1")) {
+					// this is lyrics link event selection
+					if ($(event.target).hasClass("lyrics-link")) {
+						var lyricsID = $(event.target).attr("id");
+						if (lyricsID != null) {
+							if (lyricsID != selectedSongLyricsID) {
+								selectedSongLyricsID = lyricsID;
+							}
+						}
+					}
+					// this is default row lyrics selection
+					else {
+						selectedSongLyricsID = $(this).find('.lyrics-link' )[0].id;
+					}
+					selectedSongID = $(this).attr('id');
+					$('#song_table').DataTable().$('tr.selected-row').removeClass('selected-row');
+					$(this).addClass('selected-row');
+					updateLyrics(selectedSongLyricsID);
+				}
 			}
 		});
 
@@ -181,6 +299,17 @@
 				songActions(3, event);
 			}
 		});
+		
+		function getId(url) {
+		    var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+		    var match = url.match(regExp);
+		
+		    if (match && match[2].length == 11) {
+		        return match[2];
+		    } else {
+		        return 'error';
+		    }
+		}
 
 		function songActions(action, event) {
 			switch ( action ) {
