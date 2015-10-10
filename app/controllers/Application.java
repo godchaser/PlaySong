@@ -11,6 +11,7 @@ import models.Service;
 import models.ServiceSong;
 import models.Song;
 import models.SongLyrics;
+import models.SongSuggestion;
 import models.UserAccount;
 import models.helpers.ArrayHelper;
 import models.helpers.PdfPrintable;
@@ -42,6 +43,8 @@ import java.nio.file.StandardCopyOption;
 import java.text.Collator;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.*;
 
 import com.avaje.ebean.SqlRow;
@@ -266,7 +269,33 @@ public class Application extends Controller {
 			Logger.debug("Using guest session");
 			user = new UserAccount("Guest", "", "");
 		}
-		return ok(table.render(Song.getNumberOfSongsInDatabase(), user));
+
+		int minusMonth = 1;
+		
+		Calendar calNow = Calendar.getInstance();
+		// adding -1 month
+		calNow.add(Calendar.MONTH, -minusMonth);
+		Date dateBeforeAMonth = calNow.getTime();
+
+		Date dateNow = Calendar.getInstance().getTime();
+
+		List<Song> songsModifiedInLastMonth = Song.find.where().between("date_modified", dateBeforeAMonth, dateNow)
+				.orderBy("date_modified desc").findList();
+
+		List<SongSuggestion> songModifiedList = new ArrayList<>();
+		for (Song song : songsModifiedInLastMonth) {
+			songModifiedList.add(new SongSuggestion(song.getId(), song.getSongName()));
+		}
+		
+		List<Song> songsCreatedInLastMonth = Song.find.where().between("date_created", dateBeforeAMonth, dateNow)
+				.orderBy("date_created desc").findList();
+
+		List<SongSuggestion> songCreatedList = new ArrayList<>();
+		for (Song song : songsCreatedInLastMonth) {
+			songCreatedList.add(new SongSuggestion(song.getId(), song.getSongName()));
+		}
+		
+		return ok(table.render(Song.getNumberOfSongsInDatabase(), songModifiedList, songCreatedList, user));
 	}
 
 	@Security.Authenticated(Secured.class)
@@ -878,7 +907,7 @@ public class Application extends Controller {
 
 		// Manual sorting because of JPA OrderBy bidirectional relationship bug
 		Collections.sort(service.getSongs());
-		
+
 		for (ServiceSong serviceSong : service.getSongs()) {
 			songPrintList.add(serviceSong);
 		}

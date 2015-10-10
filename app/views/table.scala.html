@@ -1,4 +1,4 @@
-@(numberOfSongsInDatabase: Int, user: UserAccount)
+@(numberOfSongsInDatabase: Int, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion], user: UserAccount)
 
 @admintheme("", user) {
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap/css/bootstrap.min.css")">
@@ -11,7 +11,7 @@
 	<h2>Song Database</h2>
 	<div>
                  <div class="row">
-	                <div class="col-lg-3 col-md-6" hidden>
+	                <div class="col-lg-3 col-md-6">
 	                    <div class="panel panel-primary">
 	                        <div class="panel-heading">
 	                            <div class="row">
@@ -19,8 +19,8 @@
 	                                    <i class="fa fa-bell-o fa-2x"></i>
 	                                </div>
 	                                <div class="col-xs-9 text-right">
-	                                    <div class="large">26</div>
-	                                    <div>New Songs!</div>
+	                                    <div class="large">@songsCreated.size</div>
+	                                    <div>New Songs! <br>(last month since @java.time.LocalDate.now)</div>
 	                                </div>
 	                            </div>
 	                        </div>
@@ -36,17 +36,16 @@
 									  </button>
 									   -->
 									  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-									    <li><a href="#">Action</a></li>
-									    <li><a href="#">Another action</a></li>
-									    <li><a href="#">Something else here</a></li>
-									    <li><a href="#">Separated link</a></li>
+									  @songsCreated.map { song =>
+									  	<li><a id=@song.getId() href="@routes.Application.songview(song.getId())">@song.getSongName()</a></li>
+									  	}
 									  </ul>
 									</div>
 	                            </div>
 	                        </div>
 	                    </div>
 	                </div>
-	                <div class="col-lg-3 col-md-6" hidden>
+	                <div class="col-lg-3 col-md-6">
 	                    <div class="panel panel-green">
 	                        <div class="panel-heading">
 	                            <div class="row">
@@ -54,8 +53,8 @@
 	                                    <i class="fa fa-pencil fa-2x"></i>
 	                                </div>
 	                                <div class="col-xs-9 text-right">
-	                                    <div class="large">12</div>
-	                                    <div>Updated Songs!</div>
+	                                    <div class="large"> @songsModified.size</div>
+	                                    <div>Updated Songs! <br>(last month since @java.time.LocalDate.now)</div>
 	                                </div>
 	                            </div>
 	                        </div>
@@ -70,10 +69,9 @@
 									  </button>
 									   -->
 									  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-									    <li><a href="#">Action</a></li>
-									    <li><a href="#">Another action</a></li>
-									    <li><a href="#">Something else here</a></li>
-									    <li><a href="#">Separated link</a></li>
+									    @songsModified.map { song =>
+									  	<li><a id=@song.getId() href="@routes.Application.songview(song.getId())">@song.getSongName()</a></li>
+									  	}
 									  </ul>
 									</div>
 	                    	</div>
