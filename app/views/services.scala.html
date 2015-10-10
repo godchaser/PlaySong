@@ -13,8 +13,8 @@
 				<ul>
 					@services.reverse.map { service =>
 					<li>
-						<strong>@service.serviceName </strong>:
-						<a href="@routes.Application.generateService(service.id)" download="service">Download</a>
+						<strong>  @service.serviceName </strong>:
+						<i class="fa fa-file-text-o"></i> <a href="@routes.Application.generateService(service.id)" download="service">Download</a>
 						@if(user.email != "Guest"){
 						<button class="deletebutton" type="button" id=@service.id class="btn btn-default">
 							<i class="fa fa-times"></i>
@@ -23,7 +23,7 @@
 						<small>@service.dateCreated</small>
 						<ol>
 						@service.songs.map { song =>											
-							<li>@song.songName</li>
+							<li><i class="fa fa-music"></i>  @song.songName</li>
 						}
 						</ol>
 					</li>
