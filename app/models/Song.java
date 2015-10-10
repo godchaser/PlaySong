@@ -35,6 +35,7 @@ public class Song extends Model implements Comparator<Song> {
 
 	public int songBookId;
 
+	@Column(updatable=false)
 	@Formats.DateTime(pattern = "dd/MM/yyyy hh:mm")
 	public Date dateCreated = new Date();
 
