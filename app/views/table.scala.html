@@ -118,10 +118,10 @@
 					<button id="editsongbutton" class="songbuttons btn btn-warning" onClick="songManipulationButtonClick(this)" href="#">
 						<i class="glyphicon glyphicon-edit"></i> Edit Song
 					</button>
+					@if(user.email != "Guest"){
 					<button id="editlyricsbutton" class="songbuttons btn btn-info" onClick="songManipulationButtonClick(this)" href="#">
 						<i class="glyphicon glyphicon-music"></i> Edit Lyrics
 					</button>
-					@if(user.email != "Guest"){
 					<button id="deletesongbutton" class="songbuttons btn btn-danger" onClick="songManipulationButtonClick(this)">
 						<i class="glyphicon glyphicon-trash"></i> Delete Song
 					</button>
