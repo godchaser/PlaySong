@@ -152,6 +152,30 @@
 	var selectedSongID;
 	//variable holding reference to selected songlyrics
 	var selectedSongLyricsID;
+	
+	function updateLyrics(lyricsID) {
+			//console.log("Updating lyrics: " + lyricsID);
+			jsRoutes.controllers.Application.getsonglyricsjson(lyricsID).ajax({
+				success : function(data) {
+					var hidden = $("#song_section_div").attr("hidden");
+					if (hidden) {
+						$("#song_section_div").toggle();
+						$("#song_section_div").removeAttr("hidden");
+					}
+					$('.transpose-keys').remove();
+					$('#songLyrics').html(data.songLyrics);
+					$(function() {
+						$("#songLyrics").transpose();
+						if ($(window).width() < 1024) {
+							$ ( '#songLyrics' )[0].scrollIntoView(true);
+						}
+					});
+				},
+				error : function() {
+					console.log("Error: ajax failure");
+				}
+			});
+		}
 
 	$(document).ready(function() {
 		// copy song table div to dynamic content div
@@ -165,73 +189,81 @@
 			return regexp.test(s);
 		}
 		
+		function selectRow(){
+			//console.log("page event fired");
+	  	 	var selectFirstRow = $('#song_table tr.songRow:first-child');
+	  		selectedSongLyricsID = $(selectFirstRow).find('.lyrics-link' )[0].id;
+	  		selectFirstRow.addClass("selected-row");
+	  		updateLyrics(selectedSongLyricsID);
+		}
+		
 		/* Table initialisation */
-		$('#song_table').dataTable({
-			"responsive" : true,
-			"processing" : false,
-			// "aaSorting" :[[ 0, "asc" ] ],
-			"serverSide" : true,
-			"bJQueryUI" : true,
-			"sPaginationType" : "full",
-			"stateSave": true,
-			"sAjaxSource" : " @routes.Application.getsongsdatatable()",
-			//"dom": 'T<"clear">lfrtip',
-			"columns" : [{
-				"data" : "songName"
-			}, {
-				"data" : "songLink"
-			}, {
-				"data" : "songOriginalTitle"
-			}, {
-				"data" : "songAuthor"
-			}, {
-				"data" : "songId"
-			}],
-			"columnDefs" : [{
-				targets : "datatable-nosort",
-				orderable : false
-			}, {
-				targets : [0],
-				"type" : "balkan_sort"
-			}],
-			"tableTools" : {
-				"sRowSelect" : "single"
-			},
-			"fnRowCallback" : function(nRow, aData, iDisplayIndex) {
-				var sLinks = '<div class="paginationBar"> <button type="button" class="btn btn-link lyrics-link" id=' + aData.songLyricsIDs[0] + '>' + aData.songName + '</button>';
-				var songLyricsIdsCount = Object.keys(aData.songLyricsIDs).length;
-				if (songLyricsIdsCount > 1) {
-					$.each(aData.songLyricsIDs, function(i, s) {
-						//this it to skip zeroth iteration
-						if (i > 0) {
-							var idx = i + 1;
-							sLinks = sLinks.concat('<button class="lyrics-link" id=' + aData.songLyricsIDs[i] + '>' + idx + '</button>');
-						}
-					});
+		$('#song_table')
+		    .dataTable({
+				"responsive" : true,
+				"processing" : false,
+				// "aaSorting" :[[ 0, "asc" ] ],
+				"serverSide" : true,
+				"bJQueryUI" : true,
+				"sPaginationType" : "full",
+				"stateSave": true,
+				"sAjaxSource" : " @routes.Application.getsongsdatatable()",
+				//"dom": 'T<"clear">lfrtip',
+				"drawCallback": function( settings ) {
+			        selectRow();
+			    },
+				"columns" : [{
+					"data" : "songName"
+				}, {
+					"data" : "songLink"
+				}, {
+					"data" : "songOriginalTitle"
+				}, {
+					"data" : "songAuthor"
+				}, {
+					"data" : "songId"
+				}],
+				"columnDefs" : [{
+					targets : "datatable-nosort",
+					orderable : false
+				}, {
+					targets : [0],
+					"type" : "balkan_sort"
+				}],
+				"tableTools" : {
+					"sRowSelect" : "single"
+				},
+				"fnRowCallback" : function(nRow, aData, iDisplayIndex) {
+					var sLinks = '<div class="paginationBar"> <button type="button" class="btn btn-link lyrics-link" id=' + aData.songLyricsIDs[0] + '>' + aData.songName + '</button>';
+					var songLyricsIdsCount = Object.keys(aData.songLyricsIDs).length;
+					if (songLyricsIdsCount > 1) {
+						$.each(aData.songLyricsIDs, function(i, s) {
+							//this it to skip zeroth iteration
+							if (i > 0) {
+								var idx = i + 1;
+								sLinks = sLinks.concat('<button class="lyrics-link" id=' + aData.songLyricsIDs[i] + '>' + idx + '</button>');
+							}
+						});
+					}
+					sLinks = sLinks.concat('</div>');
+					$('td:eq(0)', nRow).html(sLinks);
+					if (aData.songLink && isUrl(aData.songLink)) {
+						var sYTLink = '<button type="button" class="ytlinkbutton" id='+aData.songLink+'><i class="fa fa-play-circle fa-lg"></i></button>';
+						$('td:eq(1)', nRow).html(sYTLink);
+					} else {
+						$('td:eq(1)', nRow).html("");
+					}
+	
+					$(nRow).attr('id', aData.songId);
+					$(nRow).attr('class', "songRow");
+					return nRow;
 				}
-				sLinks = sLinks.concat('</div>');
-				$('td:eq(0)', nRow).html(sLinks);
-				if (aData.songLink && isUrl(aData.songLink)) {
-					var sYTLink = '<button type="button" class="ytlinkbutton" id='+aData.songLink+'><i class="fa fa-play-circle fa-lg"></i></button>';
-					$('td:eq(1)', nRow).html(sYTLink);
-				} else {
-					$('td:eq(1)', nRow).html("");
-				}
-
-				$(nRow).attr('id', aData.songId);
-				return nRow;
-			}
 		});
 		
 		
 		//for static row selection events - marking selected/deselected rows
 		$('#song_table tbody').on('click', 'tr', function(event) {
 
-			var hidden = $("#song_section_div").attr("hidden");
-			if (hidden) {
-				$("#song_section_div").toggle();
-				$("#song_section_div").removeAttr("hidden");
-			}
 			// ignore responsive expand button trigger
 			if (!$(event.target).hasClass("sorting_1")) {
 				// this is lyrics link event selection
@@ -264,11 +296,6 @@
 			
 		$('#song_table tbody').on('mouseover', 'tr', function (event) {
 		if ($(window).width()>=800){
- 			var hidden = $("#song_section_div").attr("hidden");
-				if (hidden) {
-					$("#song_section_div").toggle();
-					$("#song_section_div").removeAttr("hidden");
-				}
 				// ignore responsive expand button trigger
 				if (!$(event.target).hasClass("sorting_1")) {
 					// this is lyrics link event selection
@@ -291,7 +318,7 @@
 				}
 			}
 		});
-
+		
 		$('.songbuttons').click(function(event) {
 			if ("editsongbutton" == event.target.attributes.id.value) {
 				songActions(1, event);
@@ -340,25 +367,7 @@
 				break;
 			}
 		}
-
-		function updateLyrics(lyricsID) {
-			jsRoutes.controllers.Application.getsonglyricsjson(lyricsID).ajax({
-				success : function(data) {
-					$('.transpose-keys').remove();
-					$('#songLyrics').html(data.songLyrics);
-					$(function() {
-						$("#songLyrics").transpose();
-						if ($(window).width() < 1024) {
-							$ ( '#songLyrics' )[0].scrollIntoView(true);
-						}
-					});
-				},
-				error : function() {
-					console.log("Error: ajax failure");
-				}
-			});
-		}
-
+		
 		function openSongEditor(id) {
 			var songEditorUrl = jsRoutes.controllers.Application.songeditor(id).url;
 			window.location.href = songEditorUrl;
@@ -389,7 +398,57 @@
 	function closeAlert() {
 		$("#cert-error").hide();
 	}
-
+	$(document).keydown(function (event) {
+		var currentRow = $(".selected-row").get(0);
+		//console.log(event.keyCode);
+		    switch(event.keyCode)
+		    {     
+		        //arrow down
+		        case 40:
+		        	if (currentRow){
+			        	event.preventDefault();
+			        	var row = $(currentRow).closest('tr');
+			        	if (row.next().length){
+				        	var next = row.next();
+				        	selectedSongID = $(next).attr('id');
+							selectedSongLyricsID = $(next).find('.lyrics-link' )[0].id;
+							updateLyrics(selectedSongLyricsID);
+					        $(next).addClass("selected-row");
+					        $(currentRow).removeClass("selected-row");
+			            }
+		            }	            
+		            break;
+		        //arrow up
+		        case 38:
+		        	if (currentRow){
+			        	event.preventDefault();
+			        	var row = $(currentRow).closest('tr');
+			        	if (row.prev().length){
+			        		var prev = row.prev();
+				        	selectedSongID = $(prev).attr('id');
+				        	selectedSongLyricsID = $(prev).find('.lyrics-link' )[0].id;
+				        	updateLyrics(selectedSongLyricsID);
+				            $(prev).addClass("selected-row");
+				            $(currentRow).removeClass("selected-row");
+				        }	            			            
+			        }
+			        break;
+			    //arrow right
+			    case 39:
+			    	if (currentRow){
+			        	event.preventDefault();
+			    	 	$('#song_table').DataTable().page('next').draw('page');	    	 	
+			    	}
+			    	break; 	
+			    //arrow left
+			    case 37:
+				    if (currentRow){
+				        event.preventDefault();
+			    		$('#song_table').DataTable().page('previous').draw('page');
+			    	}
+			    	break;
+		    }
+		});
 </script>
-<script src="@routes.Assets.at("javascripts/jquery.transposer.js")" type="text/javascript"></script>
+<script async src="@routes.Assets.at("javascripts/jquery.transposer.js")" type="text/javascript"></script>
 }
