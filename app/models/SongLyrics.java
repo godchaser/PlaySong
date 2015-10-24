@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import controllers.chords.LineTypeChecker;
+import models.helpers.SongSanitizer;
 import play.db.ebean.Model;
 
 /**
@@ -71,5 +73,21 @@ public class SongLyrics extends Model {
 
 	public void setSong(Song song) {
 		this.song = song;
+	}
+	
+	public void updateSongLyrics(){
+		updateSongKeys();
+		sanitizeLyrics();
+		update();
+	}
+	
+	public void updateSongKeys(){
+		String songKey = LineTypeChecker.getSongKey(songLyrics);
+		setSongKey(songKey);
+	}
+	
+	public void sanitizeLyrics(){
+		String newSongLyrics = SongSanitizer.sanitizeSong(songLyrics);
+		setsongLyrics(newSongLyrics);
 	}
 }

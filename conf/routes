@@ -3,80 +3,83 @@
 # ~~~~
 
 # Home page
-GET      /                            controllers.Application.index()
+GET      /                                   controllers.Application.index()
 
 # views
-GET      /admin                       controllers.Application.admin()
-GET      /table                       controllers.Application.table()
-GET      /songbook                    controllers.Application.songbook()
-GET      /songeditor/:id              controllers.Application.songeditor(id: Long)
-GET      /newsongeditor               controllers.Application.newsongeditor()
-GET      /songview/:id                controllers.Application.songview(id: Long)
-GET      /songsbackup                 controllers.Application.songs()
-GET      /services                    controllers.Application.services()
+GET      /admin                              controllers.Application.admin()
+GET      /table                              controllers.Application.table()
+GET      /songbook                           controllers.Application.songbook()
+GET      /songeditor/:id                     controllers.Application.songeditor(id: Long)
+GET      /newsongeditor                      controllers.Application.newsongeditor()
+GET      /songview/:id                       controllers.Application.songview(id: Long)
+GET      /songsbackup                        controllers.Application.songs()
+GET      /services                           controllers.Application.services()
 
 # Authentication routes
-GET      /login                       controllers.Application.login()
-POST     /login                       controllers.Application.authenticate()
-GET      /logout                      controllers.Application.logout()
+GET      /login                              controllers.Application.login()
+POST     /login                              controllers.Application.authenticate()
+GET      /logout                             controllers.Application.logout()
 
 ## Songs RESTFUL API
 # not used currently - sending all (unfiltered) songs as json
-GET      /songs                       controllers.Application.getsongdata()
+GET      /songs                              controllers.Application.getsongdata()
 # POST add song - from form - not JSON
-POST     /songs                       controllers.Application.newsong()
-DELETE   /songs/:id                   controllers.Application.deletesong(id: Long)
+POST     /songs                              controllers.Application.newsong()
+DELETE   /songs/:id                          controllers.Application.deletesong(id: Long)
 
-DELETE   /services/:id                controllers.Application.deleteservice(id: Long)
-GET      /services/:id                controllers.Application.generateService(id: Long)
+DELETE   /services/:id                       controllers.Application.deleteservice(id: Long)
+GET      /services/:id                       controllers.Application.generateService(id: Long)
 
 # used for retrieving specific song info in json format
-GET      /songs/:id                   controllers.Application.getsongjson(id: Long)
+GET      /songs/:id                          controllers.Application.getsongjson(id: Long)
 
 # used for retrieving specific song lyrics info in json format
-GET      /songlyricsjson/:id          controllers.Application.getsonglyricsjson(id: Long)
+GET      /songlyricsjson/:id                 controllers.Application.getsonglyricsjson(id: Long)
+
+# used for updating songlyrics
+POST     /songlyricsjson/:id                 controllers.Application.updatesonglyricsjson(id: Long)
 
 # used for dashboard search engine
-GET      /songsuggestions             controllers.Application.songsuggestions()
+GET      /songsuggestions                    controllers.Application.songsuggestions()
 
 #used for update through xls file
-GET      /update                      controllers.Application.updateFromXLS()
-GET      /getxls                      controllers.Application.getXLS()
-POST     /updatefromspreadsheet       controllers.Application.updateFromOnlineSpreadsheet()
+GET      /update                             controllers.Application.updateFromXLS()
+GET      /getxls                             controllers.Application.getXLS()
+POST     /updatefromspreadsheet              controllers.Application.updateFromOnlineSpreadsheet()
 
 ##db operations
 # used for db init
-GET      /init                        controllers.Application.init()
-GET      /inituser                    controllers.Application.inituser()
-GET      /sqlinit                     controllers.Application.sqlinit()
-GET      /yamlbackup                  controllers.Application.yamlbackup()
-GET      /yamlrestore                 controllers.Application.yamlrestore()
+GET      /init                               controllers.Application.init()
+GET      /inituser                           controllers.Application.inituser()
+GET      /sqlinit                            controllers.Application.sqlinit()
+GET      /yamlbackup                         controllers.Application.yamlbackup()
+GET      /yamlrestore                        controllers.Application.yamlrestore()
 # used for clearing all data from db
-GET      /empty                       controllers.Application.emptyDb()
+GET      /empty                              controllers.Application.emptyDb()
 # db sanitize - update song keys (chords)
-GET      /sanitize                    controllers.Application.sanitizesongs()
+GET      /sanitize                           controllers.Application.sanitizesongs()
 
 # update from xml
-GET      /xmlupdate                   controllers.Application.xmlupdate()
+GET      /xmlupdate                          controllers.Application.xmlupdate()
 # upload xls
-POST     /upload                      controllers.Application.upload()
+POST     /upload                             controllers.Application.upload()
 
 # getting paginated data for data table
-GET      /getsongsdatatable           controllers.Application.getsongsdatatable()
+GET      /getsongsdatatable                  controllers.Application.getsongsdatatable()
 
 # download songbook
-GET      /downloadsongbook            controllers.Application.downloadAndDeleteFile()
-POST     /generatesongbook            controllers.Application.generateSongbook()
+GET      /downloadsongbook                   controllers.Application.downloadAndDeleteFile()
+POST     /generatesongbook                   controllers.Application.generateSongbook()
 
 # REST user account management
-POST     /user                        controllers.Application.addUser()
-GET      /user/:email                 controllers.Application.getUser(email: String)
-DELETE   /user/:email                 controllers.Application.deleteUser(email: String)
-PUT      /user/:email                 controllers.Application.updateUser(email: String)
+POST     /user                               controllers.Application.addUser()
+GET      /user/:email                        controllers.Application.getUser(email: String)
+DELETE   /user/:email                        controllers.Application.deleteUser(email: String)
+PUT      /user/:email                        controllers.Application.updateUser(email: String)
 
-GET      /assets/javascripts/routes   controllers.Application.javascriptRoutes()
+GET      /assets/javascripts/routes          controllers.Application.javascriptRoutes()
 # Map static resources from the /public folder to the /assets URL path
-GET      /assets/*file                controllers.Assets.at(path="/public", file)
+GET      /assets/*file                       controllers.Assets.at(path="/public", file)
 
 #simple echo test
-GET      /test                        controllers.Application.test()
+GET      /test                               controllers.Application.test()

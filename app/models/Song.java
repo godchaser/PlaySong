@@ -66,11 +66,10 @@ public class Song extends Model implements Comparator<Song> {
 			}
 		}
 		song.songLyrics.removeAll(removedList);
+		
 		for (SongLyrics songLyrics : song.songLyrics) {
-			String songKey = LineTypeChecker.getSongKey(songLyrics.getsongLyrics());
-			songLyrics.setSongKey(songKey);
-			String newSongLyrics = SongSanitizer.sanitizeSong(songLyrics.getsongLyrics());
-			songLyrics.setsongLyrics(newSongLyrics);
+			songLyrics.updateSongKeys();
+			songLyrics.sanitizeLyrics();
 		}
 		if (song.id != null && song.id > 0) {
 			// DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");

@@ -21,7 +21,7 @@ import models.helpers.XMLSongsParser;
 import models.json.JsonSongbook;
 import play.Logger;
 import play.Routes;
-
+import play.data.DynamicForm;
 import play.data.Form;
 import play.libs.Json;
 import play.mvc.Controller;
@@ -271,7 +271,7 @@ public class Application extends Controller {
 		}
 
 		int minusMonth = 1;
-		
+
 		Calendar calNow = Calendar.getInstance();
 		// adding -1 month
 		calNow.add(Calendar.MONTH, -minusMonth);
@@ -286,7 +286,7 @@ public class Application extends Controller {
 		for (Song song : songsModifiedInLastMonth) {
 			songModifiedList.add(new SongSuggestion(song.getId(), song.getSongName()));
 		}
-		
+
 		List<Song> songsCreatedInLastMonth = Song.find.where().between("date_created", dateBeforeAMonth, dateNow)
 				.orderBy("date_created desc").findList();
 
@@ -294,7 +294,7 @@ public class Application extends Controller {
 		for (Song song : songsCreatedInLastMonth) {
 			songCreatedList.add(new SongSuggestion(song.getId(), song.getSongName()));
 		}
-		
+
 		return ok(table.render(Song.getNumberOfSongsInDatabase(), songModifiedList, songCreatedList, user));
 	}
 
@@ -451,6 +451,16 @@ public class Application extends Controller {
 		ObjectNode lyricsResult = Json.newObject();
 		lyricsResult.put("songLyrics", lyrics);
 		return ok(lyricsResult);
+	}
+
+	@Security.Authenticated(Secured.class)
+	public static Result updatesonglyricsjson(Long id) {
+		SongLyrics lyricsObject = SongLyrics.find.byId(id);
+		DynamicForm df = play.data.Form.form().bindFromRequest();
+		String songLyrics = df.get("songLyrics");
+		lyricsObject.setsongLyrics(songLyrics);
+		lyricsObject.updateSongLyrics();
+		return ok();
 	}
 
 	@Security.Authenticated(Secured.class)
@@ -990,6 +1000,7 @@ public class Application extends Controller {
 				controllers.routes.javascript.Application.songeditor(),
 				controllers.routes.javascript.Application.songsuggestions(),
 				controllers.routes.javascript.Application.getsonglyricsjson(),
+				controllers.routes.javascript.Application.updatesonglyricsjson(),
 				controllers.routes.javascript.Application.services(),
 				controllers.routes.javascript.Application.generateService(),
 				controllers.routes.javascript.Application.deleteservice(),
