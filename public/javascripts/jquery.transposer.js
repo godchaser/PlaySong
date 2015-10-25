@@ -16,7 +16,9 @@
         var opts = $.extend({}, $.fn.transpose.defaults, options);
 
         var currentKey = null;
-
+        
+        var backupHtml = null;
+        
         var keys = [
             { name: 'Ab',  value: 0,   type: 'F' },
             { name: 'A',   value: 1,   type: 'N' },
@@ -284,17 +286,28 @@
 
 
             $(this).before(keysHtml);
-
+            
             $('#hideChordsButton').click(function(event) {
-                $('.chordLine').remove();
-                var output = $();
-
-                $.each($("pre[id*='songLyrics']").html().split(/[\n\r]+/g), function(i, el) {
-                    if (el) {
-                        output = output.add($("<span class='lyricsOnly'>" + el + "</span>"));
-                    }
-                });
-                $("pre[id*='songLyrics']").html(output);
+            	// hide
+            	if (backupHtml == null){
+            		backupHtml = $("pre[id*='songLyrics']").html();
+            		$('.chordLine').remove();
+	                var output = $();
+	
+	                $.each($("pre[id*='songLyrics']").html().split(/[\n\r]+/g), function(i, el) {
+	                    if (el) {
+	                        output = output.add($("<span class='lyricsOnly'>" + el + "</span>"));
+	                    }
+	                });
+	                $("pre[id*='songLyrics']").html(output);
+	                $(this).text("Unhide Chords");
+            	} 
+            	// unhide
+            	else {
+            		$("pre[id*='songLyrics']").html(backupHtml);
+            		backupHtml = null;
+            		$(this).text("Hide Chords");
+            	}
             });
             $(this).html(output.join("\n"));
         });
