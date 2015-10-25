@@ -208,38 +208,52 @@
         var wrapChords = function (input) {
             return input.replace(opts.chordReplaceRegex, "<span class='c'>$1</span>");
         };
-
-
+        
         return $(this).each(function() {
             var output = [];
+            
             var lines = $(this).text().split("\n");
             var line = "";
             var initialChordSet = false;
+            var verseTypes = ["Verse", "Chorus", "Bridge", "Intro", "Ending"];
 
             for (var i = 0; i < lines.length; i++) {
+            	var lineRecognized = false;
                 line = lines[i];
-
                 if (isChordLine(line)){
                     if (!initialChordSet) {
                         currentKey=getFirstChordInLine(line);
                         initialChordSet = true;
                     }
-                    output.push("<span class='chordLine'>" + wrapChords(line) + "</span>")
+                    output.push("<span class='chordLine'>" + wrapChords(line) + "</span>");
+                    lineRecognized = true;
                 }
-            // check if this is verse type
-            else if (line.charAt(line.length-1) == "]") {
-            	 switch(line.charAt(1)) {
-	                 case "C": line = line.replace("C", "Chorus "); break;
-	                 case "V": line = line.replace("V", "Verse "); break;
-	                 case "B": line = line.replace("B", "Bridge "); break;
-	                 case "I": line = line.replace("I", "Intro "); break;
-	                 case "E": line = line.replace("E", "Ending "); break;
-	                 default:  break;
-            	 }
-            	output.push("<span class='verseType'>" + line.substring(1,line.length-1).trim() + "</span>");
-            } else {
-                output.push("<span class='lyrics'>" + line + "</span>");
-            }
+                // check if this is verse type
+	            else if (line.charAt(line.length-1) == "]") {
+	            	 switch(line.charAt(1)) {
+		                 case "C": line = line.replace("C", "Chorus "); break;
+		                 case "V": line = line.replace("V", "Verse "); break;
+		                 case "B": line = line.replace("B", "Bridge "); break;
+		                 case "I": line = line.replace("I", "Intro "); break;
+		                 case "E": line = line.replace("E", "Ending "); break;
+		                 default:  break;
+	            	 }
+	            	output.push("<span class='verseType'>" + line.substring(1,line.length-1).trim() + "</span>");
+	            	lineRecognized = true;
+	            }            
+	            else if (!lineRecognized){
+		            for(var j=0; j< verseTypes.length; j++){
+		            	if(line.indexOf(verseTypes[j]) != -1){
+		        	  	  output.push("<span class='verseType'>" + line + "</span>");
+		        	  	  lineRecognized = true;
+		        	  	  break;
+		            	  }
+		            }
+		            if (!lineRecognized){
+		                output.push("<span class='lyrics'>" + line + "</span>");
+		                lineRecognized = true;
+		            }
+	            }
             };
 
             if (!initialChordSet){

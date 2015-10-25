@@ -290,7 +290,7 @@
 	}
 	
 	function isSmallScreen(){
-		return ($(window).width()>=800) ? false : true;
+		return ($(window).width()<800) ? true : false;
 	}
 	
 	$(document).ready(function() {
