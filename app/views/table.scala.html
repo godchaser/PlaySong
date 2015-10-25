@@ -308,17 +308,19 @@
 		function selectRow(rowNumber){
 			//console.log("page event fired");
 			rowNumber = typeof rowNumber !== 'undefined' ? rowNumber : 1;
-			var selectFirstRow;
-			if (rowNumber == 1){
-		  	 	selectFirstRow = $('#song_table tr.songRow:first-child');
-	  		} else {
-	  			selectFirstRow = $('#'+rowNumber);
-	  		}
-	  		selectedSongID = $(selectFirstRow).attr('id');
-	  		selectedSongLyricsID = $(selectFirstRow).find('.lyrics-link' )[0].id;
-		  	selectFirstRow.addClass("selected-row");
-		  	
-	  		updateLyricsPanel(selectedSongLyricsID);		
+			if(!isSmallScreen()){
+				var selectFirstRow;
+				if (rowNumber == 1){
+			  	 	selectFirstRow = $('#song_table tr.songRow:first-child');
+		  		} else {
+		  			selectFirstRow = $('#'+rowNumber);
+		  		}
+		  		selectedSongID = $(selectFirstRow).attr('id');
+		  		selectedSongLyricsID = $(selectFirstRow).find('.lyrics-link' )[0].id;
+			  	selectFirstRow.addClass("selected-row");
+			  	
+		  		updateLyricsPanel(selectedSongLyricsID);
+	  		}		
 		}
 		
 		/* Table initialisation */
