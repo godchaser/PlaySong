@@ -17,6 +17,7 @@ import java.util.Map;
 import play.Logger;
 import models.ServiceSong;
 import models.SongLyrics;
+import models.helpers.ArrayHelper;
 import models.helpers.PdfPrintable;
 //import models.Song;
 //import models.SongLyrics;
@@ -87,6 +88,9 @@ public class PdfGenerator extends PdfPageEventHelper {
 
 		}
 	}
+
+	// Verse styling
+	String[] verseTypes = { "Verse", "Chorus", "Bridge", "Intro", "Ending" };
 
 	public PdfGenerator(String outputPdfPath) throws Exception {
 		this.document = new Document(songPageSize);
@@ -211,35 +215,42 @@ public class PdfGenerator extends PdfPageEventHelper {
 			// System.out.println(content);
 
 			for (String line : content.split("\\r?\\n")) {
-				if (line.startsWith("[")) {
-					// VERSETYPE STYLING
-
-					switch ("" + line.charAt(1)) {
-					case "C":
-						line = line.replace("C", "Chorus ");
-						break;
-					case "V":
-						line = line.replace("V", "Verse ");
-						break;
-					case "B":
-						line = line.replace("B", "Bridge ");
-						break;
-					case "I":
-						line = line.replace("I", "Intro ");
-						break;
-					case "E":
-						line = line.replace("E", "Ending ");
-						break;
-					default:
-						break;
+				// verse recognition
+				boolean lineStartsWithBrace = line.startsWith("[");
+				if (lineStartsWithBrace || ArrayHelper.stringContainsItemFromList(line, verseTypes)) {
+					// expand verse type name if necessary
+					if (lineStartsWithBrace) {
+						switch ("" + line.charAt(1)) {
+						case "C":
+							line = line.replace("C", "Chorus ");
+							break;
+						case "V":
+							line = line.replace("V", "Verse ");
+							break;
+						case "B":
+							line = line.replace("B", "Bridge ");
+							break;
+						case "I":
+							line = line.replace("I", "Intro ");
+							break;
+						case "E":
+							line = line.replace("E", "Ending ");
+							break;
+						default:
+							break;
+						}
+						// remove braces
+						line = line.substring(1, line.length() - 1);
 					}
+					// VERSETYPE STYLING
 					fonts.MONOSPACE.setColor(BaseColor.WHITE);
-					Chunk c = new Chunk(line.substring(1,line.length()-1).trim(), fonts.MONOSPACE);
+					Chunk c = new Chunk(line.trim(), fonts.MONOSPACE);
 					c.setBackground(BaseColor.LIGHT_GRAY);
 					Paragraph verseTypeParagraph = new Paragraph(c);
 					chapter.addSection(verseTypeParagraph, 0);
 					fonts.MONOSPACE.setColor(BaseColor.BLACK);
 				} else {
+					// STANDARD STYLING
 					chapter.addSection(new Paragraph(line, fonts.MONOSPACE), 0);
 				}
 			}
@@ -261,7 +272,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 
 		}
 	}
-	
+
 	private void createChapters(List<? extends PdfPrintable> printObject) throws DocumentException {
 
 		for (int i = 0; i < printObject.size(); i++) {
