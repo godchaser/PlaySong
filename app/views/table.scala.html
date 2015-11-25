@@ -176,7 +176,8 @@
 					$('#songLyrics').html(data.songLyrics);
 					$(function() {
 						$("#songLyrics").transpose();
-						if ($(window).width()<1024) {
+						// Automatic scrool into view if screen width smaller that 800px
+						if ($(window).width()<800) {
 							$ ( '#songLyrics' )[0].scrollIntoView(true);
 						}
 					});
