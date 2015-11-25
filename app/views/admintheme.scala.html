@@ -139,8 +139,8 @@
 
 		<!-- Typehead  -->
 		<script src="@routes.Assets.at("lib/jquery/dist/jquery.min.js")" type="text/javascript"></script>
-		<script src="@routes.Assets.at("lib/typeahead.js/dist/typeahead.bundle.min.js")" type="text/javascript"></script>
-
+		<!-- <script src="@routes.Assets.at("lib/typeahead.js/dist/typeahead.bundle.js")" type="text/javascript"></script> -->
+		<script src="@routes.Assets.at("javascripts/typeahead.bundle.min.js")" type="text/javascript"></script> 
 		<script type="text/javascript">
 			$(document)
 					.ready(
@@ -148,27 +148,35 @@
 
 								var songSuggestionUrl = jsRoutes.controllers.Application
 										.songsuggestions().url;
+	
 								var songList = new Bloodhound(
 										{
 											datumTokenizer : Bloodhound.tokenizers.obj
 													.whitespace('value'),
 											queryTokenizer : Bloodhound.tokenizers.whitespace,
 											//prefetch: '../data/films/post_1960.json',
+											//local: testStringsJson,
 											remote : {
 												url : songSuggestionUrl
 														+ '?q=%QUERY',
-												wildcard : '%QUERY'
-											},
-											delay : 1,
+												wildcard : '%QUERY',
+												/*
+												filter: function (list) {
+								                    //debugger;
+									          		console.log(list);
+									          		return list;
+												}
+												*/
+											},									
 										});
 
 								songList.initialize();
-
+								
+								
 								$('.typeahead').typeahead(null, {
 									name : 'songs',
 									displayKey : 'value',
-									minLength : '1',
-									limit : '15',
+									limit : 15,
 									source : songList.ttAdapter()
 								});
 
