@@ -1,5 +1,6 @@
 package models;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -79,6 +80,10 @@ public class SongLyrics extends Model {
 		updateSongKeys();
 		sanitizeLyrics();
 		update();
+		// Automatically update song modification journal
+		Date date = new Date();
+		getSong().setDateModified(date);
+		getSong().update();
 	}
 	
 	public void updateSongKeys(){
