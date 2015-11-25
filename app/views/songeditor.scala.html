@@ -1,6 +1,6 @@
-@(id: Long, songForm: Form[Song], user: UserAccount)
+@(id: Long, songForm: Form[Song], user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
 
-@admintheme("Song Editor", user){
+@admintheme("Song Editor", user, songsModified, songsCreated) {
     <div id="songEditor">
         <h2>Edit or create song</h2>
         @helper.form(action = routes.Application.newsong()) {

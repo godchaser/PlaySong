@@ -189,4 +189,48 @@ public class Song extends Model implements Comparator<Song> {
 	public void setDateModified(Date dateModified) {
 		this.dateModified = dateModified;
 	}
+
+	public static List<SongSuggestion> getSongModifiedList(){
+		
+		int minusMonth = 1;
+
+		Calendar calNow = Calendar.getInstance();
+		// adding -1 month
+		calNow.add(Calendar.MONTH, -minusMonth);
+		Date dateBeforeAMonth = calNow.getTime();
+
+		Date dateNow = Calendar.getInstance().getTime();
+		
+		List<Song> songsModifiedInLastMonth = Song.find.where().between("date_modified", dateBeforeAMonth, dateNow)
+				.orderBy("date_modified desc").findList();
+		
+		List<SongSuggestion> songModifiedList = new ArrayList<>();
+		for (Song song : songsModifiedInLastMonth) {
+			songModifiedList.add(new SongSuggestion(song.getId(), song.getSongName(), song.getDateModified()));
+		}
+		return songModifiedList;
+	}
+	
+	public static List<SongSuggestion> getSongCreatedList(){
+		
+		int minusMonth = 1;
+
+		Calendar calNow = Calendar.getInstance();
+		// adding -1 month
+		calNow.add(Calendar.MONTH, -minusMonth);
+		Date dateBeforeAMonth = calNow.getTime();
+
+		Date dateNow = Calendar.getInstance().getTime();
+		
+		List<Song> songsCreatedInLastMonth = Song.find.where().between("date_created", dateBeforeAMonth, dateNow)
+				.orderBy("date_created desc").findList();
+
+		List<SongSuggestion> songCreatedList = new ArrayList<>();
+		for (Song song : songsCreatedInLastMonth) {
+			songCreatedList.add(new SongSuggestion(song.getId(), song.getSongName(), song.getDateModified()));
+		}
+		return songCreatedList;
+	}
+	
+	
 }

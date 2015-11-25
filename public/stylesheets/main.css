@@ -9,3 +9,11 @@
 .selected-row {
     background-color: #98cae1!important;
 }
+
+.force-inline {
+	display: inline-block!important;
+}
+
+.smaller-font {
+    font-size: 60%!important;
+}

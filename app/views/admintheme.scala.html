@@ -1,4 +1,4 @@
-@(title: String, user: UserAccount)(dynamiccontent: Html)
+@(title: String, user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])(dynamiccontent: Html)
 
 <html>
 	<head>
@@ -62,7 +62,55 @@
 
 				<ul class="nav navbar-top-links navbar-right">
 					<!-- /.dropdown -->
-					<li class="dropdown">
+                <li class="dropdown force-inline">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-bell fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-alerts">
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-music fa-fw"></i> New Songs
+                                    <span class="pull-right text-muted small"> since @java.time.LocalDate.now</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+	                        @if(songsCreated.size>0){
+									  @songsCreated.map { song =>
+									  	<li><a id=@song.getId() href="@routes.Application.songview(song.getId())">@song.getSongName() <span class="pull-right text-muted smaller-font"> @song.getDateModified()</span></a></li>
+									  	<li class="divider"></li>
+									  	}
+	                            }
+                    </ul>
+                    <!-- /.dropdown-alerts -->
+                </li>
+                		<!-- /.dropdown -->
+                <li class="dropdown force-inline">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-pencil fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-alerts">
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-music fa-fw"></i> Updated Songs
+                                    <span class="pull-right text-muted small"> since @java.time.LocalDate.now</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+	                        @if(songsModified.size>0){
+									  @songsModified.map { song =>
+									  	<li><a id=@song.getId() href="@routes.Application.songview(song.getId())">@song.getSongName() <span class="pull-right text-muted smaller-font"> @song.getDateModified()</span></a></li>
+									  	<li class="divider"></li>
+									  	}
+	                            }
+                    </ul>
+                    <!-- /.dropdown-alerts -->
+                </li>
+										<!-- /.dropdown -->
+					<li class="dropdown force-inline">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#"> @user.name <span> @user.email </span><i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i> </a>
 						<ul class="dropdown-menu dropdown-user">
 							<li>

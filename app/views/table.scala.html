@@ -1,6 +1,6 @@
 @(numberOfSongsInDatabase: Int, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion], user: UserAccount)
 
-@admintheme("", user) {
+@admintheme("", user, songsModified, songsCreated) {
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap/css/bootstrap.min.css")">
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/datatables-responsive/css/dataTables.responsive.css")">
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jquery.transposer.css")">
@@ -8,89 +8,12 @@
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/font-awesome/css/font-awesome.css")">
 
 <div hidden id="song_table_wrapper" class="panel panel-default hover" cellspacing="0" width="100%">
-	<h2>Song Database</h2>
+	<h2>Song Database <span class="pull-right small"> <i class="glyphicon glyphicon-stats"></i> @numberOfSongsInDatabase songs</span></h2>                 	
 	<div>
                  <div class="row">
-	                <div class="col-lg-3 col-md-6">
-	                    <div class="panel panel-primary">
-	                        <div class="panel-heading">
-	                            <div class="row">
-	                                <div class="col-xs-3">
-	                                    <i class="fa fa-bell-o fa-2x"></i>
-	                                </div>
-	                                <div class="col-xs-9 text-right">
-	                                    <div class="large">@songsCreated.size</div>
-	                                    <div>New Songs! <br>(last month since @java.time.LocalDate.now)</div>
-	                                </div>
-	                            </div>
-	                        </div>
-	                        <div>
-	                        @if(songsCreated.size>0){
-	                            <div class="panel-footer">
-	                            	<div class="dropdown">     	
-	                                <span id="dropdownMenu1" class="pull-left dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="fa fa-arrow-circle-right"></i> View Songs</span>
-	                                <div class="clearfix"></div>
-	                            	<!-- 
-									  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-									    View Songs
-									    <span class="caret"></span>
-									  </button>
-									   -->
-									  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-									  @songsCreated.map { song =>
-									  	<li><a id=@song.getId() href="@routes.Application.songview(song.getId())">@song.getSongName()</a></li>
-									  	}
-									  </ul>
-									</div>
-	                            </div>
-	                            }
-	                        </div>
-	                    </div>
-	                </div>
-	                <div class="col-lg-3 col-md-6">
-	                    <div class="panel panel-green">
-	                        <div class="panel-heading">
-	                            <div class="row">
-	                                <div class="col-xs-3">
-	                                    <i class="fa fa-pencil fa-2x"></i>
-	                                </div>
-	                                <div class="col-xs-9 text-right">
-	                                    <div class="large"> @songsModified.size</div>
-	                                    <div>Updated Songs! <br>(last month since @java.time.LocalDate.now)</div>
-	                                </div>
-	                            </div>
-	                        </div>
-	                        @if(songsModified.size>0){
-	                         <div class="panel-footer">
-	                            	<div class="dropdown">     	
-	                                <span id="dropdownMenu1" class="pull-left dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="fa fa-arrow-circle-right"></i> View Songs</span>
-	                                <div class="clearfix"></div>
-	                            	<!-- 
-									  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-									    View Songs
-									    <span class="caret"></span>
-									  </button>
-									   -->
-									  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-									    @songsModified.map { song =>
-									  	<li><a id=@song.getId() href="@routes.Application.songview(song.getId())">@song.getSongName()</a></li>
-									  	}
-									  </ul>
-									</div>
-									}
-	                    	</div>
-	                	</div>
-                	</div>
                 	<div id="ytvideoframe" class="col-lg-3 col-md-6">
                 	</div>
                 </div>
-                   
-                	<div class="panel-heading"  id="song_table_header">
-						<div class="large">
-						<i class="glyphicon glyphicon-stats"></i>  @numberOfSongsInDatabase songs			
-						</div>
-						<div class="clearfix"></div>
-					</div>
             </div>
 		
 

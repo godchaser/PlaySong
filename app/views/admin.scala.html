@@ -1,6 +1,6 @@
-@(user: UserAccount, userAccountForm: Form[UserAccount], userAccounts: List[UserAccount], message: String)
+@(user: UserAccount, userAccountForm: Form[UserAccount], userAccounts: List[UserAccount], message: String, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
 
-@admintheme("Admin", user){
+@admintheme("Admin", user, songsModified, songsCreated) {
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap-select/dist/css/bootstrap-select.min.css")">
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/handsontable/handsontable.full.min.css")">
 

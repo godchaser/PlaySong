@@ -1,6 +1,6 @@
-@(id: Long, user: UserAccount)
+@(id: Long, user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
 
-@admintheme("Song Viewer", user){
+@admintheme("Song Viewer", user, songsModified, songsCreated) {
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jquery.transposer.css")">
 
 <div id="song_viewer_wrapper">

@@ -109,7 +109,7 @@ public class Application extends Controller {
 		}
 		String message = "Welcome admin";
 		Logger.trace(message);
-		return ok(admin.render(user, userForm, UserAccount.find.all(), message));
+		return ok(admin.render(user, userForm, UserAccount.find.all(), message, Song.getSongModifiedList(), Song.getSongCreatedList()));
 	}
 
 	@Security.Authenticated(Secured.class)
@@ -163,7 +163,7 @@ public class Application extends Controller {
 		if (filledForm.hasErrors()) {
 			String message = "Invalid user form";
 			Logger.trace(message);
-			return badRequest(admin.render(user, userForm, UserAccount.find.all(), message));
+			return badRequest(admin.render(user, userForm, UserAccount.find.all(), message, Song.getSongModifiedList(), Song.getSongCreatedList()));
 		}
 
 		UserAccount newUser = filledForm.get();
@@ -270,32 +270,7 @@ public class Application extends Controller {
 			user = new UserAccount("Guest", "", "");
 		}
 
-		int minusMonth = 1;
-
-		Calendar calNow = Calendar.getInstance();
-		// adding -1 month
-		calNow.add(Calendar.MONTH, -minusMonth);
-		Date dateBeforeAMonth = calNow.getTime();
-
-		Date dateNow = Calendar.getInstance().getTime();
-
-		List<Song> songsModifiedInLastMonth = Song.find.where().between("date_modified", dateBeforeAMonth, dateNow)
-				.orderBy("date_modified desc").findList();
-
-		List<SongSuggestion> songModifiedList = new ArrayList<>();
-		for (Song song : songsModifiedInLastMonth) {
-			songModifiedList.add(new SongSuggestion(song.getId(), song.getSongName()));
-		}
-
-		List<Song> songsCreatedInLastMonth = Song.find.where().between("date_created", dateBeforeAMonth, dateNow)
-				.orderBy("date_created desc").findList();
-
-		List<SongSuggestion> songCreatedList = new ArrayList<>();
-		for (Song song : songsCreatedInLastMonth) {
-			songCreatedList.add(new SongSuggestion(song.getId(), song.getSongName()));
-		}
-
-		return ok(table.render(Song.getNumberOfSongsInDatabase(), songModifiedList, songCreatedList, user));
+		return ok(table.render(Song.getNumberOfSongsInDatabase(), Song.getSongModifiedList(), Song.getSongCreatedList(), user));
 	}
 
 	@Security.Authenticated(Secured.class)
@@ -307,7 +282,7 @@ public class Application extends Controller {
 		if (user == null) {
 			user = new UserAccount("Guest", "", "");
 		}
-		return ok(songeditor.render(id, songForm, user));
+		return ok(songeditor.render(id, songForm, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
 	}
 
 	@Security.Authenticated(Secured.class)
@@ -339,7 +314,7 @@ public class Application extends Controller {
 			Logger.debug("Using guest session");
 			user = new UserAccount("Guest", "", "");
 		}
-		return ok(songviewer.render(id, user));
+		return ok(songviewer.render(id, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
 	}
 
 	public static Result songbook() {
@@ -373,7 +348,7 @@ public class Application extends Controller {
 			Logger.debug("Using guest session");
 			user = new UserAccount("Guest", "", "");
 		}
-		return ok(songbook.render(sortedSongs, user));
+		return ok(songbook.render(sortedSongs, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
 	}
 
 	public static Result services() {
@@ -406,7 +381,7 @@ public class Application extends Controller {
 			Collections.sort(service.getSongs());
 		}
 
-		return ok(services.render(serviceList, user));
+		return ok(services.render(serviceList, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
 	}
 
 	@Security.Authenticated(Secured.class)

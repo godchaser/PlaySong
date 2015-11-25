@@ -1,6 +1,6 @@
-@(services: List[Service], user: UserAccount)
+@(services: List[Service], user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
 
-@admintheme("Services", user){
+@admintheme("Services", user, songsModified, songsCreated) {
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap-select/dist/css/bootstrap-select.min.css")">
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/handsontable/handsontable.full.min.css")">
 <script src="@routes.Application.javascriptRoutes()" type="text/javascript"></script>

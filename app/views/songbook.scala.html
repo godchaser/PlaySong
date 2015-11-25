@@ -1,6 +1,6 @@
-@(songs: List[Song],  user: UserAccount)
+@(songs: List[Song],  user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
 
-@admintheme("", user) {
+@admintheme("", user, songsModified, songsCreated) {
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap/css/bootstrap.min.css")">
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap-multiselect/dist/css/bootstrap-multiselect.css")">
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap-select/dist/css/bootstrap-select.min.css")">
