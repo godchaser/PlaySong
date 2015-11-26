@@ -44,7 +44,7 @@
 
 	//$ ( '#songAuthor' ).html ( data.songAuthor ) ;
 	if (data.songLink && isUrl(data.songLink)){
-	var sYTLink = '<button onclick="openYtLink(event)" type="button" id="'+data.songLink+'"><i class="glyphicon glyphicon-play-circle"></i></button>';
+	var sYTLink = '<button id="'+data.songLink+'" onclick="openYtLink(this.id)" type="button"><i class="glyphicon glyphicon-play-circle"></i></button>';
 	//$ ( '#songLink' ).html ( sYTLink ) ;
 	$ ( '#songOriginalTitle' ).html ( data.songOriginalTitle + ", " + data.songAuthor + " " + sYTLink) ;
 	} else {
@@ -78,8 +78,7 @@
 	}
 	window.onload = songView(id);
 		
-	function openYtLink(event){
-		var ytLink = event.target.attributes.id.value;
+	function openYtLink(ytLink){
 		var ytLinkId = getId(ytLink);
 		var iframeHtml = '<iframe width="320" height="250" frameborder="0" src='+'"'+'//www.youtube.com/embed/'+ytLinkId+'?autoplay=1"'+'></iframe>';
 		$('#ytvideoframe').html(iframeHtml);

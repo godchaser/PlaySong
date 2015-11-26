@@ -219,6 +219,24 @@
 		return ($(window).width()<800) ? true : false;
 	}
 	
+	function getId(url) {
+		var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+		var match = url.match(regExp);
+		
+		if (match && match[2].length == 11) {
+		   		return match[2];
+		    } 
+		    else {
+		    	return 'error';
+			}
+	}
+		
+	function openYtLink(ytLink){
+		var ytLinkId = getId(ytLink);
+		var iframeHtml = '<iframe width="320" height="250" frameborder="0" src='+'"'+'//www.youtube.com/embed/'+ytLinkId+'?autoplay=1"'+'></iframe>';
+		$('#ytvideoframe').html(iframeHtml);
+	}
+	
 	$(document).ready(function() {
 		// copy song table div to dynamic content div
 		//$('#song_table_wrapper').insertAfter(('#dynamiccontent'));
@@ -311,7 +329,7 @@
 					sLinks = sLinks.concat('</div>');
 					$('td:eq(0)', nRow).html(sLinks);
 					if (aData.songLink && isUrl(aData.songLink)) {
-						var sYTLink = '<button type="button" class="ytlinkbutton" id='+aData.songLink+'><i class="fa fa-play-circle fa-lg"></i></button>';
+						var sYTLink = '<button type="button" class="ytlinkbutton" id='+aData.songLink+' onclick="openYtLink(this.id)"><i class="fa fa-play-circle fa-lg"></i></button>';
 						$('td:eq(1)', nRow).html(sYTLink);
 					} else {
 						$('td:eq(1)', nRow).html("");
@@ -351,13 +369,6 @@
 						$(this).addClass('selected-row');
 						updateLyricsPanel(selectedSongLyricsID);
 						
-						//now open youtube link
-						if ($(event.target).hasClass("ytlinkbutton")){
-							var ytLink = event.target.attributes.id.value;
-							var ytLinkId = getId(ytLink);
-							var iframeHtml = '<iframe width="320" height="250" frameborder="0" src='+'"'+'//www.youtube.com/embed/'+ytLinkId+'?autoplay=1"'+'></iframe>';
-							$('#ytvideoframe').html(iframeHtml);
-						}
 					}
 				}
 			}
@@ -393,17 +404,6 @@
 		});
 		*/
 		
-		function getId(url) {
-		    var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-		    var match = url.match(regExp);
-		
-		    if (match && match[2].length == 11) {
-		        return match[2];
-		    } else {
-		        return 'error';
-		    }
-		}
-
 	});
 
 	function showAlert() {
