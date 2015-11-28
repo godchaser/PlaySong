@@ -39,6 +39,22 @@ public class PdfGenerator extends PdfPageEventHelper {
 
 	private String outputPdfPath = "resources/pdf/songbook.pdf";
 	private Rectangle songPageSize = PageSize.A4;
+	
+	String LiberationMonoFontPath = "resources/fonts/LiberationMono-Regular.ttf";
+	String LiberationMonoBoldFontPath = "resources/fonts/LiberationMono-Bold.ttf";
+	String TimesNewRomanFontPath = "resources/fonts/Times_New_Roman.ttf";
+	String TimesNewRomanBoldFontPath = "resources/fonts/Times_New_Roman_Bold.ttf";
+
+	int MONOSPACE_SIZE = 12;
+	int NORMAL_SIZE = 12;
+	int BOLD_SIZE = 14;
+	
+	BaseColor DEFAULT_COLOR = BaseColor.BLACK;
+	BaseColor CHORDS_COLOR = BaseColor.BLUE;
+	BaseColor VERSE_COLOR = BaseColor.WHITE;
+	BaseColor VERSE_BACKGROUND_COLOR = BaseColor.LIGHT_GRAY;
+
+	
 
 	// table to store placeholder for all chapters and sections
 	private final Map<String, PdfTemplate> tocPlaceholder = new HashMap<>();
@@ -49,14 +65,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 	private SongFonts fonts = new SongFonts();
 
 	private class SongFonts {
-		String LiberationMonoFontPath = "resources/fonts/LiberationMono-Regular.ttf";
-		String LiberationMonoBoldFontPath = "resources/fonts/LiberationMono-Bold.ttf";
-		String TimesNewRomanFontPath = "resources/fonts/Times_New_Roman.ttf";
-		String TimesNewRomanBoldFontPath = "resources/fonts/Times_New_Roman_Bold.ttf";
 
-		int MONOSPACE_SIZE = 12;
-		int NORMAL_SIZE = 12;
-		int BOLD_SIZE = 14;
 		Font MONOSPACE;
 		Font NORMAL;
 		Font BOLD;
@@ -64,24 +73,29 @@ public class PdfGenerator extends PdfPageEventHelper {
 		Font BOLDITALIC;
 
 		public SongFonts() {
+			
 			FontFactory.register(LiberationMonoFontPath, LiberationMonoFontPath);
 			FontFactory.register(LiberationMonoBoldFontPath, LiberationMonoBoldFontPath);
 			FontFactory.register(TimesNewRomanFontPath, TimesNewRomanFontPath);
 			FontFactory.register(TimesNewRomanBoldFontPath, TimesNewRomanFontPath);
 			// Get the font NB. last parameter indicates font needs to be
 			// embedded
+			
 			MONOSPACE = FontFactory.getFont(LiberationMonoFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
 			MONOSPACE.setSize(MONOSPACE_SIZE);
 
 			NORMAL = FontFactory.getFont(TimesNewRomanFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
 			NORMAL.setStyle(Font.NORMAL);
 			NORMAL.setSize(NORMAL_SIZE);
+			
 			BOLD = FontFactory.getFont(TimesNewRomanBoldFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
 			BOLD.setStyle(Font.NORMAL);
 			BOLD.setSize(BOLD_SIZE);
+			
 			ITALIC = FontFactory.getFont(TimesNewRomanFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
 			ITALIC.setStyle(Font.ITALIC);
 			ITALIC.setSize(12);
+			
 			BOLDITALIC = FontFactory.getFont(TimesNewRomanFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
 			BOLDITALIC.setStyle(Font.BOLDITALIC);
 			BOLDITALIC.setSize(12);
@@ -249,6 +263,12 @@ public class PdfGenerator extends PdfPageEventHelper {
 					Paragraph verseTypeParagraph = new Paragraph(c);
 					chapter.addSection(verseTypeParagraph, 0);
 					fonts.MONOSPACE.setColor(BaseColor.BLACK);
+				} else if (LineTypeChecker.isChordLine(line)){
+					// CHORD STYLING
+					//Font f1 = FontFactory.getFont(FontFactory.TIMES_ROMAN, 12);
+					//f1.setColor(BaseColor.BLUE);
+					fonts.MONOSPACE.setColor(CHORDS_COLOR);
+					chapter.addSection(new Paragraph(line, fonts.MONOSPACE), 0);
 				} else {
 					// STANDARD STYLING
 					chapter.addSection(new Paragraph(line, fonts.MONOSPACE), 0);
