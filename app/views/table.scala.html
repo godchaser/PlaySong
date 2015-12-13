@@ -38,20 +38,29 @@
 		<div class="panel panel-default col-lg-6" id="song_section_div" hidden>
 			<div class="panel-body">
 				<div class="row">
+					<p class="inline-buttons">
 					<button id="editsongbutton" class="songbuttons btn btn-warning" onClick="songManipulationButtonClick(this)" href="#">
-						<i class="glyphicon glyphicon-edit"></i> Edit Song
+						<i class="glyphicon glyphicon-edit"></i> Edit
 					</button>
+					</p>
 					@if(user.email != "Guest"){
+						<p class="inline-buttons">
 					<button id="editlyricsbutton" class="songbuttons btn btn-info" onClick="songManipulationButtonClick(this)" href="#">
-						<i class="glyphicon glyphicon-music"></i> Edit Lyrics
+						<i class="glyphicon glyphicon-music"></i> Quick Edit
 					</button>
+					</p>
+					<p class="inline-buttons">
 					<button id="deletesongbutton" class="songbuttons btn btn-danger" onClick="songManipulationButtonClick(this)">
-						<i class="glyphicon glyphicon-trash"></i> Delete Song
+						<i class="glyphicon glyphicon-trash"></i> Delete
 					</button>
+					</p>
 					}
+					<p class="inline-buttons">
 					<button id="addsongbutton" class="songbuttons btn btn-primary" onClick="songManipulationButtonClick(this)">
-							<i class="glyphicon glyphicon-plus"></i> Add New Song
+							<i class="glyphicon glyphicon-plus"></i> Add New
 					</button>
+					</p>
+			
 					<div class="alert alert-block alert-error fade in" id="cert-error" style="display:none;">
 						<button type="button" class="close" data-dismiss="alert"></button>
 						<h4 class="alert-heading">Delete success</h4>
