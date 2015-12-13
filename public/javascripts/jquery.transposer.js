@@ -296,7 +296,7 @@
 	
 	                $.each($("pre[id*='songLyrics']").html().split(/[\n\r]+/g), function(i, el) {
 	                    if (el) {
-	                        output = output.add($("<span class='lyricsOnly'>" + el + "</span>"));
+	                        output = output.add($("<span class='lyricsOnly'>" + el + "\n</span>"));
 	                    }
 	                });
 	                $("pre[id*='songLyrics']").html(output);
