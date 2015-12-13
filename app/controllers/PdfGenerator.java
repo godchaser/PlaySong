@@ -67,7 +67,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 		Font MONOSPACE;
 		Font MONOSPACE_CHORDS;
 		Font NORMAL;
-		Font ITALIC_VERSETYPE;
+		Font VERSETYPE_FONT;
 		Font BOLD;
 		Font ITALIC;
 		Font BOLDITALIC;
@@ -88,7 +88,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 			
 			MONOSPACE_CHORDS = FontFactory.getFont(LiberationMonoFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
 			MONOSPACE_CHORDS.setSize(MONOSPACE_SIZE);
-			MONOSPACE_CHORDS.setStyle(Font.NORMAL);
+			MONOSPACE_CHORDS.setStyle(Font.BOLD);
 			MONOSPACE_CHORDS.setColor(CHORDS_COLOR);
 
 			NORMAL = FontFactory.getFont(TimesNewRomanFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
@@ -96,10 +96,10 @@ public class PdfGenerator extends PdfPageEventHelper {
 			NORMAL.setSize(NORMAL_SIZE);
 			NORMAL.setColor(DEFAULT_COLOR);
 			
-			ITALIC_VERSETYPE = FontFactory.getFont(TimesNewRomanFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
-			ITALIC_VERSETYPE.setStyle(Font.ITALIC);
-			ITALIC_VERSETYPE.setSize(NORMAL_SIZE);
-			ITALIC_VERSETYPE.setColor(VERSE_COLOR);
+			VERSETYPE_FONT = FontFactory.getFont(TimesNewRomanFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
+			VERSETYPE_FONT.setStyle(Font.BOLD);
+			VERSETYPE_FONT.setSize(NORMAL_SIZE);
+			VERSETYPE_FONT.setColor(VERSE_COLOR);
 			
 			BOLD = FontFactory.getFont(TimesNewRomanBoldFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
 			BOLD.setStyle(Font.NORMAL);
@@ -272,8 +272,8 @@ public class PdfGenerator extends PdfPageEventHelper {
 					}
 					// VERSETYPE STYLING
 					//fonts.MONOSPACE.setColor(BaseColor.WHITE);
-					Chunk c = new Chunk(line.trim(), fonts.ITALIC_VERSETYPE);
-					c.setBackground(BaseColor.LIGHT_GRAY);
+					Chunk c = new Chunk(line.trim(), fonts.VERSETYPE_FONT);
+					c.setBackground(VERSE_BACKGROUND_COLOR, 1.5f, 0f, 1.5f, 1.5f);
 					Paragraph verseTypeParagraph = new Paragraph(c);
 					chapter.addSection(verseTypeParagraph, 0);
 					//fonts.MONOSPACE.setColor(BaseColor.BLACK);
