@@ -17,3 +17,18 @@
 .smaller-font {
     font-size: 60%!important;
 }
+
+.pull-dropdown {
+	right: auto!important;
+	left: 0px!important;
+	float: right!important;
+}
+
+/* tablets and upwards */
+@media (min-width: 768px) {
+    .pull-dropdown {
+    	right: 0px!important;
+		left: auto!important;
+		float: left!important;
+    }
+}
