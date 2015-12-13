@@ -23,7 +23,7 @@ span.lyrics {
 }
 
 span.verseType {
-	font-style: italic;
+	font-style: normal;
 	font-weight: bold;
     color: #ffffff;
 	background-color: #729fcf;
