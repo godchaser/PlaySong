@@ -4,9 +4,17 @@ version := "1.0"
 
 lazy val `playsong` = (project in file(".")).enablePlugins(PlayJava)
 
-scalaVersion := "2.11.1"
+scalaVersion := "2.11.7"
 
-libraryDependencies ++= Seq( javaJdbc , javaEbean , cache , javaWs , filters,
+// Compile the project before generating Eclipse files, so that generated .scala or .class files for views and routes are present
+EclipseKeys.preTasks := Seq(compile in Compile)
+
+routesGenerator := InjectedRoutesGenerator
+
+lazy val myProject = (project in file("."))
+  .enablePlugins(PlayJava, PlayEbean)
+
+libraryDependencies ++= Seq( javaJdbc , cache , javaWs , filters, evolutions,
   "org.hsqldb" % "hsqldb" % "2.3.3",
   "org.postgresql" % "postgresql" % "9.4-1206-jdbc42",
   "org.apache.poi" % "poi" % "3.13",

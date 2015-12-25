@@ -10,7 +10,7 @@ import models.helpers.SongSuggestion;
 import play.Logger;
 import play.data.format.Formats;
 import play.data.validation.Constraints.Required;
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 /**
  * Created by samuel on 19.02.15..

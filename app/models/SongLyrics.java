@@ -10,7 +10,7 @@ import javax.persistence.ManyToOne;
 
 import chord.tools.LineTypeChecker;
 import chord.tools.SongSanitizer;
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 /**
  * Created by samuel on 3/31/15.

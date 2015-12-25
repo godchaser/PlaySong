@@ -323,7 +323,7 @@ public class XlsHelper {
 				i++;
 			} else {
 				System.out.println("SEARCHING BY FILTER");
-				List<Song> songs = Song.find.where(
+				List<Song> songs = Song.find.where().add(
 						Expr.ilike("songName", "%" + filter + "%")).findList();
 				if ((!songs.isEmpty()) && (songs.get(0) != null)) {
 					System.out.println(songs.get(0).id);

@@ -22,9 +22,9 @@ public class Global extends GlobalSettings {
 
 	@Override
 	public void onStart(Application app) {
-		ActorRef demoActor = Akka.system().actorOf(DemoActor.props(42), "demo");
+		ActorRef cleanupActor = Akka.system().actorOf(CleanupActor.props(42), "demo");
 		Akka.system().scheduler().schedule(Duration.create(0, TimeUnit.MILLISECONDS), // Initial
 				Duration.create(30, TimeUnit.SECONDS), // Frequency 15 seconds
-				demoActor, "cleaning resource files", Akka.system().dispatcher(), null);
+				cleanupActor, "cleaning resource files", Akka.system().dispatcher(), null);
 	}
 }

@@ -38,7 +38,7 @@
 			</div>
 		</div>
 		<div>
-			<h3>Upload updated xlsx file</h3>
+			<h3>Upload updated song data in xls format</h3>
 			@helper.form(action = routes.Application.upload, 'enctype -> "multipart/form-data") {
 			<input type="file" name="uploadedfile">
 			<p>
@@ -48,13 +48,15 @@
 		</div>
 		<div>
 			<button type="button" id="downloadxlsx" class="btn btn-default">
-				Download xlsx dump
+				Download song data in xls
 			</button>
 		</div>
 		<div id="songtable"></div>
+		<!-- 
 		<button type="button" id="updatefromspreadsheet" class="btn btn-default">
 			Update songs from table
 		</button>
+		 -->
 	</div>
 </div>
 
@@ -113,7 +115,7 @@
 		        }
 		    });
 		});
-		
+		/*
 		var data = function() {
 			return Handsontable.helper.createSpreadsheetData(250, 5);
 		};
@@ -144,7 +146,7 @@
 		};
 
 		getSongsData();
-
+		*/
 	}); 
 </script>
 }

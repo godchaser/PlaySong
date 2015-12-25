@@ -6,7 +6,7 @@ import akka.actor.UntypedActor;
 import akka.japi.Creator;
 import play.Logger;
 
-public class DemoActor extends UntypedActor {
+public class CleanupActor extends UntypedActor {
 
 	private int fileExpirationDuration = 60000;
 
@@ -19,25 +19,25 @@ public class DemoActor extends UntypedActor {
 	 *         configured (e.g. calling `.withDispatcher()` on it)
 	 */
 	public static Props props(final int magicNumber) {
-		return Props.create(new Creator<DemoActor>() {
+		return Props.create(new Creator<CleanupActor>() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public DemoActor create() throws Exception {
-				return new DemoActor(magicNumber);
+			public CleanupActor create() throws Exception {
+				return new CleanupActor(magicNumber);
 			}
 		});
 	}
 
 	final int magicNumber;
 
-	public DemoActor(int magicNumber) {
+	public CleanupActor(int magicNumber) {
 		this.magicNumber = magicNumber;
 	}
 
 	@Override
 	public void onReceive(Object msg) {
-		Logger.debug("Executing actor: " + msg.toString());
+		//Logger.debug("Executing actor: " + msg.toString());
 		cleanFiles();
 	}
 

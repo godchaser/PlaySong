@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 import models.helpers.PdfPrintable;
 import play.data.validation.Constraints.Required;
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 @Entity
 public class ServiceSong extends Model implements PdfPrintable, Comparable<ServiceSong> {
