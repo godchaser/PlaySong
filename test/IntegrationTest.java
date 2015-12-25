@@ -5,7 +5,6 @@ import play.test.*;
 import play.libs.F.*;
 
 import static play.test.Helpers.*;
-import static org.fest.assertions.Assertions.*;
 
 import static org.fluentlenium.core.filter.FilterConstructor.*;
 

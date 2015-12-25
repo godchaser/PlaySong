@@ -16,7 +16,7 @@ import play.libs.F;
 import play.libs.F.*;
 
 import static play.test.Helpers.*;
-import static org.fest.assertions.Assertions.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -29,8 +29,7 @@ public class ApplicationTest {
 
     @Test
     public void simpleCheck() {
-        int a = 1 + 1;
-        assertThat(a).isEqualTo(2);
+        assertEquals(a, 2);
     }
 
     @Test
