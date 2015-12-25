@@ -28,4 +28,6 @@ libraryDependencies ++= Seq( javaJdbc , javaEbean , cache , javaWs , filters,
   "org.yaml" % "snakeyaml" % "1.15"
   )
 
-unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )  
+unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )
+
+TwirlKeys.templateImports ++= Seq("models.helpers._")

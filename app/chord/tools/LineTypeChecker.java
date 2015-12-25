@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package controllers.chords;
+package chord.tools;
 
 /**
  * Created by samuel on 4/23/15.

@@ -1,4 +1,4 @@
-package models.helpers;
+package document.tools;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,13 +13,17 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import controllers.chords.LineTypeChecker;
 import models.Song;
 import models.SongLyrics;
+import models.helpers.SongLyricsXML;
+import models.helpers.SongXML;
+import models.helpers.SongsXML;
 
 import org.eclipse.persistence.jaxb.JAXBContextFactory;
 
-public class XMLSongsParser {
+import chord.tools.LineTypeChecker;
+
+public class XmlSongsParser {
 
 	public static void convertToSong(SongsXML songs) {
 		System.out.println("Checking if unmarshalled XML songs is null");

@@ -1,4 +1,4 @@
-package controllers;
+package document.tools;
 
 /**
  * Created by samuel on 4/6/15.
@@ -7,8 +7,6 @@ import java.io.*;
 import java.math.BigInteger;
 import java.util.List;
 
-import controllers.chords.ChordLineTransposer;
-import controllers.chords.LineTypeChecker;
 import models.SongLyrics;
 import models.helpers.SongPrint;
 
@@ -25,10 +23,12 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.STPageOrientation;
 
 import com.itextpdf.text.Paragraph;
 
+import chord.tools.ChordLineTransposer;
+import chord.tools.LineTypeChecker;
 import play.Logger;
 import play.Play;
 
-public class DocumentWriter {
+public class DocxGenerator {
 
 	private String songTitleFont = "Arial";
 	private int songTitleSize = 18;
@@ -221,7 +221,7 @@ public class DocumentWriter {
 	}
 
 	public static void main(String[] args) throws Exception {
-		// DocumentWriter doc = new DocumentWriter();
+		// DocxGenerator doc = new DocxGenerator();
 		// ArrayList<String> song = ParserHelpers.readFile("test_data\\" +
 		// "inputTestSong");
 		// TODO: this should be unit testable somehow?!

@@ -1,4 +1,4 @@
-package controllers;
+package document.tools;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,7 +12,7 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 
 import com.lowagie.text.FontFactory;
 
-public class PdfConverter {
+public class DocxToPdfConverter {
 
     public static void convert (String inputFile, String outputFile){
         try {
@@ -63,8 +63,8 @@ public class PdfConverter {
     }
     public static void main(String[] args) {
         // TODO Auto-generated method stub
-        PdfConverter.convert("resources/fonts/test.docx", "resources/test.pdf");
-        PdfConverter.convert("resources/fonts/test.docx", "resources/test2.pdf");
-        PdfConverter.convert("resources/fonts/test.docx", "resources/test3.pdf");
+        DocxToPdfConverter.convert("resources/fonts/test.docx", "resources/test.pdf");
+        DocxToPdfConverter.convert("resources/fonts/test.docx", "resources/test2.pdf");
+        DocxToPdfConverter.convert("resources/fonts/test.docx", "resources/test3.pdf");
     }
 }

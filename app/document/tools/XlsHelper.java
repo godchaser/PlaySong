@@ -1,4 +1,4 @@
-package controllers.songbook;
+package document.tools;
 
 import com.avaje.ebean.Expr;
 
@@ -26,7 +26,7 @@ import java.util.Set;
  * Created by samuel on 5/8/15.
  */
 
-public class XLSHelper {
+public class XlsHelper {
 	private static class XLSSong {
 		private String songName;
 		private String songOriginalTitle;

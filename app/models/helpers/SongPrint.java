@@ -1,6 +1,6 @@
 package models.helpers;
 
-import controllers.chords.ChordLineTransposer;
+import chord.tools.ChordLineTransposer;
 import models.Song;
 import models.SongLyrics;
 import play.Logger;

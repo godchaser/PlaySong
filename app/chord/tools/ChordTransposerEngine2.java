@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package controllers.chords;
+package chord.tools;
 
 
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ import play.Logger;
  *
  * @author Michael
  */
-public class ChordTransposer {
+public class ChordTransposerEngine2 {
 
     /**
      * Internal class containing the actual chord letter and the "tail"
@@ -78,7 +78,7 @@ public class ChordTransposer {
      *
      * @param chord the chord to transpose.
      */
-    public ChordTransposer(String chord) {
+    public ChordTransposerEngine2(String chord) {
         if(chord == null) {
             return;
         }

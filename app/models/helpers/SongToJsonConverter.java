@@ -1,4 +1,4 @@
-package controllers;
+package models.helpers;
 
 import java.util.ArrayList;
 
@@ -13,7 +13,7 @@ import models.Song;
 /**
  * Created by samuel on 4/1/15.
  */
-public class SongToJson {
+public class SongToJsonConverter {
 
 	public static ObjectNode convert(Song s) {
 

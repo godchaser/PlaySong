@@ -8,8 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import controllers.chords.LineTypeChecker;
-import models.helpers.SongSanitizer;
+import chord.tools.LineTypeChecker;
+import chord.tools.SongSanitizer;
 import play.db.ebean.Model;
 
 /**

@@ -1,12 +1,13 @@
-package controllers;
+package document.tools;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.Font.FontFamily;
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 
-import controllers.chords.ChordLineTransposer;
-import controllers.chords.LineTypeChecker;
+import chord.tools.ChordLineTransposer;
+import chord.tools.LineTypeChecker;
+import helpers.ArrayHelper;
 
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -17,10 +18,7 @@ import java.util.Map;
 import play.Logger;
 import models.ServiceSong;
 import models.SongLyrics;
-import models.helpers.ArrayHelper;
 import models.helpers.PdfPrintable;
-//import models.Song;
-//import models.SongLyrics;
 import models.helpers.SongPrint;
 
 ;

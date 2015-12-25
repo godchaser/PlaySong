@@ -1,4 +1,4 @@
-package controllers.chords;
+package chord.tools;
 
 import play.Logger;
 
@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by samuel on 5/1/15.
  */
-public class ChordHelper {
+public class ChordTransposerEngine1 {
     private List<Key> keys = new ArrayList();
     private class Key {
         String name;
@@ -21,7 +21,7 @@ public class ChordHelper {
         }
     }
 
-    public ChordHelper (){
+    public ChordTransposerEngine1 (){
         keys.add(new Key("Ab",0,"F"));
         keys.add(new Key("A",1,"N"));
         keys.add(new Key("A#",2,"S"));
@@ -182,7 +182,7 @@ public class ChordHelper {
         //String chord = "A/C#";
         //String chord = "F#";
         String chord = "Am7";
-        ChordHelper ch = new ChordHelper();
+        ChordTransposerEngine1 ch = new ChordTransposerEngine1();
         String transposed = ch.transpose(currentKey, targetKey, chord);
         System.out.println("key: " + currentKey + "\n targ: " +targetKey + "\n chord: " + chord +"\n trans: " + transposed);
     }

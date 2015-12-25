@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package controllers.chords;
+package chord.tools;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -32,7 +32,7 @@ import play.Logger;
 public class ChordLineTransposer {
 
 	private String chordLine;
-	ChordHelper chordHelper = new ChordHelper();
+	ChordTransposerEngine1 chordHelper = new ChordTransposerEngine1();
 
 	/**
 	 * Create a new chord line transposer.
@@ -85,7 +85,7 @@ public class ChordLineTransposer {
 		String[] whitespace = chordLine.split("[A-Za-z0-9#/]+");
 		StringBuilder ret = new StringBuilder();
 		for (int i = 0; i < chords.length; i++) {
-			ret.append(new ChordTransposer(chords[i]).transpose(semitones,
+			ret.append(new ChordTransposerEngine2(chords[i]).transpose(semitones,
 					newKey));
 			if (i < whitespace.length) {
 				ret.append(whitespace[i]);

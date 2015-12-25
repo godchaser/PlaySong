@@ -5,19 +5,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import controllers.chords.ChordLineTransposer;
-import controllers.songbook.XLSHelper;
 import models.Service;
 import models.ServiceSong;
 import models.Song;
 import models.SongLyrics;
-import models.SongSuggestion;
 import models.UserAccount;
-import models.helpers.ArrayHelper;
 import models.helpers.PdfPrintable;
 import models.helpers.SongPrint;
+import models.helpers.SongSuggestion;
 import models.helpers.SongTableData;
-import models.helpers.XMLSongsParser;
+import models.helpers.SongToJsonConverter;
 import models.json.JsonSongbook;
 import play.Logger;
 import play.Routes;
@@ -34,12 +31,20 @@ import views.html.*;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import chord.tools.ChordLineTransposer;
+import document.tools.DocxGenerator;
+import document.tools.PdfGenerator;
+import document.tools.XmlSongsParser;
+import document.tools.XlsHelper;
+import helpers.ArrayHelper;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.sql.Time;
 import java.text.Collator;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -53,6 +58,7 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 
 import play.twirl.api.Html;
+import songimporters.SongImporter;
 
 import static play.data.Form.form;
 
@@ -109,7 +115,8 @@ public class Application extends Controller {
 		}
 		String message = "Welcome admin";
 		Logger.trace(message);
-		return ok(admin.render(user, userForm, UserAccount.find.all(), message, Song.getSongModifiedList(), Song.getSongCreatedList()));
+		return ok(admin.render(user, userForm, UserAccount.find.all(), message, Song.getSongModifiedList(),
+				Song.getSongCreatedList()));
 	}
 
 	@Security.Authenticated(Secured.class)
@@ -139,7 +146,7 @@ public class Application extends Controller {
 				e.printStackTrace();
 			}
 			Logger.trace("Updating songs");
-			XLSHelper.importAndUpdateSongs3();
+			XlsHelper.importAndUpdateSongs3();
 
 			return redirect(routes.Application.admin());
 		} else {
@@ -163,7 +170,8 @@ public class Application extends Controller {
 		if (filledForm.hasErrors()) {
 			String message = "Invalid user form";
 			Logger.trace(message);
-			return badRequest(admin.render(user, userForm, UserAccount.find.all(), message, Song.getSongModifiedList(), Song.getSongCreatedList()));
+			return badRequest(admin.render(user, userForm, UserAccount.find.all(), message, Song.getSongModifiedList(),
+					Song.getSongCreatedList()));
 		}
 
 		UserAccount newUser = filledForm.get();
@@ -228,7 +236,7 @@ public class Application extends Controller {
 
 	@Security.Authenticated(Secured.class)
 	public static Result getXLS() {
-		XLSHelper.dumpSongs((Song.find.all()));
+		XlsHelper.dumpSongs((Song.find.all()));
 		String message = "Getting xls songs";
 		Logger.trace(message);
 		File tmpFile = new File("resources/xlsx/songs.xlsx");
@@ -270,7 +278,8 @@ public class Application extends Controller {
 			user = new UserAccount("Guest", "", "");
 		}
 
-		return ok(table.render(Song.getNumberOfSongsInDatabase(), Song.getSongModifiedList(), Song.getSongCreatedList(), user));
+		return ok(table.render(Song.getNumberOfSongsInDatabase(), Song.getSongModifiedList(), Song.getSongCreatedList(),
+				user));
 	}
 
 	@Security.Authenticated(Secured.class)
@@ -401,7 +410,7 @@ public class Application extends Controller {
 		ArrayList<ObjectNode> songsJson = new ArrayList<>();
 
 		for (Song s : songs) {
-			ObjectNode songJson = SongToJson.convert(s);
+			ObjectNode songJson = SongToJsonConverter.convert(s);
 			songsJson.add(songJson);
 		}
 		return ok(Json.toJson(songsJson));
@@ -416,7 +425,7 @@ public class Application extends Controller {
 
 	public static Result getsongjson(Long id) {
 		Song s = Song.get(id);
-		ObjectNode songJson = SongToJson.convert(s);
+		ObjectNode songJson = SongToJsonConverter.convert(s);
 		return ok(Json.toJson(songJson));
 	}
 
@@ -484,7 +493,7 @@ public class Application extends Controller {
 		try {
 			// SongImporter.restoreFromSQLDump();
 			SongImporter.importFromDb();
-			XLSHelper.importAndUpdateSongs();
+			XlsHelper.importAndUpdateSongs();
 		} catch (Exception e) {
 			Logger.error("Exception occured during init" + e.getStackTrace());
 			e.printStackTrace();
@@ -535,13 +544,13 @@ public class Application extends Controller {
 
 	@Security.Authenticated(Secured.class)
 	public static Result xmlupdate() {
-		XMLSongsParser.updateFromXML();
+		XmlSongsParser.updateFromXML();
 		return ok();
 	}
 
 	@Security.Authenticated(Secured.class)
 	public static Result updateFromXLS() {
-		XLSHelper.importAndUpdateSongs();
+		XlsHelper.importAndUpdateSongs();
 		return ok();
 	}
 
@@ -654,7 +663,7 @@ public class Application extends Controller {
 				for (Entry<Long, SongTableData> inneritem : smallMap.entrySet()) {
 					Long songId = inneritem.getKey();
 					SongTableData ts = inneritem.getValue();
-					ObjectNode songJson = SongToJson.convert(ts.getSong_name(), ts.getSong_link(),
+					ObjectNode songJson = SongToJsonConverter.convert(ts.getSong_name(), ts.getSong_link(),
 							ts.getSong_original_title(), ts.getSong_author(), songId, ts.getSong_importer(),
 							ts.getLyrics_id());
 					an.add(songJson);
@@ -773,7 +782,7 @@ public class Application extends Controller {
 
 		JsonNode jsonNode = request().body().asJson();
 		List<SongPrint> songsForPrint = new ArrayList<>();
-		DocumentWriter docWriter = null;
+		DocxGenerator docWriter = null;
 		Logger.trace("Songbook generator json string: " + jsonNode);
 		ObjectMapper mapper = new ObjectMapper();
 		String format = "word";
@@ -799,7 +808,7 @@ public class Application extends Controller {
 						Long.parseLong(songJson.getSong().getLyricsID()), songJson.getSong().getKey()));
 			}
 			if ("word".equals(format)) {
-				docWriter = new DocumentWriter();
+				docWriter = new DocxGenerator();
 				try {
 					docWriter.setSongLyricsFont(jsonSongbook.getFonts().getLyricsFont());
 					docWriter.setSongTitleFont(jsonSongbook.getFonts().getTitleFont());
@@ -837,26 +846,31 @@ public class Application extends Controller {
 		// this should maybe made async somehow, because it is not crucial for
 		// this response
 		if (!("Guest".equals(user.name)) && publishService) {
-			Service service = new Service();
-			ArrayList<ServiceSong> serviceSongList = new ArrayList<ServiceSong>();
-			for (SongPrint sp : songsForPrint) {
-				ServiceSong servicesong = new ServiceSong();
-				servicesong.setSongName(sp.getSong().getSongName());
-				servicesong.setSongId(sp.getSong().getId());
-				servicesong.setLyricsId(sp.getLyricsID());
-				servicesong.setSongKey(sp.getKey());
-				servicesong.setSongLyrics(SongLyrics.find.byId((sp.getLyricsID())).songLyrics);
-				serviceSongList.add(servicesong);
+			try {
+				Service service = new Service();
+				ArrayList<ServiceSong> serviceSongList = new ArrayList<ServiceSong>();
+				for (SongPrint sp : songsForPrint) {
+					ServiceSong servicesong = new ServiceSong();
+					servicesong.setSongName(sp.getSong().getSongName());
+					servicesong.setSongId(sp.getSong().getId());
+					servicesong.setLyricsId(sp.getLyricsID());
+					servicesong.setSongKey(sp.getKey());
+					servicesong.setSongLyrics(SongLyrics.find.byId((sp.getLyricsID())).songLyrics);
+					serviceSongList.add(servicesong);
+				}
+				service.setSongs(serviceSongList);
+				service.setDateCreated(new Date());
+				service.setUserEmail(user.email);
+				service.setUserName(user.name);
+				if (songBookName != null) {
+					service.setServiceName(songBookName);
+				}
+				service.save();
+				Logger.debug("Publishing service: " + service.getDateCreated());
+			} catch (Exception e) {
+				Logger.debug("Failed to publishing service");
+				e.printStackTrace();
 			}
-			service.setSongs(serviceSongList);
-			service.setDateCreated(new Date());
-			service.setUserEmail(user.email);
-			service.setUserName(user.name);
-			if (songBookName != null) {
-				service.setServiceName(songBookName);
-			}
-			service.save();
-			Logger.debug("Publishing service: " + service.getDateCreated());
 		}
 		return ok(hash);
 	}

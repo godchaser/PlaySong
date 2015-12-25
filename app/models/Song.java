@@ -4,8 +4,9 @@ import java.util.*;
 
 import javax.persistence.*;
 
-import controllers.chords.LineTypeChecker;
-import models.helpers.SongSanitizer;
+import chord.tools.LineTypeChecker;
+import chord.tools.SongSanitizer;
+import models.helpers.SongSuggestion;
 import play.Logger;
 import play.data.format.Formats;
 import play.data.validation.Constraints.Required;
