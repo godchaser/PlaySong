@@ -22,7 +22,7 @@ public class UserAccount extends Model {
 		this.password = password;
 	}
 
-	public static Finder<String, UserAccount> find = new Finder<String, UserAccount>(String.class, UserAccount.class);
+	public static Finder<String, UserAccount> find = new Finder<>(UserAccount.class);
 
 	public static UserAccount authenticate(String email, String password) {
 		return find.where().eq("email", email).eq("password", password).findUnique();

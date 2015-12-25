@@ -16,9 +16,6 @@ import scala.concurrent.duration.Duration;
  */
 
 public class Global extends GlobalSettings {
-	public <T extends EssentialFilter> Class<T>[] filters() {
-		return new Class[] { GzipFilter.class };
-	}
 
 	@Override
 	public void onStart(Application app) {

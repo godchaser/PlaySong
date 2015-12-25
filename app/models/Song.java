@@ -4,8 +4,6 @@ import java.util.*;
 
 import javax.persistence.*;
 
-import chord.tools.LineTypeChecker;
-import chord.tools.SongSanitizer;
 import models.helpers.SongSuggestion;
 import play.Logger;
 import play.data.format.Formats;
@@ -92,11 +90,8 @@ public class Song extends Model implements Comparator<Song> {
 		find.ref(id).delete();
 	}
 
-	public static boolean contains(Long id) {
-		return find.ref(id).contains(id);
-	}
+	public static Finder<Long, Song> find = new Finder<>(Song.class);
 
-	public static Finder<Long, Song> find = new Finder(Long.class, Song.class);
 
 	@Override
 	public int compare(Song song1, Song song2) {

@@ -1,35 +1,34 @@
 package songimporters;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import models.SongLyrics;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-//import play.libs.Yaml;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
-import java.io.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.*;
 
 import models.Song;
+import models.SongLyrics;
 
 /**
  * Created by samuel on 23.02.15..
@@ -61,7 +60,7 @@ public class SongImporter {
 		Document dom = db.parse(xmlFile);
 		NodeList nodes = dom.getChildNodes();
 		Element eElement = (Element) nodes.item(0).getChildNodes();
-		Song song = new Song();
+
 		String name = eElement.getElementsByTagName("title").item(0)
 				.getTextContent();
 		String author = eElement.getElementsByTagName("author").item(0)
@@ -159,7 +158,6 @@ public class SongImporter {
 	}
 
 	public static void songToYaml(){
-		List<Song> songs = Song.all();
 		ObjectMapper mapper = new ObjectMapper();
 		//mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		try {
@@ -204,8 +202,9 @@ public class SongImporter {
         */
 	}
 
-    public static void yamlToSong(){
-        ArrayList <Song> data = (ArrayList)play.libs.Yaml.load("songs.yml");
+    @SuppressWarnings("unchecked")
+	public static void yamlToSong(){
+        ArrayList <Song> data = (ArrayList<Song>)play.libs.Yaml.load("songs.yml");
         //Ebean.save((Collection)(data));
 
         for (Song s : data){

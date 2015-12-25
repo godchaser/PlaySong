@@ -9,7 +9,8 @@ import java.util.List;
  * Created by samuel on 5/1/15.
  */
 public class ChordTransposerEngine1 {
-    private List<Key> keys = new ArrayList();
+    private List<Key> keys;
+    
     private class Key {
         String name;
         int value;
@@ -22,6 +23,7 @@ public class ChordTransposerEngine1 {
     }
 
     public ChordTransposerEngine1 (){
+    	keys = new ArrayList<Key>();
         keys.add(new Key("Ab",0,"F"));
         keys.add(new Key("A",1,"N"));
         keys.add(new Key("A#",2,"S"));

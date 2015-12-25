@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 import play.data.format.Formats;
 import play.data.validation.Constraints.Required;
-import play.db.ebean.*;
+import com.avaje.ebean.Model;
 
 @Entity
 public class Service extends Model {
@@ -70,7 +70,7 @@ public class Service extends Model {
 	@Formats.DateTime(pattern = "dd-MM-yyyy_hhmm")
 	public Date dateCreated = new Date();
 
-	public static Finder<Long, Service> find = new Finder<Long, Service>(Long.class, Service.class);
+	public static Finder<Long, Service> find = new Finder<>(Service.class);
 
 	public static void delete(Long id) {
 		find.byId(id).delete();
