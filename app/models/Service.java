@@ -14,6 +14,7 @@ import com.avaje.ebean.Model;
 public class Service extends Model {
 
 	@Id
+	@GeneratedValue
 	public Long id;
 
 	@Required

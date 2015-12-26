@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
@@ -19,6 +20,7 @@ import com.avaje.ebean.Model;
 public class SongLyrics extends Model {
 
 	@Id
+	@GeneratedValue
 	public Long id;
 
 	@ManyToOne
