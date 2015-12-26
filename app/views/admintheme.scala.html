@@ -113,17 +113,17 @@
                 </li>
 										<!-- /.dropdown -->
 					<li class="dropdown force-inline">
-						<a class="dropdown-toggle" data-toggle="dropdown" href="#"> @user.name <span> @user.email </span><i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i> </a>
+						<a id="dropdown-user-box" class="dropdown-toggle" data-toggle="dropdown" href="#"> @user.name <span> @user.email </span><i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i> </a>
 						<ul class="dropdown-menu dropdown-user">
 							<li>
-								<a href="@routes.Application.login()"><i class="fa fa-sign-in fa-fw"></i> Login</a>
+								<a id="user-login" href="@routes.Application.login()"><i class="fa fa-sign-in fa-fw"></i> Login</a>
 							</li>
 							<li>
-								<a href="@routes.Application.admin()"><i class="fa fa-user fa-fw"></i> Administrator</a>
+								<a id="user-admin" href="@routes.Application.admin()"><i class="fa fa-user fa-fw"></i> Administrator</a>
 							</li>
 							<li class="divider"></li>
 							<li>
-								<a href="@routes.Application.logout()"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+								<a id="user-logout" href="@routes.Application.logout()"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
 							</li>
 						</ul>
 						<!-- /.dropdown-user -->
@@ -136,7 +136,7 @@
 					<div class="sidebar-nav navbar-collapse">
 					  <form role="form" class="navbar-form"> 
 							<div class="form-group has-feedback">
-								<input id="scrollable-dropdown-menu" type="text" class="form-control typeahead" placeholder="Song name, lyrics, author..." />
+								<input id="scrollable-dropdown-menu" type="text" class="form-control typeahead" name="q" placeholder="Song name, lyrics, author..." />
 									<i class="form-control-feedback glyphicon glyphicon-search"></i>
 							</div>
 						  </form>

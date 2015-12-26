@@ -15,6 +15,7 @@ lazy val myProject = (project in file("."))
   .enablePlugins(PlayJava, PlayEbean)
 
 libraryDependencies ++= Seq( javaJdbc , cache , javaWs , filters, evolutions,
+  "org.seleniumhq.selenium" % "selenium-java" % "2.48.2",
   "org.hsqldb" % "hsqldb" % "2.3.3",
   "org.postgresql" % "postgresql" % "9.4-1206-jdbc42",
   "org.apache.poi" % "poi" % "3.13",
