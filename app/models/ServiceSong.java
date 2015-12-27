@@ -12,7 +12,7 @@ import com.avaje.ebean.Model;
 public class ServiceSong extends Model implements PdfPrintable, Comparable<ServiceSong> {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.SEQUENCE)
 	public int id;
 
 	@Required

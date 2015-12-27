@@ -17,7 +17,7 @@ import com.avaje.ebean.Model;
 public class Song extends Model implements Comparator<Song> {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.SEQUENCE)
 	public Long id;
 
 	@Required

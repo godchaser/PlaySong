@@ -21,7 +21,7 @@ import com.avaje.ebean.Model;
 public class SongLyrics extends Model {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.SEQUENCE)
 	public Long id;
 
 	@ManyToOne

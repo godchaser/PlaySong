@@ -14,7 +14,7 @@ import com.avaje.ebean.Model;
 public class Service extends Model {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.SEQUENCE)
 	public Long id;
 
 	@Required
