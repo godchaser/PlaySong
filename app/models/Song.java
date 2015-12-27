@@ -35,7 +35,7 @@ public class Song extends Model implements Comparator<Song> {
 
 	public int songBookId;
 
-	@Column(updatable=false)
+	@Column(updatable = false)
 	@Formats.DateTime(pattern = "dd/MM/yyyy hh:mm")
 	public Date dateCreated = new Date();
 
@@ -66,25 +66,30 @@ public class Song extends Model implements Comparator<Song> {
 			}
 		}
 		song.songLyrics.removeAll(removedList);
-		
-		for (SongLyrics songLyrics : song.songLyrics) {
-			songLyrics.updateSongKeys();
-			songLyrics.sanitizeLyrics();
-		}
-		if (song.id != null && song.id > 0) {
-			// DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
-			Date date = new Date();
-			song.setDateModified(date);
-			song.update();
+
+		// song must have lyrics
+		if (song.songLyrics.size() > 0) {
+			for (SongLyrics songLyrics : song.songLyrics) {
+				songLyrics.updateSongKeys();
+				songLyrics.sanitizeLyrics();
+			}
+			if (song.id != null && song.id > 0) {
+				// DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+				Date date = new Date();
+				song.setDateModified(date);
+				song.update();
+			} else {
+				song.id = null;
+				// DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+				Date date = new Date();
+				song.setDateCreated(date);
+				song.save();
+			}
+			Logger.debug("Song updated by user: " + song.songLastModifiedBy);
+			Logger.debug("Song updated on: " + song.getDateModified().toString());
 		} else {
-			song.id = null;
-			// DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
-			Date date = new Date();
-			song.setDateCreated(date);
-			song.save();
+			Logger.debug("Will not save song without lyrics");
 		}
-		Logger.debug("Song updated by user: " + song.songLastModifiedBy);
-		Logger.debug("Song updated on: " + song.getDateModified().toString());
 	}
 
 	public static void delete(Long id) {
@@ -92,7 +97,6 @@ public class Song extends Model implements Comparator<Song> {
 	}
 
 	public static Finder<Long, Song> find = new Finder<>(Song.class);
-
 
 	@Override
 	public int compare(Song song1, Song song2) {
@@ -187,8 +191,8 @@ public class Song extends Model implements Comparator<Song> {
 		this.dateModified = dateModified;
 	}
 
-	public static List<SongSuggestion> getSongModifiedList(){
-		
+	public static List<SongSuggestion> getSongModifiedList() {
+
 		int minusMonth = 1;
 
 		Calendar calNow = Calendar.getInstance();
@@ -197,19 +201,19 @@ public class Song extends Model implements Comparator<Song> {
 		Date dateBeforeAMonth = calNow.getTime();
 
 		Date dateNow = Calendar.getInstance().getTime();
-		
+
 		List<Song> songsModifiedInLastMonth = Song.find.where().between("date_modified", dateBeforeAMonth, dateNow)
 				.orderBy("date_modified desc").findList();
-		
+
 		List<SongSuggestion> songModifiedList = new ArrayList<>();
 		for (Song song : songsModifiedInLastMonth) {
 			songModifiedList.add(new SongSuggestion(song.getId(), song.getSongName(), song.getDateModified()));
 		}
 		return songModifiedList;
 	}
-	
-	public static List<SongSuggestion> getSongCreatedList(){
-		
+
+	public static List<SongSuggestion> getSongCreatedList() {
+
 		int minusMonth = 1;
 
 		Calendar calNow = Calendar.getInstance();
@@ -218,7 +222,7 @@ public class Song extends Model implements Comparator<Song> {
 		Date dateBeforeAMonth = calNow.getTime();
 
 		Date dateNow = Calendar.getInstance().getTime();
-		
+
 		List<Song> songsCreatedInLastMonth = Song.find.where().between("date_created", dateBeforeAMonth, dateNow)
 				.orderBy("date_created desc").findList();
 
@@ -228,6 +232,5 @@ public class Song extends Model implements Comparator<Song> {
 		}
 		return songCreatedList;
 	}
-	
-	
+
 }
