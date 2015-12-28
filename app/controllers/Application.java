@@ -396,7 +396,7 @@ public class Application extends Controller {
 		return ok(Json.toJson(Song.all()));
 	}
 
-	@Security.Authenticated(Secured.class)
+	//@Security.Authenticated(Secured.class)
 	public Result getsongdata() {
 		List<Song> songs = Song.all();
 		ArrayList<ObjectNode> songsJson = new ArrayList<>();
@@ -406,6 +406,19 @@ public class Application extends Controller {
 			songsJson.add(songJson);
 		}
 		return ok(Json.toJson(songsJson));
+	}
+	
+	//@Security.Authenticated(Secured.class)
+	public Result getsonglyricsdata() {
+		List<SongLyrics> songlyrics = SongLyrics.all();
+
+		ArrayList<ObjectNode> songlyricsJson = new ArrayList<>();
+
+		for (SongLyrics sl : songlyrics) {
+			ObjectNode songLyricsJson = SongToJsonConverter.convertLyrics(sl);
+			songlyricsJson.add(songLyricsJson);
+		}
+		return ok(Json.toJson(songlyricsJson));
 	}
 
 	@Security.Authenticated(Secured.class)

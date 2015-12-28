@@ -2,6 +2,12 @@ package models.helpers;
 
 import java.util.ArrayList;
 
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -70,6 +76,17 @@ public class SongToJsonConverter {
 		songObject.putArray("songLyricsIDs").addAll(songLyricsIDsArray);
 
 		return songObject;
+	}
+	
+	public static ObjectNode convertLyrics(SongLyrics s) {
+
+		ObjectNode songLyricsObject = Json.newObject();
+		
+		songLyricsObject.put("songLyricsId", s.getId());
+		songLyricsObject.put("songLyrics", s.getsongLyrics());
+		songLyricsObject.put("songKey", s.getSongKey());
+
+		return songLyricsObject;
 	}
 
 }
