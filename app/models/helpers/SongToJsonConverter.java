@@ -85,6 +85,7 @@ public class SongToJsonConverter {
 		songLyricsObject.put("songLyricsId", s.getId());
 		songLyricsObject.put("songLyrics", s.getsongLyrics());
 		songLyricsObject.put("songKey", s.getSongKey());
+		songLyricsObject.put("songId", s.getSong().getId());
 
 		return songLyricsObject;
 	}
