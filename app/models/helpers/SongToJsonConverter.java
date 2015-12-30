@@ -33,24 +33,25 @@ public class SongToJsonConverter {
 		}
 
 		ObjectNode songObject = convert(s.songName, s.songLink, s.songOriginalTitle, s.songAuthor, s.id, s.songImporter,
-				songLyricsIDsArray);
+				s.dateCreated.getTime(), s.dateModified.getTime(), songLyricsIDsArray);
 
 		return songObject;
 	}
+
 	
 	public static ObjectNode convert(String songName, String songLink, String songOriginalTitle, String songAuthor,
 			Long id, String songImporter, ArrayList<String> songLyricsIDsArrayList) {
 		
 		ObjectMapper mapper = new ObjectMapper();
 		ObjectNode songLyricsIDs = mapper.createObjectNode();
-
+	
 		ArrayNode songLyricsIDsArray = songLyricsIDs.putArray("songLyricsIDs");
-
+	
 		for (String lyricsId : songLyricsIDsArrayList) {
 			songLyricsIDsArray.add(lyricsId);
 		}
 		ObjectNode songObject = Json.newObject();
-
+	
 		songObject.put("songName", songName);
 		songObject.put("songLink", songLink);
 		songObject.put("songOriginalTitle", songOriginalTitle);
@@ -58,12 +59,12 @@ public class SongToJsonConverter {
 		songObject.put("songId", id);
 		songObject.put("songImporter", songImporter);
 		songObject.putArray("songLyricsIDs").addAll(songLyricsIDsArray);
-
+	
 		return songObject;
 	}
-
+	
 	public static ObjectNode convert(String songName, String songLink, String songOriginalTitle, String songAuthor,
-			Long id, String songImporter, ArrayNode songLyricsIDsArray) {
+			Long id, String songImporter, Long dateCreated, Long dateModified, ArrayNode songLyricsIDsArray) {
 
 		ObjectNode songObject = Json.newObject();
 
@@ -73,15 +74,18 @@ public class SongToJsonConverter {
 		songObject.put("songAuthor", songAuthor);
 		songObject.put("songId", id);
 		songObject.put("songImporter", songImporter);
+		songObject.put("songImporter", songImporter);
+		songObject.put("dateCreated", dateCreated);
+		songObject.put("dateModified", dateModified);
 		songObject.putArray("songLyricsIDs").addAll(songLyricsIDsArray);
 
 		return songObject;
 	}
-	
+
 	public static ObjectNode convertLyrics(SongLyrics s) {
 
 		ObjectNode songLyricsObject = Json.newObject();
-		
+
 		songLyricsObject.put("songLyricsId", s.getId());
 		songLyricsObject.put("songLyrics", s.getsongLyrics());
 		songLyricsObject.put("songKey", s.getSongKey());
