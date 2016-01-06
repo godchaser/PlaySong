@@ -57,8 +57,12 @@ public class ChordTransposerEngine1 {
     }
 
     String getChordRoot (String input) {
-        //System.out.println("INPUT: " + input + "!!!");
-        if (input.length() > 1 && ("b".equals(input.charAt(1)) || "#".equals(input.charAt(1))))
+    	String firstChar = null;
+    	if (input.length() > 1){
+    		firstChar = input.substring(1,2);
+    	}
+    	//System.out.println("INPUT: " + firstChar + "!!!");
+        if (("b".equals(firstChar) || "#".equals(firstChar)))
             return input.substring(0, 2);
         else
             return input.substring(0, 1);
