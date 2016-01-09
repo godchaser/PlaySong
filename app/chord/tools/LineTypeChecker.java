@@ -58,11 +58,9 @@ public class LineTypeChecker {
 			return false;
 		}
 		// First check if this is possibly a verse marker - (C) (V)
-		for (String s : line.split("\\s")) {
-			if (s.trim().startsWith("(") || s.trim().startsWith("[")) {
-				Logger.debug("Not chord - most likely verse marker - " + s);
-				return false;
-			}
+		if (line.trim().startsWith("(") || line.trim().startsWith("[")) {
+			Logger.debug("Not chord - most likely verse marker - " + line);
+			return false;
 		}
 
 		String checkLine = line.replace('-', ' ');
