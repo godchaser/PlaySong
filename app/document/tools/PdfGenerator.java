@@ -127,11 +127,13 @@ public class PdfGenerator extends PdfPageEventHelper {
 		this.document.open();
 	}
 
+	
 	public void onChapter(final PdfGenerator writer, final Document document, final float paragraphPosition,
 			final Paragraph title) {
 		this.pageByTitle.put(title.getContent(), this.writer.getPageNumber());
 	}
 
+	
 	public void onSection(final PdfGenerator writer, final Document document, final float paragraphPosition,
 			final int depth, final Paragraph title) {
 		this.pageByTitle.put(title.getContent(), this.writer.getPageNumber());
@@ -273,7 +275,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 					Chunk c = new Chunk(line.trim(), fonts.VERSETYPE_FONT);
 					c.setBackground(VERSE_BACKGROUND_COLOR, 1.5f, 0f, 1.5f, 1.5f);
 					Paragraph verseTypeParagraph = new Paragraph(c);
-					chapter.addSection(verseTypeParagraph, 0);
+					chapter.add(verseTypeParagraph);
 					//fonts.MONOSPACE.setColor(BaseColor.BLACK);
 				} else if (LineTypeChecker.isChordLine(line)) {
 					// CHORD STYLING
@@ -281,10 +283,10 @@ public class PdfGenerator extends PdfPageEventHelper {
 					// 12);
 					// f1.setColor(BaseColor.BLUE);
 					//fonts.MONOSPACE.setColor(CHORDS_COLOR);
-					chapter.addSection(new Paragraph(line, fonts.MONOSPACE_CHORDS), 0);
+					chapter.add(new Paragraph(line, fonts.MONOSPACE_CHORDS));
 				} else {
 					// STANDARD STYLING
-					chapter.addSection(new Paragraph(line, fonts.MONOSPACE), 0);
+					chapter.add(new Paragraph(line, fonts.MONOSPACE));
 				}
 			}
 
