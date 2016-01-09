@@ -206,11 +206,12 @@ public class PdfGenerator extends PdfPageEventHelper {
 
 			final String title = printObject.get(i).getTitle();
 			// final String songTitle = songPrintObjects.get(i).getSong();
-
-			final Chunk chunk = new Chunk(i + ". " + title, fonts.NORMAL).setLocalGoto(title);
+			// So that song count does not start from 0
+			int idxPlusOne = i+1;
+			final Chunk chunk = new Chunk(idxPlusOne + ". " + title, fonts.NORMAL).setLocalGoto(title);
 			this.document.add(new Paragraph(chunk));
 
-			final String songTitleId = title + i;
+			final String songTitleId = title + idxPlusOne;
 
 			// Add a placeholder for the page reference
 			this.document.add(new VerticalPositionMark() {
@@ -234,8 +235,10 @@ public class PdfGenerator extends PdfPageEventHelper {
 			// final String songTitle = songPrintObjects.get(i).getSong();
 
 			final Chunk chunk = new Chunk(songTitle, fonts.BOLD).setLocalDestination(songTitle);
-
-			final Chapter chapter = new Chapter(new Paragraph(chunk), i);
+			
+			int idxPlusOne = i+1;
+					
+			final Chapter chapter = new Chapter(new Paragraph(chunk), idxPlusOne);
 			// chapter.setNumberDepth(0);
 
 			String content = printObject.get(i).getContent();
@@ -293,8 +296,8 @@ public class PdfGenerator extends PdfPageEventHelper {
 			// chapter.setNumberDepth(0);
 
 			this.document.add(chapter);
-
-			String songTitleId = songTitle + i;
+			
+			String songTitleId = songTitle + idxPlusOne;
 
 			// When we wrote the chapter, we now the pagenumber
 			final PdfTemplate template = this.tocPlaceholder.get(songTitleId);
