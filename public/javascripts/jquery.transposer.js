@@ -176,7 +176,9 @@
             // if we find one we know that this line is not a 'chord' line.
             for (var i = 0; i < tokens.length; i++) {
                 // match -/,(,)," " and replace them with ""
-                tokens[i]=tokens[i].replace(/(\()|(\))|(\-\/)|(\s+)/,"");
+                tokens[i]=tokens[i].replace(/(\()|(\))|(\-\/)|(\s+)/g,"");
+                console.log("token");
+                console.log(tokens[i]);
                 // i should replace ( ) also, maybe with one regex
                 if (!$.trim(tokens[i]).length == 0 && !tokens[i].match(opts.chordRegex)){
                     return false;
