@@ -144,7 +144,12 @@ public class ChordTransposerEngine1 {
 
         int delta = getDelta(getKeyByName(currentKey.trim()).value, getKeyByName(targetKey.trim()).value);
         Logger.debug("Key delta: " + delta);
-        String newChord;
+
+        StringBuilder newChord =  new StringBuilder();
+        if(chord.startsWith("(") && chord.endsWith(")")){
+        	chord = chord.substring(1, chord.length()-1);
+        }
+        
         if (chord.contains("/")){
             String[] parts = chord.split("/");
             String chordFirstTransposed;
@@ -160,16 +165,17 @@ public class ChordTransposerEngine1 {
             String chordRootSecondChord = getChordRoot(chordSecond);
             String chordSecondTransposed = getNewChord(delta, chordSecond, chordRootSecondChord, targetKey);
 
-            newChord = chordFirstTransposed+"/"+chordSecondTransposed;
+            newChord.append(chordFirstTransposed).append("/").append(chordSecondTransposed);
         } else {
             String chordRoot = getChordRoot(chord);
             String newChordRoot = getNewKey(chordRoot, delta, targetKey.trim());
             //System.out.println("len:" + chord.substring(chordRoot.length())+"$");
             String chordTail = chord.substring(chordRoot.length()).replace("#","");
             chordTail= chordTail.replace("b","");
-            newChord = newChordRoot + chordTail;
+            newChord.append(newChordRoot).append(chordTail);
         }
-        return newChord;
+        
+        return newChord.toString();
     }
 
     private String getNewChord(int delta, String chord, String chordRoot, String targetKey){
