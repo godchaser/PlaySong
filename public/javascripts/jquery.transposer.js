@@ -132,7 +132,7 @@
             }
 
             var delta = getDelta(currentKey.value, newKey.value);
-
+            
             $("span.c", target).each(function (i, el) {
                 transposeChord(el, delta, newKey);
             });
@@ -148,8 +148,8 @@
             var newChord = newChordRoot.name + oldChord.substr(oldChordRoot.length);
             el.text(newChord);
 
-            var sib = el[0].nextSibling;
-            if (sib && sib.nodeType == 3 && sib.nodeValue.length > 0 && sib.nodeValue.charAt(0) != "/" && sib.nodeValue.charAt(0) != "-" ) {
+            var sib = el[0].nextSibling; 
+            if (sib && sib.nodeType == 3 && sib.nodeValue.length > 0 && sib.nodeValue.charAt(0) != "/" && sib.nodeValue.trim() != "-/" && sib.nodeValue.trim() != "(" && sib.nodeValue.charAt(0) != ")"){
                 var wsLength = getNewWhiteSpaceLength(oldChord.length, newChord.length, sib.nodeValue.length);
                 sib.nodeValue = makeString(" ", wsLength);
             }
@@ -177,8 +177,8 @@
             for (var i = 0; i < tokens.length; i++) {
                 // match -/,(,)," " and replace them with ""
                 tokens[i]=tokens[i].replace(/(\()|(\))|(\-\/)|(\s+)/g,"");
-                console.log("token");
-                console.log(tokens[i]);
+                //console.log("token");
+                //console.log(tokens[i]);
                 // i should replace ( ) also, maybe with one regex
                 if (!$.trim(tokens[i]).length == 0 && !tokens[i].match(opts.chordRegex)){
                     return false;
