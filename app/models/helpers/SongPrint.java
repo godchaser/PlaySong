@@ -1,6 +1,7 @@
 package models.helpers;
 
 import chord.tools.ChordLineTransposer;
+import chord.tools.LineTypeChecker;
 import models.Song;
 import models.SongLyrics;
 import play.Logger;
@@ -12,11 +13,13 @@ public class SongPrint implements PdfPrintable {
 	Song song;
 	Long lyricsID;
 	String key;
+	boolean excludeChords;
 
-	public SongPrint(Song s, Long lid, String key) {
+	public SongPrint(Song s, Long lid, String key, boolean excludeChords) {
 		setSong(s);
 		setLyricsID(lid);
 		setKey(key);
+		setExcludeChords(excludeChords);
 	}
 
 	public Song getSong() {
@@ -58,8 +61,20 @@ public class SongPrint implements PdfPrintable {
 		if (!origKey.equals(newKey)) {
 			songLyrics = ChordLineTransposer.transposeLyrics(origKey, newKey, songLyrics);
 		}
+		if (excludeChords){
+			Logger.trace("Removing chords");
+			songLyrics = LineTypeChecker.removeChordLines(songLyrics);
+		}
 
 		return songLyrics;
+	}
+	
+	public boolean isExcludeChords() {
+		return excludeChords;
+	}
+
+	public void setExcludeChords(boolean excludeChords) {
+		this.excludeChords = excludeChords;
 	}
 
 }

@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import chord.tools.ChordLineTransposer;
+import chord.tools.LineTypeChecker;
 import document.tools.DocxGenerator;
 import document.tools.PdfGenerator;
 import document.tools.XlsHelper;
@@ -798,6 +799,7 @@ public class Application extends Controller {
 
 		boolean publishService = false;
 		String songBookName = null;
+		boolean excludeChords = false;
 
 		try {
 			JsonSongbook jsonSongbook = mapper.treeToValue(jsonNode, JsonSongbook.class);
@@ -810,11 +812,14 @@ public class Application extends Controller {
 				if (additionalProperties.get("songBookName") != null) {
 					songBookName = additionalProperties.get("songBookName").toString();
 				}
+				if (additionalProperties.get("excludeChords") != null) {
+					excludeChords = Boolean.parseBoolean(additionalProperties.get("excludeChords").toString());
+				}
 			}
 			List<models.json.Song> songsJson = jsonSongbook.getSongs();
 			for (models.json.Song songJson : songsJson) {
 				songsForPrint.add(new SongPrint(Song.get(Long.parseLong(songJson.getSong().getId())),
-						Long.parseLong(songJson.getSong().getLyricsID()), songJson.getSong().getKey()));
+						Long.parseLong(songJson.getSong().getLyricsID()), songJson.getSong().getKey(), excludeChords));
 			}
 			if ("word".equals(format)) {
 				docWriter = new DocxGenerator();
@@ -885,7 +890,7 @@ public class Application extends Controller {
 		return ok(hash);
 	}
 
-	public Result generateService(Long id) {
+	public Result generateService(String id) {
 
 		UserAccount user = null;
 		if (request().cookies().get("PLAY_SESSION") != null) {
@@ -910,14 +915,28 @@ public class Application extends Controller {
 			user = new UserAccount("Guest", "", "");
 		}
 
-		Service service = Service.find.byId(id);
+		boolean excludeChords = false;
+		Long service_id = null;
+		if (id.endsWith("_x")){
+			excludeChords = true;
+			service_id = Long.parseLong(id.substring(0, id.length()-2));
+		} else {
+			service_id = Long.parseLong(id);
+		}
+		
+		Service service = Service.find.byId(service_id);
 
 		ArrayList<PdfPrintable> songPrintList = new ArrayList<PdfPrintable>();
 
 		// Manual sorting because of JPA OrderBy bidirectional relationship bug
 		Collections.sort(service.getSongs());
 
-		for (ServiceSong serviceSong : service.getSongs()) {
+		for (ServiceSong serviceSong : service.getSongs()) {			
+			if (excludeChords){
+				String lyricsWithoutChords = serviceSong.getContent();
+				lyricsWithoutChords = LineTypeChecker.removeChordLines(lyricsWithoutChords);
+				serviceSong.setSongLyrics(lyricsWithoutChords);
+			}
 			songPrintList.add(serviceSong);
 		}
 		DateFormat df = new SimpleDateFormat("dd-MM-yyyy_hhmm");

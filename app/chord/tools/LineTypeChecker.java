@@ -109,6 +109,18 @@ public class LineTypeChecker {
 			return defaultKey;
 		}
 	}
+	
+	public static String removeChordLines (String lyrics){
+		StringBuilder lyricsWithoutChords = new StringBuilder();
+		String[] songLines = lyrics.split("[\r\n]+");
+		for (String songLine : songLines) {
+			if (!LineTypeChecker.isChordLine(songLine)) {
+				lyricsWithoutChords.append(songLine);
+				lyricsWithoutChords.append("\n");
+			}
+		}
+		return lyricsWithoutChords.toString();
+	}
 
 	public static void main(String[] args) {
 		String[] testChords = { "C         D          G   -/F#   Em",

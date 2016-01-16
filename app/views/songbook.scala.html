@@ -65,6 +65,9 @@
 				<option value="1">pdf</option>
 				<option value="2">word</option>
 			</select>
+			<div class="checkbox">
+				  <label><input type="checkbox" id="exclude-chords-checkbox" value="">Exclude chords?</label>
+			</div>
 		</div>
 		<br>
 		@if(user.email != "Guest"){
@@ -274,6 +277,7 @@
 				songBookData.publishService = document.getElementById('publish-service-checkbox').checked;
 				songBookData.songBookName = $('#songbook-name').val();
 				}
+				songBookData.excludeChords = document.getElementById('exclude-chords-checkbox').checked;
 								
 				console.log("HERE IS JSON OBJECT:");
 				console.log(songBookData);
@@ -284,7 +288,7 @@
 						var link = "@routes.Application.downloadAndDeleteFile()";
 						link = link.concat("?hash=" + data);
 						link = link.concat("&format=" + format);
-						window.location = link;
+						window.open(link, '_self');
 						$('#notificationdiv').html('<div class="alert alert-info close" data-dismiss="alert">Songbook downloaded</div>');		
 					},
 					contentType : 'application/json'

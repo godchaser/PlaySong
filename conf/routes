@@ -28,7 +28,7 @@ POST     /songs                       controllers.Application.newsong()
 DELETE   /songs/:id                   controllers.Application.deletesong(id: Long)
 
 DELETE   /services/:id                controllers.Application.deleteservice(id: Long)
-GET      /services/:id                controllers.Application.generateService(id: Long)
+GET      /services/:id                controllers.Application.generateService(id: String)
 
 # used for retrieving specific song info in json format
 GET      /songs/:id                   controllers.Application.getsongjson(id: Long)
