@@ -43,14 +43,20 @@ public class PdfGenerator extends PdfPageEventHelper {
 	String TimesNewRomanFontPath = "resources/fonts/Times_New_Roman.ttf";
 	String TimesNewRomanBoldFontPath = "resources/fonts/Times_New_Roman_Bold.ttf";
 
-	int MONOSPACE_SIZE = 12;
-	int NORMAL_SIZE = 12;
-	int BOLD_SIZE = 14;
+	int MONOSPACE_SIZE = 10;
+	int NORMAL_SIZE = 10;
+	int BOLD_SIZE = 12;
 
 	BaseColor DEFAULT_COLOR = BaseColor.BLACK;
 	BaseColor CHORDS_COLOR = BaseColor.BLUE;
 	BaseColor VERSE_COLOR = BaseColor.WHITE;
 	BaseColor VERSE_BACKGROUND_COLOR = BaseColor.LIGHT_GRAY;
+
+	int maxCharLenght = 40;
+	int maxLineNumber = 50;
+
+	// Verse styling
+	String[] verseTypes = { "Verse", "Chorus", "Bridge", "Intro", "Ending" };
 
 	// table to store placeholder for all chapters and sections
 	private final Map<String, PdfTemplate> tocPlaceholder = new HashMap<>();
@@ -83,7 +89,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 			MONOSPACE.setSize(MONOSPACE_SIZE);
 			MONOSPACE.setStyle(Font.NORMAL);
 			MONOSPACE.setColor(DEFAULT_COLOR);
-			
+
 			MONOSPACE_CHORDS = FontFactory.getFont(LiberationMonoFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
 			MONOSPACE_CHORDS.setSize(MONOSPACE_SIZE);
 			MONOSPACE_CHORDS.setStyle(Font.BOLD);
@@ -93,12 +99,12 @@ public class PdfGenerator extends PdfPageEventHelper {
 			NORMAL.setStyle(Font.NORMAL);
 			NORMAL.setSize(NORMAL_SIZE);
 			NORMAL.setColor(DEFAULT_COLOR);
-			
+
 			VERSETYPE_FONT = FontFactory.getFont(TimesNewRomanFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
 			VERSETYPE_FONT.setStyle(Font.BOLD);
 			VERSETYPE_FONT.setSize(NORMAL_SIZE);
 			VERSETYPE_FONT.setColor(VERSE_COLOR);
-			
+
 			BOLD = FontFactory.getFont(TimesNewRomanBoldFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
 			BOLD.setStyle(Font.NORMAL);
 			BOLD.setSize(BOLD_SIZE);
@@ -115,9 +121,6 @@ public class PdfGenerator extends PdfPageEventHelper {
 		}
 	}
 
-	// Verse styling
-	String[] verseTypes = { "Verse", "Chorus", "Bridge", "Intro", "Ending" };
-
 	public PdfGenerator(String outputPdfPath) throws Exception {
 		this.document = new Document(songPageSize);
 		this.document.setMargins(50, 50, 60, 40);
@@ -127,13 +130,11 @@ public class PdfGenerator extends PdfPageEventHelper {
 		this.document.open();
 	}
 
-	
 	public void onChapter(final PdfGenerator writer, final Document document, final float paragraphPosition,
 			final Paragraph title) {
 		this.pageByTitle.put(title.getContent(), this.writer.getPageNumber());
 	}
 
-	
 	public void onSection(final PdfGenerator writer, final Document document, final float paragraphPosition,
 			final int depth, final Paragraph title) {
 		this.pageByTitle.put(title.getContent(), this.writer.getPageNumber());
@@ -207,7 +208,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 			final String title = printObject.get(i).getTitle();
 			// final String songTitle = songPrintObjects.get(i).getSong();
 			// So that song count does not start from 0
-			int idxPlusOne = i+1;
+			int idxPlusOne = i + 1;
 			final Chunk chunk = new Chunk(idxPlusOne + ". " + title, fonts.NORMAL).setLocalGoto(title);
 			this.document.add(new Paragraph(chunk));
 
@@ -227,27 +228,59 @@ public class PdfGenerator extends PdfPageEventHelper {
 		}
 	}
 
-	private void createSongsChapters(List<? extends PdfPrintable> printObject) throws DocumentException {
+	private class SongParagraphs {
+		String name;
+		ArrayList<Element> paragraphs = new ArrayList<Element>();
+		int longestLine = 0;
+
+		SongParagraphs(String name, ArrayList<Element> paragraphs, int longestLine) {
+			setName(name);
+			setParagraphs(paragraphs);
+			setLongestLine(longestLine);
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public ArrayList<Element> getParagraphs() {
+			return paragraphs;
+		}
+
+		public void setParagraphs(ArrayList<Element> paragraphs) {
+			this.paragraphs = paragraphs;
+		}
+
+		public int getLongestLine() {
+			return longestLine;
+		}
+
+		public void setLongestLine(int longestLine) {
+			// System.out.println("#### Longest line" + name + " : " +
+			// longestLine);
+			this.longestLine = longestLine;
+		}
+	}
+
+	private ArrayList<SongParagraphs> getPrintableSongs(List<? extends PdfPrintable> printObject) {
+		ArrayList<SongParagraphs> printableSongs = new ArrayList<SongParagraphs>();
 
 		for (int i = 0; i < printObject.size(); i++) {
-			// append the chapter
+			ArrayList<Element> paragraphs = new ArrayList<Element>();
+
 			String songTitle = printObject.get(i).getTitle();
-			// final String songTitle = songPrintObjects.get(i).getSong();
-
-			final Chunk chunk = new Chunk(songTitle, fonts.BOLD).setLocalDestination(songTitle);
-			
-			int idxPlusOne = i+1;
-					
-			final Chapter chapter = new Chapter(new Paragraph(chunk), idxPlusOne);
-			// chapter.setNumberDepth(0);
-
 			String content = printObject.get(i).getContent();
 
-			// System.out.println(content);
+			int longestLine = 0;
 
 			for (String line : content.split("\\r?\\n")) {
 				// verse recognition
 				boolean lineStartsWithBrace = line.startsWith("[");
+				Paragraph styledParagraph = null;
 				if (lineStartsWithBrace || ArrayHelper.stringContainsItemFromList(line, verseTypes)) {
 					// expand verse type name if necessary
 					if (lineStartsWithBrace) {
@@ -274,32 +307,122 @@ public class PdfGenerator extends PdfPageEventHelper {
 						line = line.substring(1, line.length() - 1);
 					}
 					// VERSETYPE STYLING
-					//fonts.MONOSPACE.setColor(BaseColor.WHITE);
 					Chunk c = new Chunk(line.trim(), fonts.VERSETYPE_FONT);
 					c.setBackground(VERSE_BACKGROUND_COLOR, 1.5f, 0f, 1.5f, 1.5f);
-					Paragraph verseTypeParagraph = new Paragraph(c);
-					chapter.add(verseTypeParagraph);
-					//fonts.MONOSPACE.setColor(BaseColor.BLACK);
+					styledParagraph = new Paragraph(c);
 				} else if (LineTypeChecker.isChordLine(line)) {
 					// CHORD STYLING
-					// Font f1 = FontFactory.getFont(FontFactory.TIMES_ROMAN,
-					// 12);
-					// f1.setColor(BaseColor.BLUE);
-					//fonts.MONOSPACE.setColor(CHORDS_COLOR);
-					chapter.add(new Paragraph(line, fonts.MONOSPACE_CHORDS));
+					styledParagraph = new Paragraph(line, fonts.MONOSPACE_CHORDS);
 				} else {
 					// STANDARD STYLING
-					chapter.add(new Paragraph(line, fonts.MONOSPACE));
+					styledParagraph = new Paragraph(line, fonts.MONOSPACE);
 				}
+				// find longest line
+				longestLine = (line.length() > longestLine) ? line.length() : longestLine;
+				paragraphs.add(styledParagraph);
+			}
+			printableSongs.add(new SongParagraphs(songTitle, paragraphs, longestLine));
+		}
+		return printableSongs;
+	}
+
+	private void createSongsChapters(List<? extends PdfPrintable> printObject) throws DocumentException {
+
+		PdfContentByte cb = writer.getDirectContent();
+		ArrayList<SongParagraphs> printableSongs = getPrintableSongs(printObject);
+
+		int numberOfSongs = printableSongs.size();
+
+		boolean skipNextSong = false;
+
+		for (int i = 0; i < numberOfSongs; i++) {
+			// skip song if it is already merged
+			if (skipNextSong) {
+				skipNextSong = false;
+				continue;
 			}
 
-			// chapter.setNumberDepth(0);
+			SongParagraphs currentSong = printableSongs.get(i);
+			SongParagraphs nextSong = null;
 
-			this.document.add(chapter);
-			
+			String songTitle = currentSong.getName();
+
+			int idxPlusOne = i + 1;
+			int idxPlusTwo = idxPlusOne + 1;
 			String songTitleId = songTitle + idxPlusOne;
 
+			int songLongestLine = currentSong.getLongestLine();
+			int songNumberOfLines = currentSong.getParagraphs().size();
+
+			boolean isThereColumnForAnotherSongOnPage = (songLongestLine < maxCharLenght) ? true : false;
+			boolean isThereLinesForAnotherSongOnPage = (songNumberOfLines < maxLineNumber) ? true : false;
+
+			System.out.println("### " + songTitleId + ":" + songLongestLine + ":" + songNumberOfLines + ":");
+			// first handle multi song page scenario
+			if (isThereColumnForAnotherSongOnPage && isThereLinesForAnotherSongOnPage) {
+				System.out.println("Multi-Page");
+
+				ColumnText ct = new ColumnText(cb);
+				ct.setSimpleColumn(60f, 60f, 280f, 760f);
+				ColumnText ct2 = new ColumnText(cb);
+				ct2.setSimpleColumn(300, 60f, 520, 760f);
+
+				// TODO: Have to define Chapters for mutli songs
+				final Chunk chunk = new Chunk(songTitle, fonts.BOLD).setLocalDestination(songTitle);
+				final Chapter chapter = new Chapter(new Paragraph(chunk), idxPlusOne);
+				chapter.add(new Chunk());
+				this.document.add(chapter);
+
+				for (Element songParagraph : currentSong.getParagraphs()) {
+					if (songParagraph != null) {
+						ct.addElement(songParagraph);
+					}
+				}
+				// this is to check if this is the last song and that next
+				// song does not have too many char in line
+				if (idxPlusOne < numberOfSongs) {
+					nextSong = printableSongs.get(i + 1);
+					int nextSongLongestLine = nextSong.getLongestLine();
+					if (nextSongLongestLine < maxCharLenght) {
+						for (Element songParagraph : nextSong.getParagraphs()) {
+							if (songParagraph != null) {
+								ct2.addElement(songParagraph);
+							}
+						}
+						ct2.go();
+						System.out.println("Adding next song: " + nextSong.getName());
+						// TODO: Have to define Chapters for mutli songs
+						final Chunk chunk2 = new Chunk(nextSong.getName(), fonts.BOLD).setLocalDestination(nextSong.getName());
+						final Chapter chapter2 = new Chapter(new Paragraph(chunk), idxPlusTwo);
+						chapter2.add(new Chunk());
+						this.document.add(chapter2);
+						skipNextSong = true;
+					}
+				}
+				ct.go();
+				// this is single song per page scenario
+			} else {
+				final Chunk chunk = new Chunk(songTitle, fonts.BOLD).setLocalDestination(songTitle);
+				final Chapter chapter = new Chapter(new Paragraph(chunk), idxPlusOne);
+				System.out.println("Single Page");
+				chapter.addAll(printableSongs.get(i).getParagraphs());
+				this.document.add(chapter);
+			}
+
 			// When we wrote the chapter, we now the pagenumber
+			// Add additional song page number to new chapter
+			if (skipNextSong && nextSong!=null) {
+				
+				String nextSongTitleId = nextSong.getName()+idxPlusTwo;
+				final PdfTemplate template = this.tocPlaceholder.get(nextSongTitleId);
+				template.beginText();
+				template.setFontAndSize(fonts.NORMAL.getBaseFont(), 12);
+				template.setTextMatrix(
+						50 - fonts.NORMAL.getBaseFont().getWidthPoint(String.valueOf(this.writer.getPageNumber()), 12),
+						0);
+				template.showText(String.valueOf(this.writer.getPageNumber()));
+				template.endText();
+			}
 			final PdfTemplate template = this.tocPlaceholder.get(songTitleId);
 			template.beginText();
 			template.setFontAndSize(fonts.NORMAL.getBaseFont(), 12);
@@ -309,6 +432,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 			template.endText();
 
 		}
+
 	}
 
 	private void createChapters(List<? extends PdfPrintable> printObject) throws DocumentException {
