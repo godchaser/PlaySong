@@ -325,8 +325,9 @@ public class PdfGenerator extends PdfPageEventHelper {
 		}
 		return printableSongs;
 	}
-
-	private void createSongsChapters(List<? extends PdfPrintable> printObject) throws DocumentException {
+	
+	private void createSongsChapters(List<? extends PdfPrintable> printObject, boolean useColumns)
+			throws DocumentException {
 
 		PdfContentByte cb = writer.getDirectContent();
 		ArrayList<SongParagraphs> printableSongs = getPrintableSongs(printObject);
@@ -335,6 +336,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 
 		boolean skipNextSong = false;
 
+		// TODO: implement spliting one song onto multiple columns
 		for (int i = 0; i < numberOfSongs; i++) {
 			// skip song if it is already merged
 			if (skipNextSong) {
@@ -359,18 +361,17 @@ public class PdfGenerator extends PdfPageEventHelper {
 
 			System.out.println("### " + songTitleId + ":" + songLongestLine + ":" + songNumberOfLines + ":");
 			// first handle multi song page scenario
-			if (isThereColumnForAnotherSongOnPage && isThereLinesForAnotherSongOnPage) {
+			if (isThereColumnForAnotherSongOnPage && isThereLinesForAnotherSongOnPage && useColumns) {
 				System.out.println("Multi-Page");
 
 				ColumnText ct = new ColumnText(cb);
 				ct.setSimpleColumn(60f, 60f, 280f, 760f);
 				ColumnText ct2 = new ColumnText(cb);
-				ct2.setSimpleColumn(300, 60f, 520, 760f);
-
-				// TODO: Have to define Chapters for mutli songs
+				ct2.setSimpleColumn(300f, 60f, 520f, 740f);
+									
 				final Chunk chunk = new Chunk(songTitle, fonts.BOLD).setLocalDestination(songTitle);
-				final Chapter chapter = new Chapter(new Paragraph(chunk), idxPlusOne);
-				chapter.add(new Chunk());
+				Paragraph firstTitleParagraph = new Paragraph(chunk);
+				final Chapter chapter = new Chapter(firstTitleParagraph, idxPlusOne);
 				this.document.add(chapter);
 
 				for (Element songParagraph : currentSong.getParagraphs()) {
@@ -378,10 +379,25 @@ public class PdfGenerator extends PdfPageEventHelper {
 						ct.addElement(songParagraph);
 					}
 				}
-				// this is to check if this is the last song and that next
-				// song does not have too many char in line
+				ct.go();
+				// this is to check if this is the last song and that next song does not have too many char in line
 				if (idxPlusOne < numberOfSongs) {
+					
 					nextSong = printableSongs.get(i + 1);
+					
+					System.out.println("Adding next song: " + nextSong.getName());
+					
+					
+					final Chunk chunk2 = new Chunk(nextSong.getName(), fonts.BOLD)
+							.setLocalDestination(nextSong.getName());
+					Paragraph secondTitleParagraph = new Paragraph(chunk2);
+					secondTitleParagraph.setFirstLineIndent(250f);
+					final Chapter chapter2 = new Chapter(secondTitleParagraph, idxPlusTwo);		
+					chapter2.setTriggerNewPage(false);
+					this.document.add(chapter2);
+					
+					skipNextSong = true;			
+									
 					int nextSongLongestLine = nextSong.getLongestLine();
 					if (nextSongLongestLine < maxCharLenght) {
 						for (Element songParagraph : nextSong.getParagraphs()) {
@@ -390,16 +406,9 @@ public class PdfGenerator extends PdfPageEventHelper {
 							}
 						}
 						ct2.go();
-						System.out.println("Adding next song: " + nextSong.getName());
-						// TODO: Have to define Chapters for mutli songs
-						final Chunk chunk2 = new Chunk(nextSong.getName(), fonts.BOLD).setLocalDestination(nextSong.getName());
-						final Chapter chapter2 = new Chapter(new Paragraph(chunk), idxPlusTwo);
-						chapter2.add(new Chunk());
-						this.document.add(chapter2);
-						skipNextSong = true;
 					}
 				}
-				ct.go();
+
 				// this is single song per page scenario
 			} else {
 				final Chunk chunk = new Chunk(songTitle, fonts.BOLD).setLocalDestination(songTitle);
@@ -410,27 +419,34 @@ public class PdfGenerator extends PdfPageEventHelper {
 			}
 
 			// When we wrote the chapter, we now the pagenumber
-			// Add additional song page number to new chapter
-			if (skipNextSong && nextSong!=null) {
-				
-				String nextSongTitleId = nextSong.getName()+idxPlusTwo;
-				final PdfTemplate template = this.tocPlaceholder.get(nextSongTitleId);
-				template.beginText();
-				template.setFontAndSize(fonts.NORMAL.getBaseFont(), 12);
-				template.setTextMatrix(
-						50 - fonts.NORMAL.getBaseFont().getWidthPoint(String.valueOf(this.writer.getPageNumber()), 12),
-						0);
-				template.showText(String.valueOf(this.writer.getPageNumber()));
-				template.endText();
-			}
+
 			final PdfTemplate template = this.tocPlaceholder.get(songTitleId);
+			String pgNumber = String.valueOf(this.writer.getPageNumber()-1);
+			
 			template.beginText();
 			template.setFontAndSize(fonts.NORMAL.getBaseFont(), 12);
 			template.setTextMatrix(
-					50 - fonts.NORMAL.getBaseFont().getWidthPoint(String.valueOf(this.writer.getPageNumber()), 12), 0);
-			template.showText(String.valueOf(this.writer.getPageNumber()));
+					50 - fonts.NORMAL.getBaseFont().getWidthPoint(pgNumber, 12), 0);
+			template.showText(pgNumber);
 			template.endText();
+			
+			// Add additional song page number to new chapter
+			if (skipNextSong && nextSong != null) {
 
+				String nextSongTitleId = nextSong.getName() + idxPlusTwo;
+				final PdfTemplate template2 = this.tocPlaceholder.get(nextSongTitleId);
+				pgNumber = String.valueOf(this.writer.getPageNumber()-1);
+				
+				template2.beginText();
+				template2.setFontAndSize(fonts.NORMAL.getBaseFont(), 12);
+				template2.setTextMatrix(
+						50 - fonts.NORMAL.getBaseFont().getWidthPoint(pgNumber, 12),
+						0);
+				template2.showText(pgNumber);
+				template2.endText();
+				
+			}
+			
 		}
 
 	}
@@ -470,12 +486,13 @@ public class PdfGenerator extends PdfPageEventHelper {
 		}
 	}
 
-	public static void writeListContent(String outputPdfPath, List<? extends PdfPrintable> songPrintObjects) {
+	public static void writeListContent(String outputPdfPath, List<? extends PdfPrintable> songPrintObjects,
+			boolean useColumns) {
 		PdfGenerator pdfGenerator;
 		try {
 			pdfGenerator = new PdfGenerator(outputPdfPath);
 			pdfGenerator.createSongsTOC(songPrintObjects);
-			pdfGenerator.createSongsChapters(songPrintObjects);
+			pdfGenerator.createSongsChapters(songPrintObjects, useColumns);
 			pdfGenerator.document.close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

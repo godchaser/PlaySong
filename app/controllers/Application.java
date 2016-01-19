@@ -800,6 +800,7 @@ public class Application extends Controller {
 		boolean publishService = false;
 		String songBookName = null;
 		boolean excludeChords = false;
+		boolean useColumns = false;
 
 		try {
 			JsonSongbook jsonSongbook = mapper.treeToValue(jsonNode, JsonSongbook.class);
@@ -814,6 +815,9 @@ public class Application extends Controller {
 				}
 				if (additionalProperties.get("excludeChords") != null) {
 					excludeChords = Boolean.parseBoolean(additionalProperties.get("excludeChords").toString());
+				}
+				if (additionalProperties.get("useColumns") != null) {
+					useColumns = Boolean.parseBoolean(additionalProperties.get("useColumns").toString());
 				}
 			}
 			List<models.json.Song> songsJson = jsonSongbook.getSongs();
@@ -848,7 +852,7 @@ public class Application extends Controller {
 				String outputPdfPath = "resources/pdf/" + hash + ".pdf";
 				try {
 					Logger.debug("Writing PDF: " + outputPdfPath);
-					PdfGenerator.writeListContent(outputPdfPath, songsForPrint);
+					PdfGenerator.writeListContent(outputPdfPath, songsForPrint, useColumns);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -891,6 +895,8 @@ public class Application extends Controller {
 	}
 
 	public Result generateService(String id) {
+		
+		boolean useColumns = false;
 
 		UserAccount user = null;
 		if (request().cookies().get("PLAY_SESSION") != null) {
@@ -947,7 +953,7 @@ public class Application extends Controller {
 		String outputPdfPath = "resources/pdf/" + normalizedFileName + "_" + date + ".pdf";
 		try {
 			Logger.debug("Writing PDF: " + outputPdfPath);
-			PdfGenerator.writeListContent(outputPdfPath, songPrintList);
+			PdfGenerator.writeListContent(outputPdfPath, songPrintList, useColumns);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

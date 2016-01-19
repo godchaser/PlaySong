@@ -66,7 +66,10 @@
 				<option value="2">word</option>
 			</select>
 			<div class="checkbox">
-				  <label><input type="checkbox" id="exclude-chords-checkbox" value="">Exclude chords?</label>
+				  <label><input type="checkbox" id="exclude-chords-checkbox" value="">Exclude chords</label>
+			</div>
+			<div class="checkbox">
+				  <label><input type="checkbox" id="use-columns-checkbox" value="">Use columns</label>
 			</div>
 		</div>
 		<br>
@@ -278,7 +281,8 @@
 				songBookData.songBookName = $('#songbook-name').val();
 				}
 				songBookData.excludeChords = document.getElementById('exclude-chords-checkbox').checked;
-								
+				songBookData.useColumns = document.getElementById('use-columns-checkbox').checked;
+											
 				console.log("HERE IS JSON OBJECT:");
 				console.log(songBookData);
 				$.ajax("@routes.Application.generateSongbook()", {
