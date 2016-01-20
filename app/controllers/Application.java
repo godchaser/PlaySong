@@ -397,7 +397,7 @@ public class Application extends Controller {
 		return ok(Json.toJson(Song.all()));
 	}
 
-	//@Security.Authenticated(Secured.class)
+	// @Security.Authenticated(Secured.class)
 	public Result getsongdata() {
 		List<Song> songs = Song.all();
 		ArrayList<ObjectNode> songsJson = new ArrayList<>();
@@ -408,8 +408,8 @@ public class Application extends Controller {
 		}
 		return ok(Json.toJson(songsJson));
 	}
-	
-	//@Security.Authenticated(Secured.class)
+
+	// @Security.Authenticated(Secured.class)
 	public Result getsonglyricsdata() {
 		List<SongLyrics> songlyrics = SongLyrics.all();
 
@@ -858,7 +858,7 @@ public class Application extends Controller {
 				}
 			}
 		} catch (Exception e) {
-			Logger.error("Failed to generate document "+format);
+			Logger.error("Failed to generate document " + format);
 			e.printStackTrace();
 		}
 
@@ -895,8 +895,8 @@ public class Application extends Controller {
 	}
 
 	public Result generateService(String id) {
-		
-		boolean useColumns = false;
+
+		boolean useColumns = true;
 
 		UserAccount user = null;
 		if (request().cookies().get("PLAY_SESSION") != null) {
@@ -923,13 +923,31 @@ public class Application extends Controller {
 
 		boolean excludeChords = false;
 		Long service_id = null;
-		if (id.endsWith("_x")){
+		boolean defaultServiceOptions = true;
+
+		switch (id.substring(id.length() - 3)) {
+		case "_x0":
 			excludeChords = true;
-			service_id = Long.parseLong(id.substring(0, id.length()-2));
+			defaultServiceOptions = false;
+			break;
+		case "_0c":
+			useColumns = false;
+			defaultServiceOptions = false;
+			break;
+		case "_xc":
+			excludeChords = true;
+			useColumns = false;			
+			defaultServiceOptions = false;
+			break;
+		default:
+			
+		}
+		if (!defaultServiceOptions) {
+			service_id = Long.parseLong(id.substring(0, id.length() - 3));
 		} else {
 			service_id = Long.parseLong(id);
 		}
-		
+
 		Service service = Service.find.byId(service_id);
 
 		ArrayList<PdfPrintable> songPrintList = new ArrayList<PdfPrintable>();
@@ -937,8 +955,8 @@ public class Application extends Controller {
 		// Manual sorting because of JPA OrderBy bidirectional relationship bug
 		Collections.sort(service.getSongs());
 
-		for (ServiceSong serviceSong : service.getSongs()) {			
-			if (excludeChords){
+		for (ServiceSong serviceSong : service.getSongs()) {
+			if (excludeChords) {
 				String lyricsWithoutChords = serviceSong.getContent();
 				lyricsWithoutChords = LineTypeChecker.removeChordLines(lyricsWithoutChords);
 				serviceSong.setSongLyrics(lyricsWithoutChords);
