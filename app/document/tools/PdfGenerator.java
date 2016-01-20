@@ -185,7 +185,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 	 *      com.itextpdf.text.Document)
 	 */
 	public void onCloseDocument(PdfWriter writer, Document document) {
-		ColumnText.showTextAligned(total, Element.ALIGN_LEFT, new Phrase(String.valueOf(writer.getPageNumber() - 1)), 2,
+		ColumnText.showTextAligned(total, Element.ALIGN_LEFT, new Phrase(String.valueOf(writer.getPageNumber())), 2,
 				2, 0);
 	}
 
@@ -372,7 +372,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 					splitSingleSong = true;
 				} else {
 					// this is for dual songs (columns) per page
-					ct2.setSimpleColumn(300f, 60f, 520f, 740f);
+					ct2.setSimpleColumn(300f, 60f, 520f, 740f);				
 				}
 
 				// Write first song chapter
@@ -456,8 +456,13 @@ public class PdfGenerator extends PdfPageEventHelper {
 
 			// When we wrote the chapter, we update the the pagenumbers on TOC
 			final PdfTemplate template = this.tocPlaceholder.get(songTitleId);
-			String pgNumber = String.valueOf(this.writer.getPageNumber() - 1);
-
+			String pgNumber = null;
+			if (splitSingleSong) {
+				pgNumber = String.valueOf(this.writer.getPageNumber()+1);
+			} else {
+				pgNumber = String.valueOf(this.writer.getPageNumber());
+			}
+			 
 			template.beginText();
 			template.setFontAndSize(fonts.NORMAL.getBaseFont(), 12);
 			template.setTextMatrix(50 - fonts.NORMAL.getBaseFont().getWidthPoint(pgNumber, 12), 0);
@@ -468,11 +473,11 @@ public class PdfGenerator extends PdfPageEventHelper {
 			if (!splitSingleSong && skipNextSong && nextSong != null) {
 				String nextSongTitleId = nextSong.getName() + idxPlusTwo;
 				final PdfTemplate template2 = this.tocPlaceholder.get(nextSongTitleId);
-				pgNumber = String.valueOf(this.writer.getPageNumber() - 1);
+				String pgNumber2 = String.valueOf(this.writer.getPageNumber());
 				template2.beginText();
 				template2.setFontAndSize(fonts.NORMAL.getBaseFont(), 12);
-				template2.setTextMatrix(50 - fonts.NORMAL.getBaseFont().getWidthPoint(pgNumber, 12), 0);
-				template2.showText(pgNumber);
+				template2.setTextMatrix(50 - fonts.NORMAL.getBaseFont().getWidthPoint(pgNumber2, 12), 0);
+				template2.showText(pgNumber2);
 				template2.endText();
 			}
 		}
