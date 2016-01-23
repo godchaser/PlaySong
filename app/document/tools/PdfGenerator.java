@@ -10,6 +10,7 @@ import chord.tools.LineTypeChecker;
 import helpers.ArrayHelper;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +27,7 @@ import models.helpers.SongPrint;
 /**
  * Created by samuel on 5/23/15.
  */
-public class PdfGenerator extends PdfPageEventHelper {
+public class PdfGenerator  {
 	private final Document document;
 	private final PdfWriter writer;
 
@@ -55,7 +56,16 @@ public class PdfGenerator extends PdfPageEventHelper {
 	int maxCharLenght = 40;
 	int maxLineNumber = 49;
 
-	float secodTitleIndent = 240f;
+	float secondTitleIndent = 240f;
+	
+
+	public static final Rectangle[] COLUMNS = { new Rectangle(60f, 60f, 280f, 760f),
+			new Rectangle(300f, 60f, 520f, 760f) };
+
+	public class TOCEntry {
+		protected PdfAction action;
+		protected String title;
+	}
 
 	// Verse styling
 	String[] verseTypes = { "Verse", "Chorus", "Bridge", "Intro", "Ending" };
@@ -128,8 +138,56 @@ public class PdfGenerator extends PdfPageEventHelper {
 		this.document.setMargins(50, 50, 60, 40);
 		this.document.setMarginMirroring(false);
 		this.writer = PdfWriter.getInstance(this.document, new FileOutputStream(outputPdfPath));
-		this.writer.setPageEvent(this);
+		//this.writer.setPageEvent(this);
 		this.document.open();
+	}
+
+	TOCCreation event;
+
+	public TOCCreation getEvent() {
+		return event;
+	}
+
+	public void setEvent(TOCCreation event) {
+		this.event = event;
+	}
+
+	public PdfGenerator(String outputPdfPath, boolean newEngine) throws Exception {
+		this.document = new Document(songPageSize);
+		this.document.setMargins(50, 50, 60, 40);
+		this.document.setMarginMirroring(false);
+		this.writer = PdfWriter.getInstance(this.document, new FileOutputStream(outputPdfPath));
+		this.setEvent(new TOCCreation());
+		this.writer.setPageEvent(this.getEvent());
+		this.document.open();
+		this.getEvent().setRoot(this.writer.getRootOutline());
+	}
+
+	public class TOCCreation extends PdfPageEventHelper {
+
+		protected PdfOutline root;
+		protected List<TOCEntry> toc = new ArrayList<TOCEntry>();
+
+		public TOCCreation() {
+		}
+
+		public void setRoot(PdfOutline root) {
+			this.root = root;
+		}
+
+		public List<TOCEntry> getToc() {
+			return toc;
+		}
+
+		@Override
+		public void onGenericTag(PdfWriter writer, Document document, Rectangle rect, String text) {
+			PdfDestination dest = new PdfDestination(PdfDestination.XYZ, rect.getLeft(), rect.getTop(), 0);
+			new PdfOutline(root, dest, text);
+			TOCEntry entry = new TOCEntry();
+			entry.action = PdfAction.gotoLocalPage(writer.getPageNumber(), dest, writer);
+			entry.title = text;
+			toc.add(entry);
+		}
 	}
 
 	public void onChapter(final PdfGenerator writer, final Document document, final float paragraphPosition,
@@ -185,8 +243,8 @@ public class PdfGenerator extends PdfPageEventHelper {
 	 *      com.itextpdf.text.Document)
 	 */
 	public void onCloseDocument(PdfWriter writer, Document document) {
-		ColumnText.showTextAligned(total, Element.ALIGN_LEFT, new Phrase(String.valueOf(writer.getPageNumber())), 2,
-				2, 0);
+		ColumnText.showTextAligned(total, Element.ALIGN_LEFT, new Phrase(String.valueOf(writer.getPageNumber())), 2, 2,
+				0);
 	}
 
 	/**
@@ -328,6 +386,14 @@ public class PdfGenerator extends PdfPageEventHelper {
 		return printableSongs;
 	}
 
+	public PdfPCell getCell(String text, int alignment) {
+		PdfPCell cell = new PdfPCell(new Phrase(text));
+		cell.setPadding(0);
+		cell.setHorizontalAlignment(alignment);
+		cell.setBorder(PdfPCell.NO_BORDER);
+		return cell;
+	}
+
 	private void createSongsChapters(List<? extends PdfPrintable> printObject, boolean useColumns)
 			throws DocumentException {
 
@@ -372,7 +438,7 @@ public class PdfGenerator extends PdfPageEventHelper {
 					splitSingleSong = true;
 				} else {
 					// this is for dual songs (columns) per page
-					ct2.setSimpleColumn(300f, 60f, 520f, 740f);				
+					ct2.setSimpleColumn(300f, 60f, 520f, 740f);
 				}
 
 				// Write first song chapter
@@ -431,9 +497,10 @@ public class PdfGenerator extends PdfPageEventHelper {
 						// we need indentation of second chapter title because
 						// I am unable to write to absolute position of both
 						// titles in same line
-						secondTitleParagraph.setFirstLineIndent(secodTitleIndent);
+						secondTitleParagraph.setFirstLineIndent(secondTitleIndent);
 						final Chapter chapter2 = new Chapter(secondTitleParagraph, idxPlusTwo);
 						chapter2.setTriggerNewPage(false);
+
 						this.document.add(chapter2);
 
 						skipNextSong = true;
@@ -458,11 +525,11 @@ public class PdfGenerator extends PdfPageEventHelper {
 			final PdfTemplate template = this.tocPlaceholder.get(songTitleId);
 			String pgNumber = null;
 			if (splitSingleSong) {
-				pgNumber = String.valueOf(this.writer.getPageNumber()+1);
+				pgNumber = String.valueOf(this.writer.getPageNumber() + 1);
 			} else {
 				pgNumber = String.valueOf(this.writer.getPageNumber());
 			}
-			 
+
 			template.beginText();
 			template.setFontAndSize(fonts.NORMAL.getBaseFont(), 12);
 			template.setTextMatrix(50 - fonts.NORMAL.getBaseFont().getWidthPoint(pgNumber, 12), 0);
@@ -482,6 +549,193 @@ public class PdfGenerator extends PdfPageEventHelper {
 			}
 		}
 
+	}
+
+	public PdfPTable createTable(int start, int end) throws IOException {
+		PdfPTable table = new PdfPTable(2);
+		for (int i = start; i <= end; i++) {
+			table.addCell(String.valueOf(i));
+			table.addCell("Test");
+		}
+		return table;
+	}
+
+	private void createSongColumns(List<? extends PdfPrintable> printObject, boolean useColumns)
+			throws IOException, DocumentException {
+
+		/*
+		PdfContentByte cb = writer.getDirectContent();
+		ArrayList<SongParagraphs> printableSongs = getPrintableSongs(printObject);
+
+		int numberOfSongs = printableSongs.size();
+
+		boolean skipNextSong = false;
+
+		
+		for (int i = 0; i < numberOfSongs; i++) {
+			// skip song if it is already merged
+			if (skipNextSong) {
+				skipNextSong = false;
+				continue;
+			}
+
+			SongParagraphs currentSong = printableSongs.get(i);
+			SongParagraphs nextSong = null;
+			boolean splitSingleSong = false;
+
+			String songTitle = currentSong.getName();
+
+			int idxPlusOne = i + 1;
+			int idxPlusTwo = idxPlusOne + 1;
+			String songTitleId = songTitle + idxPlusOne;
+
+			int songLongestLine = currentSong.getLongestLine();
+			int songNumberOfLines = currentSong.getParagraphs().size();
+
+			boolean isThereSpaceForColumns = (songLongestLine < maxCharLenght) ? true : false;
+
+			// first handle multi song page scenario
+			if (isThereSpaceForColumns && useColumns) {
+				ColumnText ct = new ColumnText(cb);
+				ct.setSimpleColumn(60f, 60f, 280f, 760f);
+				ColumnText ct2 = new ColumnText(cb);
+
+				// then split one song in same page
+				if (songNumberOfLines > maxLineNumber) {
+					ct2.setSimpleColumn(300f, 60f, 520f, 760f);
+					splitSingleSong = true;
+				} else {
+					// this is for dual songs (columns) per page
+					ct2.setSimpleColumn(300f, 60f, 520f, 740f);
+				}
+
+				// Write first song chapter
+				final Chunk chunk = new Chunk(songTitle, fonts.BOLD).setLocalDestination(songTitle);
+				Paragraph firstTitleParagraph = new Paragraph(chunk);
+				// final Chapter chapter = new Chapter(firstTitleParagraph,
+				// idxPlusOne);
+				// this.document.add(chapter);
+
+				int count = 0;
+				ArrayList<Element> currentSongParagraphs = currentSong.getParagraphs();
+				// split one song in two columns scenario
+				if (splitSingleSong) {
+					for (Element songParagraph : currentSongParagraphs) {
+						if (count > maxLineNumber)
+							break;
+						if (songParagraph != null) {
+							ct.addElement(songParagraph);
+							count++;
+						}
+					}
+					ct.go();
+					for (int j = maxLineNumber; j < currentSongParagraphs.size(); j++) {
+						Element songParagraph = currentSongParagraphs.get(j);
+						if (songParagraph != null) {
+							ct2.addElement(songParagraph);
+						}
+					}
+					ct2.go();
+				}
+				// one song fits one column scenario
+				else {
+					for (Element songParagraph : currentSongParagraphs) {
+						if (songParagraph != null) {
+							ct.addElement(songParagraph);
+						}
+					}
+					ct.go();
+				}
+
+				// this is multi song columns scenario, and it is i not last
+				// song
+				if (!splitSingleSong && (idxPlusOne < numberOfSongs)) {
+
+					nextSong = printableSongs.get(i + 1);
+
+					int nextSongNumberOfLines = nextSong.getParagraphs().size();
+					int nextSongLongestLine = nextSong.getLongestLine();
+
+					// first check if we have enough lines for next song
+					if (nextSongNumberOfLines < (maxLineNumber - 1) && (nextSongLongestLine < maxCharLenght)) {
+
+						// write second song chapter
+						final Chunk chunk2 = new Chunk(nextSong.getName(), fonts.BOLD)
+								.setLocalDestination(nextSong.getName());
+						Paragraph secondTitleParagraph = new Paragraph(chunk2);
+						// we need indentation of second chapter title because
+						// I am unable to write to absolute position of both
+						// titles in same line
+						// secondTitleParagraph.setFirstLineIndent(secodTitleIndent);
+						// final Chapter chapter2 = new
+						// Chapter(secondTitleParagraph, idxPlusTwo);
+						// chapter2.setTriggerNewPage(false);
+
+						// this.document.add(chapter2);
+
+						skipNextSong = true;
+
+						for (Element songParagraph : nextSong.getParagraphs()) {
+							if (songParagraph != null) {
+								ct2.addElement(songParagraph);
+							}
+						}
+						ct2.go();
+					}
+				}
+				// this is single song per page scenario, no columns
+			} else {
+				final Chunk chunk = new Chunk(songTitle, fonts.BOLD).setLocalDestination(songTitle);
+				// final Chapter chapter = new Chapter(new Paragraph(chunk),
+				// idxPlusOne);
+				// chapter.addAll(printableSongs.get(i).getParagraphs());
+				// this.document.add(chapter);
+			}
+
+		 	*/
+			ArrayList<SongParagraphs> printableSongs = getPrintableSongs(printObject);
+
+			int numberOfSongs2 = printableSongs.size();
+
+			ColumnText ct = new ColumnText(writer.getDirectContent());
+
+			for (int i1 = 0; i1 < numberOfSongs2; i1++) {
+				
+				int idxPlusOne = i1 + 1;
+				
+				SongParagraphs song = printableSongs.get(i1);
+				String title = idxPlusOne + ". " + song.getName();
+				Chunk c = new Chunk(title, fonts.BOLD);
+				c.setGenericTag(title);
+				ct.addElement(c);
+				for (Element songParagraph : song.getParagraphs()) {
+					if (songParagraph != null) {
+						ct.addElement(songParagraph);
+					}
+				}
+			}
+			int column = 0;
+			
+			
+			do {
+				// if I filled all columns create new page
+				if (column == 2) {
+					this.document.newPage();
+					column = 0;
+				}
+				//switch columns when no more place for text
+				ct.setSimpleColumn(COLUMNS[column++]);
+			} while (ColumnText.hasMoreText(ct.go()));
+			
+
+			this.document.newPage();
+			
+			for (TOCEntry entry : this.getEvent().getToc()) {
+				Chunk c = new Chunk(entry.title, fonts.NORMAL);
+				c.setAction(entry.action);
+				//c.setLocalGoto(entry.title);
+				this.document.add(new Paragraph(c));
+			}
 	}
 
 	private void createChapters(List<? extends PdfPrintable> printObject) throws DocumentException {
@@ -523,9 +777,10 @@ public class PdfGenerator extends PdfPageEventHelper {
 			boolean useColumns) {
 		PdfGenerator pdfGenerator;
 		try {
-			pdfGenerator = new PdfGenerator(outputPdfPath);
-			pdfGenerator.createSongsTOC(songPrintObjects);
-			pdfGenerator.createSongsChapters(songPrintObjects, useColumns);
+			pdfGenerator = new PdfGenerator(outputPdfPath, true);
+			// pdfGenerator.createSongsTOC(songPrintObjects);
+			// pdfGenerator.createSongsChapters(songPrintObjects, useColumns);
+			pdfGenerator.createSongColumns(songPrintObjects, useColumns);
 			pdfGenerator.document.close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
