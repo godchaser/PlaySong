@@ -399,7 +399,7 @@ public class Application extends Controller {
 
 	//@Security.Authenticated(Secured.class)
 	public Result getsongdata() {
-		List<Song> songs = Song.all();
+		List<Song> songs = Song.all().subList(0, 10);
 		ArrayList<ObjectNode> songsJson = new ArrayList<>();
 
 		for (Song s : songs) {
@@ -420,6 +420,11 @@ public class Application extends Controller {
 			songlyricsJson.add(songLyricsJson);
 		}
 		return ok(Json.toJson(songlyricsJson));
+	}
+	
+	public Result getfavoritessongsdata() {
+		List<Service> services = Service.all();	
+		return ok(Json.toJson(SongToJsonConverter.convert(services)));
 	}
 
 	@Security.Authenticated(Secured.class)

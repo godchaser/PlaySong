@@ -1,6 +1,8 @@
 package models.helpers;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -13,7 +15,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.SongLyrics;
 import play.libs.Json;
-
+import models.Service;
+import models.ServiceSong;
 import models.Song;
 
 /**
@@ -93,5 +96,41 @@ public class SongToJsonConverter {
 
 		return songLyricsObject;
 	}
+	
+	public static ObjectNode convert(Service s) {
+		
+		ArrayList <ObjectNode> serviceSongs = new ArrayList<>();
+		for (ServiceSong ss : s.getSongs()){
+			ObjectNode serviceObject = Json.newObject();
+			serviceObject.put("songName", ss.getSongName());
+			serviceObject.put("songId", ss.getSongId());
+			serviceObject.put("lyricsId", ss.getLyricsId());
+			serviceObject.put("songKey", ss.getSongKey());
+			serviceObject.put("songLyrics", ss.getSongLyrics());
+			serviceSongs.add(serviceObject);
+		}
+		
+		ObjectNode serviceObject = Json.newObject();
+		serviceObject.put("id", s.getId());
+		serviceObject.put("dateCreated", s.getDateCreated().getTime());
+		serviceObject.put("userEmail", s.getUserEmail());
+		serviceObject.put("userName", s.getUserName());
+		serviceObject.put("songBookName", s.getServiceName());
+		serviceObject.putArray("serviceSongs").addAll(serviceSongs);
+
+		return serviceObject;
+	}
+	
+	public static ObjectNode convert (List<Service> serviceList){
+		ObjectNode servicesObject = Json.newObject();
+		ArrayList <ObjectNode> servicesArray = new ArrayList<>();
+		for (Service s : serviceList){
+			servicesArray.add(convert(s));
+		}
+		servicesObject.putArray("services").addAll(servicesArray);
+		return servicesObject;
+	}
+	
+	
 
 }

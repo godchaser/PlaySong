@@ -20,9 +20,10 @@ GET      /login                       controllers.Application.login()
 POST     /login                       controllers.Application.authenticate()
 GET      /logout                      controllers.Application.logout()
 
-## Songs RESTFUL API
-# not used currently - sending all (unfiltered) songs as json
-GET      /songsjson                   controllers.Application.getsongdata()
+# Songs RESTFUL API (Android Client)
+GET      /json/songs                   controllers.Application.getsongdata()
+GET      /json/songlyrics              controllers.Application.getsonglyricsdata()
+GET      /json/favoritesongs           controllers.Application.getfavoritessongsdata()
 # POST add song - from form - not JSON
 POST     /songs                       controllers.Application.newsong()
 DELETE   /songs/:id                   controllers.Application.deletesong(id: Long)
@@ -33,8 +34,6 @@ GET      /services/:id                controllers.Application.generateService(id
 # used for retrieving specific song info in json format
 GET      /songs/:id                   controllers.Application.getsongjson(id: Long)
 
-# not used currently - sending all (unfiltered) song lyrics as json
-GET      /songlyricsjson              controllers.Application.getsonglyricsdata()
 
 # used for retrieving specific song lyrics info in json format
 GET      /songlyricsjson/:id          controllers.Application.getsonglyricsjson(id: Long)
