@@ -399,7 +399,7 @@ public class Application extends Controller {
 
 	//@Security.Authenticated(Secured.class)
 	public Result getsongdata() {
-		List<Song> songs = Song.all().subList(0, 10);
+		List<Song> songs = Song.all();
 		ArrayList<ObjectNode> songsJson = new ArrayList<>();
 
 		for (Song s : songs) {
