@@ -25,7 +25,7 @@ libraryDependencies ++= Seq( javaJdbc , cache , javaWs , filters, evolutions,
   "fr.opensagres.xdocreport" % "org.apache.poi.xwpf.converter.pdf" % "1.0.5",
   "com.itextpdf" % "itextpdf" % "5.5.6",
   "org.eclipse.persistence" % "eclipselink" % "2.6.2",
-  "org.webjars.bower" % "jquery" % "2.1.4",
+  "org.webjars.bower" % "jquery" % "2.2.0",
   "org.webjars" % "bootstrap" % "3.3.6",
   "org.webjars.bower" % "bootstrap-select" % "1.7.5",
   "org.webjars.bower" % "bootstrap-multiselect" % "0.9.13",
@@ -38,6 +38,7 @@ libraryDependencies ++= Seq( javaJdbc , cache , javaWs , filters, evolutions,
   "org.yaml" % "snakeyaml" % "1.15"
   )
 
+dependencyOverrides += "org.webjars.bower" % "jquery" % "2.2.0"
 unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )
 
 TwirlKeys.templateImports ++= Seq("models.helpers._")
