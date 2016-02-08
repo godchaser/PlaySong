@@ -53,7 +53,7 @@ public class PdfGenerator {
 	BaseColor VERSE_COLOR = BaseColor.WHITE;
 	BaseColor VERSE_BACKGROUND_COLOR = BaseColor.LIGHT_GRAY;
 
-	int maxCharLenght = 40;
+	int maxCharLenght = 35;
 	int maxLineNumber = 49;
 
 	float secondTitleIndent = 240f;
@@ -562,387 +562,192 @@ public class PdfGenerator {
 	private void createSongColumns(List<? extends PdfPrintable> printObject, boolean useColumns)
 			throws IOException, DocumentException {
 
-		/*
-		PdfContentByte cb = writer.getDirectContent();
-		ArrayList<SongParagraphs> printableSongs = getPrintableSongs(printObject);
-		
-		int numberOfSongs = printableSongs.size();
-		
-		boolean skipNextSong = false;
-		
-		
-		for (int i = 0; i < numberOfSongs; i++) {
-			// skip song if it is already merged
-			if (skipNextSong) {
-				skipNextSong = false;
-				continue;
-			}
-		
-			SongParagraphs currentSong = printableSongs.get(i);
-			SongParagraphs nextSong = null;
-			boolean splitSingleSong = false;
-		
-			String songTitle = currentSong.getName();
-		
-			int idxPlusOne = i + 1;
-			int idxPlusTwo = idxPlusOne + 1;
-			String songTitleId = songTitle + idxPlusOne;
-		
-			int songLongestLine = currentSong.getLongestLine();
-			int songNumberOfLines = currentSong.getParagraphs().size();
-		
-			boolean isThereSpaceForColumns = (songLongestLine < maxCharLenght) ? true : false;
-		
-			// first handle multi song page scenario
-			if (isThereSpaceForColumns && useColumns) {
-				ColumnText ct = new ColumnText(cb);
-				ct.setSimpleColumn(60f, 60f, 280f, 760f);
-				ColumnText ct2 = new ColumnText(cb);
-		
-				// then split one song in same page
-				if (songNumberOfLines > maxLineNumber) {
-					ct2.setSimpleColumn(300f, 60f, 520f, 760f);
-					splitSingleSong = true;
-				} else {
-					// this is for dual songs (columns) per page
-					ct2.setSimpleColumn(300f, 60f, 520f, 740f);
-				}
-		
-				// Write first song chapter
-				final Chunk chunk = new Chunk(songTitle, fonts.BOLD).setLocalDestination(songTitle);
-				Paragraph firstTitleParagraph = new Paragraph(chunk);
-				// final Chapter chapter = new Chapter(firstTitleParagraph,
-				// idxPlusOne);
-				// this.document.add(chapter);
-		
-				int count = 0;
-				ArrayList<Element> currentSongParagraphs = currentSong.getParagraphs();
-				// split one song in two columns scenario
-				if (splitSingleSong) {
-					for (Element songParagraph : currentSongParagraphs) {
-						if (count > maxLineNumber)
-							break;
-						if (songParagraph != null) {
-							ct.addElement(songParagraph);
-							count++;
-						}
-					}
-					ct.go();
-					for (int j = maxLineNumber; j < currentSongParagraphs.size(); j++) {
-						Element songParagraph = currentSongParagraphs.get(j);
-						if (songParagraph != null) {
-							ct2.addElement(songParagraph);
-						}
-					}
-					ct2.go();
-				}
-				// one song fits one column scenario
-				else {
-					for (Element songParagraph : currentSongParagraphs) {
-						if (songParagraph != null) {
-							ct.addElement(songParagraph);
-						}
-					}
-					ct.go();
-				}
-		
-				// this is multi song columns scenario, and it is i not last
-				// song
-				if (!splitSingleSong && (idxPlusOne < numberOfSongs)) {
-		
-					nextSong = printableSongs.get(i + 1);
-		
-					int nextSongNumberOfLines = nextSong.getParagraphs().size();
-					int nextSongLongestLine = nextSong.getLongestLine();
-		
-					// first check if we have enough lines for next song
-					if (nextSongNumberOfLines < (maxLineNumber - 1) && (nextSongLongestLine < maxCharLenght)) {
-		
-						// write second song chapter
-						final Chunk chunk2 = new Chunk(nextSong.getName(), fonts.BOLD)
-								.setLocalDestination(nextSong.getName());
-						Paragraph secondTitleParagraph = new Paragraph(chunk2);
-						// we need indentation of second chapter title because
-						// I am unable to write to absolute position of both
-						// titles in same line
-						// secondTitleParagraph.setFirstLineIndent(secodTitleIndent);
-						// final Chapter chapter2 = new
-						// Chapter(secondTitleParagraph, idxPlusTwo);
-						// chapter2.setTriggerNewPage(false);
-		
-						// this.document.add(chapter2);
-		
-						skipNextSong = true;
-		
-						for (Element songParagraph : nextSong.getParagraphs()) {
-							if (songParagraph != null) {
-								ct2.addElement(songParagraph);
-							}
-						}
-						ct2.go();
-					}
-				}
-				// this is single song per page scenario, no columns
-			} else {
-				final Chunk chunk = new Chunk(songTitle, fonts.BOLD).setLocalDestination(songTitle);
-				// final Chapter chapter = new Chapter(new Paragraph(chunk),
-				// idxPlusOne);
-				// chapter.addAll(printableSongs.get(i).getParagraphs());
-				// this.document.add(chapter);
-			}
-		
-		 	*/
-
-		int maxLinesPerColumn = 46;
+		int maxLinesPerColumn = 44;
+		int maxLinesPerPage = maxLinesPerColumn * 2;
+		int maxNumberOfSongsPerPage = 6;
 
 		ArrayList<SongParagraphs> printableSongs = getPrintableSongs(printObject);
 
 		int numberOfSongs = printableSongs.size();
 
 		ColumnText ct = new ColumnText(writer.getDirectContent());
-		//ColumnText ct = null;
-
-		boolean skipNextSong = false;
-		boolean skipThirdSong = false;
-		boolean firstColumn = true;
-		boolean secondColumn = false;
-
-		//boolean secondColumn = false;
-		int availableLinesPerPage = maxLinesPerColumn * 2;
-		int usedLines = 0;
 
 		int count = 0;
 		boolean hasMoreText = false;
 
 		int writtenSongs = 0;
+		int lastWrittenSong = 0;
 
+		// iterate through all songs
 		for (int i = 0; i < numberOfSongs; i++) {
-			int writtenLines = 0;
-			// ct = new ColumnText(writer.getDirectContent());
 
 			// skip song if it is already merged
-			if (writtenSongs > 1) {
-				writtenSongs--;
+			if ((i != 0) && (i <= lastWrittenSong)) {
+				System.out.println("++++++++ SKIPPING INDEX SONG: " + i);
 				continue;
 			}
-			/*
-			if (writtenSongs==4) {
-				writtenSongs = 3;
-				continue;
-			}
-			if (writtenSongs==3) {
-				writtenSongs = 2;
-				continue;
-			}
-			if (writtenSongs==2) {
-				writtenSongs = 1;
-				continue;
-			}
-			*/
-			int idxPlusOne = i + 1;
 
-			// ADD 1. song
-			SongParagraphs song = printableSongs.get(i);
-			int songNumberOfLines = song.getParagraphs().size();
-			String title = idxPlusOne + ". " + song.getName();
-			Chunk c = new Chunk(title, fonts.BOLD);
-			c.setGenericTag(title);
-			ct.addElement(c);
-			ct.setSimpleColumn(COLUMNS[0]);
-			for (Element songParagraph : song.getParagraphs()) {
-				if (songParagraph != null) {
-					ct.addElement(songParagraph);
+			// keep count of written lines
+			int writtenLines = 0;
+			boolean firstColumn = true;
+
+			// temp workaround for lines which are too long
+			boolean forceNextColumn = false;
+			boolean secondColumnActive = false;
+
+			// iterate through all songs per page
+			for (int j = 0; j < maxNumberOfSongsPerPage; j++) {
+				// reset column on first iteration
+				if (j == 0) {
+					firstColumn = true;
+					writtenLines = 0;
+					secondColumnActive = false;	
+					forceNextColumn = false;
 				}
-			}
-			writtenSongs++;
 
-			writtenLines = writtenLines + songNumberOfLines;
+				// check if this is last song, then break
+				if ((i + j) >= numberOfSongs) {
+					break;
+				}
 
-			int status = ct.go();
-			hasMoreText = ColumnText.hasMoreText(status);
+				SongParagraphs song = printableSongs.get(i + j);
+				int songNumberOfLines = song.getParagraphs().size();
+				int songLongestLine = song.getLongestLine();
+				boolean songHasTooLongLine = (songLongestLine > maxCharLenght) ? true : false;
+				
+				System.out.println("###################################### writtenLines: " + writtenLines);
+			
+				System.out.println("+++ STARTING SONG: " + song.getName());
+	
+				// TODO: still not fixing things if lines are too long and I've got overflow
+				// TODO: BUG Check song 163 - Ovdje sam - overlof - secondColumn to new page
 
-			// if i have too much text write it to next column
-			if (hasMoreText) {
-				ct.setSimpleColumn(COLUMNS[1]);
-				//this.document.newPage();
-			}
+				// check if there is enough lines in current column - switch to next column (and not first iteration)
+				if (((songNumberOfLines + writtenLines) > maxLinesPerColumn) && (j != 0)) {
+					firstColumn = false;
+					writtenLines = maxLinesPerColumn;
+				}
+				
+				
+				// if second column active, and I don't have any more place in it or if any of the song has too long line
+				if (secondColumnActive || (writtenLines >= maxLinesPerColumn)) {
+					System.out.println("+++ SECOND COLUMN ACTIVE: ");
+					SongParagraphs previousSong = printableSongs.get(i + j - 1);
+					//int previousSongNumberOfLines = previousSong.getParagraphs().size();
+					// check if I started writing to new column
+					if (writtenLines >= maxLinesPerColumn) {
+						System.out.println("+++ SECOND COLUMN ACTIVE: 0");
+						// lines of both songs won't fit in column
+						if ((songNumberOfLines + writtenLines) > maxLinesPerColumn) {
+							break;
+						}
+						// if any of the column has too long lines break
+						boolean previousSongHasTooLongLine = (previousSong.getLongestLine() > maxCharLenght) ? true : false;
+						if (songHasTooLongLine || previousSongHasTooLongLine){
+							break;
+						}
+					}
+				}
+				
+				// if there is no more space on page then break and move to next page
+				if ((songNumberOfLines + writtenLines) > maxLinesPerPage) {
+					break;
+				}
 
-			status = ct.go();
-			//hasMoreText = ColumnText.hasMoreText(status);
+				boolean fitOnSamePage = false;
+				// if this is second iteration and I can fit more songs on page
+				if (((songNumberOfLines + writtenLines) <= maxLinesPerColumn) && (j != 0)) {
+					fitOnSamePage = true;
+				}
 
-			// if i still have place for another song, start appending it 
-			//if (songNumberOfLines < maxLinesPerColumn) {
-			// ADD 2. song
-			if (i < (numberOfSongs - 1)) {
-				SongParagraphs nextSong = printableSongs.get(i + 1);
-				String title2 = idxPlusOne + 1 + ". " + nextSong.getName();
-				Chunk c2 = new Chunk(title2, fonts.BOLD);
-				c2.setGenericTag(title2);
-				ct.addElement(c2);
-				skipNextSong = true;
+				String songTitle = i + j + ". " + song.getName();
+				
+				writtenLines = writtenLines + songNumberOfLines;
 
-				for (Element songParagraph : nextSong.getParagraphs()) {
+	
+				if (forceNextColumn) {
+					if (!secondColumnActive) {
+						ct.setSimpleColumn(COLUMNS[1]);
+					}
+					secondColumnActive = true;
+					// first column is filled
+					writtenLines = maxLinesPerColumn;
+					forceNextColumn = false;
+					System.out.println("$$$$$$$ FORCING NEXT COLUMN");
+				} else if (songHasTooLongLine && (j != 0)) {
+					if (!secondColumnActive) {
+						ct.setSimpleColumn(COLUMNS[1]);
+					}
+					secondColumnActive = true;
+					// first column is filled
+					writtenLines = maxLinesPerColumn;
+				}
+				// write to first column if the lines are too long
+				else if (fitOnSamePage && !songHasTooLongLine) {
+					// do nothing
+					System.out.println("$#$#$#$# FITTING ON SAME PAGE" + song.getName());
+				} else if (firstColumn) {
+					ct.setSimpleColumn(COLUMNS[0]);
+				} else {
+					if (!secondColumnActive) {
+						ct.setSimpleColumn(COLUMNS[1]);
+					}
+					secondColumnActive = true;
+					// first column is filled
+					writtenLines = maxLinesPerColumn;
+				}
+				
+			
+				
+				
+				// TODO: maybe remove this later - song has invalid line lenght so forcing next column in next iteration
+				if (songHasTooLongLine) {
+					forceNextColumn = true;
+				}
+
+				Chunk c = new Chunk(songTitle, fonts.BOLD);
+				c.setGenericTag(songTitle);
+				ct.addElement(c);
+
+				for (Element songParagraph : song.getParagraphs()) {
 					if (songParagraph != null) {
 						ct.addElement(songParagraph);
 					}
 				}
-				writtenSongs++;
-				writtenLines = writtenLines + nextSong.getParagraphs().size();
-			}
-			//}
+				// count written songs
+				writtenSongs = writtenSongs + 1;
+				
 
-			status = ct.go();
-			hasMoreText = ColumnText.hasMoreText(status);
+				// checking if text didn't fit in one column - overflows to next
+				int status = ct.go();
+				System.out.println("========= WRITING SONG: " + songTitle);
+				System.out.println("========= SONG LINES: " + songNumberOfLines);
+				System.out.println("========= WRITTEN LINES: " + writtenLines);
 
-			// if i have too much text write it to next column
-			if (hasMoreText) {
-				ct.setSimpleColumn(COLUMNS[1]);
-				//this.document.newPage();
-			}
 
-			status = ct.go();
-			hasMoreText = ColumnText.hasMoreText(status);
+				hasMoreText = ColumnText.hasMoreText(status);
 
-			// ADD 3. song
-			if (writtenLines < (maxLinesPerColumn * 2)) {
-				// get third song
-				if (i < (numberOfSongs - 2)) {
-					SongParagraphs nextSong = printableSongs.get(i + 2);
-					// if written lines with next song fir into all available space then write it
-					if ((writtenLines + nextSong.getParagraphs().size()) < (maxLinesPerColumn * 2)) {
-						String title2 = idxPlusOne + 2 + ". " + nextSong.getName();
-						Chunk c2 = new Chunk(title2, fonts.BOLD);
-						c2.setGenericTag(title2);
-						ct.addElement(c2);
-						skipThirdSong = true;
+				lastWrittenSong = i + j;
 
-						for (Element songParagraph : nextSong.getParagraphs()) {
-							if (songParagraph != null) {
-								ct.addElement(songParagraph);
-							}
-						}
-						writtenLines = writtenLines + nextSong.getParagraphs().size();
-						writtenSongs++;
+				// if i have too much text write it to next column and break
+				if (hasMoreText) {
+					if (!secondColumnActive) {
+						ct.setSimpleColumn(COLUMNS[1]);
 					}
+					secondColumnActive = true;
+					status = ct.go();
+					System.out.println("**************** HAS MORE TEXTS: " + songTitle);
+					break;
 				}
 			}
-			//}
-
-			status = ct.go();
-			hasMoreText = ColumnText.hasMoreText(status);
-
-			// if i have too much text write it to next column
-			if (hasMoreText) {
-				ct.setSimpleColumn(COLUMNS[1]);
-				//this.document.newPage();
-			}
-
-			status = ct.go();
-			hasMoreText = ColumnText.hasMoreText(status);
-
-			// ADD 4. song
-			if (writtenLines < (maxLinesPerColumn * 2)) {
-				// get third song
-				if (i < (numberOfSongs - 3)) {
-					SongParagraphs nextSong = printableSongs.get(i + 3);
-					// if written lines with next song fir into all available space then write it
-					if ((writtenLines + nextSong.getParagraphs().size()) < (maxLinesPerColumn * 2)) {
-						String title2 = idxPlusOne + 3 + ". " + nextSong.getName();
-						Chunk c2 = new Chunk(title2, fonts.BOLD);
-						c2.setGenericTag(title2);
-						ct.addElement(c2);
-						skipThirdSong = true;
-
-						for (Element songParagraph : nextSong.getParagraphs()) {
-							if (songParagraph != null) {
-								ct.addElement(songParagraph);
-							}
-						}
-						writtenLines = writtenLines + nextSong.getParagraphs().size();
-						writtenSongs++;
-					}
-				}
-			}
-			//}
-
-			status = ct.go();
-			hasMoreText = ColumnText.hasMoreText(status);
-
-			// if i have too much text write it to next column
-			if (hasMoreText) {
-				ct.setSimpleColumn(COLUMNS[1]);
-				//this.document.newPage();
-			}
-
-			status = ct.go();
-			hasMoreText = ColumnText.hasMoreText(status);
 
 			this.document.newPage();
-			// if i have too much text write it to next column
 
-			/*
-			// writing to first column
-			if (firstColumn && !secondColumn) {
-				ct.setSimpleColumn(COLUMNS[0]);
-				secondColumn = true;
-			} 
-			else if (secondColumn) {
-				ct.setSimpleColumn(COLUMNS[1]);
-				//secondColumn = true;	
-				firstColumn = true;
-			}
-			*/
-			/*
-			//int status = ct.go();
-			//hasMoreText  = ColumnText.hasMoreText(status);
-			
-			boolean t = false;
-			// TODO: handle song text overlow
-			// Here I am handling if song has more text than could fit in column
-			if (hasMoreText){
-				// if written first column and I need more space I should use now second column
-				if (firstColumn){
-					secondColumn = true;
-				}
-				if (secondColumn){
-					this.document.newPage();
-					t = true;
-				}
-			} 
-			
-			if (!t && secondColumn){
-				this.document.newPage();
-			}
-			*/
 			count++;
-			System.out.println("####### STATUS: " + count + " : " + status + " : " + hasMoreText);
+			System.out.println("####### STATUS: " + count + " : " + writtenSongs + " : " + hasMoreText);
 		}
 
-		/*
-		 * int co = 0;
-		while (ColumnText.hasMoreText(ct.go())) {
-			System.out.println("########## HAS MORE: " + co);
-			co++;
-		}
-		*/
-
-		/*
-		int column = 0;
-		do {
-			// if I filled all columns create new page
-			if (column == 2) {
-				this.document.newPage();
-				column = 0;
-			}
-			//switch columns when no more place for text
-			ct.setSimpleColumn(COLUMNS[column++]);
-			
-			//System.out.println("########## HAS MORE: " + co);
-			//co++;
-		
-		} while (ColumnText.hasMoreText(ct.go()));
-		*/
-
+		// Now start writing TOC
 		this.document.newPage();
 
 		for (TOCEntry entry : this.getEvent().getToc()) {
