@@ -66,10 +66,10 @@
 				<option value="2">word</option>
 			</select>
 			<div class="checkbox">
-				  <label><input type="checkbox" id="exclude-chords-checkbox" value="">Exclude chords</label>
+				  <label><input type="checkbox" id="exclude-chords-checkbox" checked> <i class="fa fa-music">  Chords</i></label>
 			</div>
 			<div class="checkbox">
-				  <label><input type="checkbox" id="use-columns-checkbox" value="">Use columns</label>
+				   <label><input type="checkbox" id="use-columns-checkbox" checked> <i class="fa fa-columns">  Columns</i></label>
 			</div>
 		</div>
 		<br>
@@ -280,7 +280,11 @@
 				songBookData.publishService = document.getElementById('publish-service-checkbox').checked;
 				songBookData.songBookName = $('#songbook-name').val();
 				}
-				songBookData.excludeChords = document.getElementById('exclude-chords-checkbox').checked;
+				if (document.getElementById('exclude-chords-checkbox').checked){
+					songBookData.excludeChords = false;
+				} else {
+					songBookData.excludeChords = true;
+				}
 				songBookData.useColumns = document.getElementById('use-columns-checkbox').checked;
 											
 				console.log("HERE IS JSON OBJECT:");

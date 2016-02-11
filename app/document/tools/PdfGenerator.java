@@ -1,11 +1,9 @@
 package document.tools;
 
 import com.itextpdf.text.*;
-import com.itextpdf.text.Font.FontFamily;
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 
-import chord.tools.ChordLineTransposer;
 import chord.tools.LineTypeChecker;
 import helpers.ArrayHelper;
 
@@ -17,10 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import play.Logger;
-import models.ServiceSong;
-import models.SongLyrics;
 import models.helpers.PdfPrintable;
-import models.helpers.SongPrint;
 
 ;
 
@@ -36,7 +31,6 @@ public class PdfGenerator {
     /** The template with the total number of pages. */
     PdfTemplate total;
 
-    private String outputPdfPath = "resources/pdf/songbook.pdf";
     private Rectangle songPageSize = PageSize.A4;
 
     String LiberationMonoFontPath = "resources/fonts/LiberationMono-Regular.ttf";
@@ -787,8 +781,13 @@ public class PdfGenerator {
         PdfGenerator pdfGenerator;
         try {
             pdfGenerator = new PdfGenerator(outputPdfPath, true);
-            // pdfGenerator.createSongsTOC(songPrintObjects);
-            // pdfGenerator.createSongsChapters(songPrintObjects, useColumns);
+            if (!useColumns){
+                // TODO: Bug - page number header is missing?
+                pdfGenerator.createSongsTOC(songPrintObjects);
+                pdfGenerator.createSongsChapters(songPrintObjects, useColumns);
+            } else {
+                pdfGenerator.createSongColumns(songPrintObjects, useColumns); 
+            }
             pdfGenerator.createSongColumns(songPrintObjects, useColumns);
             pdfGenerator.document.close();
         } catch (Exception e) {
@@ -801,11 +800,6 @@ public class PdfGenerator {
         PdfGenerator pdfGenerator;
         try {
             pdfGenerator = new PdfGenerator("resources/pdf/test.pdf");
-            // pdfGenerator.document.add(new Paragraph(
-            // "This is an example to generate a TOC.", new SongFonts()
-            // .getMonospaceFont()));
-            // pdfGenerator.createTOC(10);
-            // pdfGenerator.createChapters(10);
             pdfGenerator.document.close();
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -822,21 +816,5 @@ public class PdfGenerator {
     }
 
     public static void main(final String[] args) throws Exception {
-        List<SongPrint> songPrintObjects = new ArrayList<SongPrint>();
-        // Song s = new Song();
-        // s.setSongName("10000 Razloga");
-        String l = "      F    C   G/E    Am\n" + "Slavi Gospoda, dušo moja,\n" + "F      C     G\n" + "ime Mu sveto je." + "       F       C   F  G  Am\n" + "Pjevaj kao nikada, slavi Ga, ";
-        // songPrintObjects.add(new SongPrint("10000 Razloga", 123l,
-        // l));
-
-        // Song s2 = new Song();
-        // s2.setSongName("Ako Bog nije živ");
-        String l2 = "      F    C   G/E    Am\n" + "Slavi Gospoda, dušo moja,\n" + "F      C     G\n" + "ime Mu sveto je.\n" + "       F       C   F  G  Am\n"
-                + "Pjevaj kao nikada, slavi Ga, ";
-                // songPrintObjects.add(new SongPrint("Ako Bog nije živ", 124l,
-                // l2));
-
-        // PdfGenerator.writeSongs(songPrintObjects);
-
     }
 }
