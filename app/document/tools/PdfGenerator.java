@@ -788,7 +788,6 @@ public class PdfGenerator {
             } else {
                 pdfGenerator.createSongColumns(songPrintObjects, useColumns); 
             }
-            pdfGenerator.createSongColumns(songPrintObjects, useColumns);
             pdfGenerator.document.close();
         } catch (Exception e) {
             // TODO Auto-generated catch block
