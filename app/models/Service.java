@@ -26,6 +26,10 @@ public class Service extends Model {
 	public List<ServiceSong> songs = new ArrayList<>();
 	
 	public String serviceName;
+
+	public static Service get(Long id) {
+        return find.byId(id);
+    }
 	
 	public Long getId() {
 		return id;
@@ -34,8 +38,6 @@ public class Service extends Model {
 	public void setId(Long id) {
 		this.id = id;
 	}
-
-
 	public String getUserEmail() {
 		return userEmail;
 	}
@@ -81,11 +83,10 @@ public class Service extends Model {
 	public Date dateCreated = new Date();
 
 	public static Finder<Long, Service> find = new Finder<>(Service.class);
-	
-	public static List <Service> all (){
+    
+    public static List <Service> all (){
 		return find.all();
 	}
-
 	public static void delete(Long id) {
 		find.byId(id).delete();
 	}

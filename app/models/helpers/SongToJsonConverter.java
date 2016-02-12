@@ -1,8 +1,6 @@
 package models.helpers;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -96,8 +94,8 @@ public class SongToJsonConverter {
 
 		return songLyricsObject;
 	}
-	
-	public static ObjectNode convert(Service s) {
+
+public static ObjectNode convert(Service s) {
 		
 		ArrayList <ObjectNode> serviceSongs = new ArrayList<>();
 		for (ServiceSong ss : s.getSongs()){
@@ -121,16 +119,15 @@ public class SongToJsonConverter {
 		return serviceObject;
 	}
 	
-	public static ObjectNode convert (List<Service> serviceList){
-		ObjectNode servicesObject = Json.newObject();
+	public static List<ObjectNode> convert (List<Service> serviceList){
+		//ObjectNode servicesObject = Json.newObject();
 		ArrayList <ObjectNode> servicesArray = new ArrayList<>();
 		for (Service s : serviceList){
 			servicesArray.add(convert(s));
 		}
-		servicesObject.putArray("services").addAll(servicesArray);
-		return servicesObject;
+		//servicesObject.putArray("services").addAll(servicesArray);
+		//return servicesObject;
+		return servicesArray;
 	}
-	
-	
 
 }

@@ -23,9 +23,9 @@ libraryDependencies ++= Seq( javaJdbc , cache , javaWs , filters, evolutions,
   "org.apache.poi" % "poi-ooxml" % "3.13",
   "org.apache.commons" % "commons-lang3" % "3.4",
   "fr.opensagres.xdocreport" % "org.apache.poi.xwpf.converter.pdf" % "1.0.5",
-  "com.itextpdf" % "itextpdf" % "5.5.8",
+  "com.itextpdf" % "itextpdf" % "5.5.6",
   "org.eclipse.persistence" % "eclipselink" % "2.6.2",
-  "org.webjars.bower" % "jquery" % "2.1.4",
+  "org.webjars.bower" % "jquery" % "2.2.0",
   "org.webjars" % "bootstrap" % "3.3.6",
   "org.webjars.bower" % "bootstrap-select" % "1.7.5",
   "org.webjars.bower" % "bootstrap-multiselect" % "0.9.13",
@@ -35,9 +35,12 @@ libraryDependencies ++= Seq( javaJdbc , cache , javaWs , filters, evolutions,
   "org.webjars" % "startbootstrap-sb-admin-2" % "1.0.7",
   "org.webjars.bower" % "font-awesome" % "4.5.0",
   "org.webjars" % "handsontable" % "0.15.0-beta2",
-  "org.yaml" % "snakeyaml" % "1.15"
+  "org.yaml" % "snakeyaml" % "1.15",
+  "com.squareup.retrofit2" % "retrofit" % "2.0.0-beta3",
+  "com.squareup.retrofit2" % "converter-gson" % "2.0.0-beta3"
   )
 
+dependencyOverrides += "org.webjars.bower" % "jquery" % "2.2.0"
 unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )
 
 TwirlKeys.templateImports ++= Seq("models.helpers._")

@@ -10,6 +10,16 @@
 		<div class="row">
 			<div class="col-lg-12">
 				<h3>Services </h3>
+				<div class="checkbox">
+				  <label hidden><input type="checkbox" id="exclude-chords-checkbox" value="">Exclude chords</label>
+				</div>
+				<div class="checkbox">
+					  <label hidden><input type="checkbox" id="use-columns-checkbox" value="">Use columns</label>
+				</div>
+				<div>
+					  <a id="download-button" href="#" download hidden><i class="fa fa-download"></i> Download </a>
+				</div>
+				
 				<ul>
 					@services.reverse.map { service =>
 					<li>
@@ -26,7 +36,9 @@
 						}
 						</ol>				
 						<a href="@routes.Application.generateService(service.id.toString())" download><i class="fa fa-download"></i> Download service </a>					
-						<a href='@routes.Application.generateService(service.id.toString()+"_x")' download><i class="fa fa-download"></i> Without chords</a>			
+						<a href='@routes.Application.generateService(service.id.toString()+"_x0")' download><i class="fa fa-download"></i> No chords</a>			
+					    <a href='@routes.Application.generateService(service.id.toString()+"_0c")' download><i class="fa fa-download"></i> No columns</a>							
+					    <a href='@routes.Application.generateService(service.id.toString()+"_xc")' download><i class="fa fa-download"></i> No chords&columns</a>
 					</li>
 					}
 				</ul>
@@ -55,6 +67,24 @@
 				}
 			});
 		}
+		
+				var excludeChords = document.getElementById('exclude-chords-checkbox').checked;
+				var userColumns = document.getElementById('use-columns-checkbox').checked;
+											
+				/*
+				$.ajax("@routes.Application.generateSongbook()", {
+					type : 'GET',
+					data : JSON.stringify(songBookData),
+					success : function(data) {
+						var link = "@routes.Application.downloadAndDeleteFile()";
+						link = link.concat("?hash=" + data);
+						link = link.concat("&format=" + format);
+						window.open(link, '_self');
+						$('#notificationdiv').html('<div class="alert alert-info close" data-dismiss="alert">Songbook downloaded</div>');		
+					},
+					contentType : 'application/json'
+				});
+				*/
 
 		$('.deletebutton').click(function(event) {
 			if( ! confirm("Do you really want to delete service?") ){

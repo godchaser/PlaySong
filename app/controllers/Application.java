@@ -59,6 +59,7 @@ import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
 import play.mvc.Security;
+import rest.PlaySongRestService;
 import songimporters.SongImporter;
 import views.html.admin;
 import views.html.login;
@@ -397,9 +398,9 @@ public class Application extends Controller {
 		return ok(Json.toJson(Song.all()));
 	}
 
-	//@Security.Authenticated(Secured.class)
+	// @Security.Authenticated(Secured.class)
 	public Result getsongdata() {
-		List<Song> songs = Song.all();
+		List<Song> songs = Song.all().subList(0, 10);
 		ArrayList<ObjectNode> songsJson = new ArrayList<>();
 
 		for (Song s : songs) {
@@ -408,8 +409,8 @@ public class Application extends Controller {
 		}
 		return ok(Json.toJson(songsJson));
 	}
-	
-	//@Security.Authenticated(Secured.class)
+
+	// @Security.Authenticated(Secured.class)
 	public Result getsonglyricsdata() {
 		List<SongLyrics> songlyrics = SongLyrics.all();
 
@@ -496,6 +497,8 @@ public class Application extends Controller {
 	public Result emptyDb() {
 		Ebean.createSqlUpdate("delete from song_lyrics").execute();
 		Ebean.createSqlUpdate("delete from song").execute();
+		Ebean.createSqlUpdate("delete from service_song").execute();
+		Ebean.createSqlUpdate("delete from service").execute();		
 		return ok();
 	}
 
@@ -805,6 +808,7 @@ public class Application extends Controller {
 		boolean publishService = false;
 		String songBookName = null;
 		boolean excludeChords = false;
+		boolean useColumns = false;
 
 		try {
 			JsonSongbook jsonSongbook = mapper.treeToValue(jsonNode, JsonSongbook.class);
@@ -819,6 +823,9 @@ public class Application extends Controller {
 				}
 				if (additionalProperties.get("excludeChords") != null) {
 					excludeChords = Boolean.parseBoolean(additionalProperties.get("excludeChords").toString());
+				}
+				if (additionalProperties.get("useColumns") != null) {
+					useColumns = Boolean.parseBoolean(additionalProperties.get("useColumns").toString());
 				}
 			}
 			List<models.json.Song> songsJson = jsonSongbook.getSongs();
@@ -853,13 +860,13 @@ public class Application extends Controller {
 				String outputPdfPath = "resources/pdf/" + hash + ".pdf";
 				try {
 					Logger.debug("Writing PDF: " + outputPdfPath);
-					PdfGenerator.writeListContent(outputPdfPath, songsForPrint);
+					PdfGenerator.writeListContent(outputPdfPath, songsForPrint, useColumns);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		} catch (Exception e) {
-			Logger.error("Failed to generate document "+format);
+			Logger.error("Failed to generate document " + format);
 			e.printStackTrace();
 		}
 
@@ -897,6 +904,8 @@ public class Application extends Controller {
 
 	public Result generateService(String id) {
 
+		boolean useColumns = true;
+
 		UserAccount user = null;
 		if (request().cookies().get("PLAY_SESSION") != null) {
 			// Logger.debug("Found PLAY_SESSION cookie");
@@ -922,13 +931,31 @@ public class Application extends Controller {
 
 		boolean excludeChords = false;
 		Long service_id = null;
-		if (id.endsWith("_x")){
+		boolean defaultServiceOptions = true;
+
+		switch (id.substring(id.length() - 3)) {
+		case "_x0":
 			excludeChords = true;
-			service_id = Long.parseLong(id.substring(0, id.length()-2));
+			defaultServiceOptions = false;
+			break;
+		case "_0c":
+			useColumns = false;
+			defaultServiceOptions = false;
+			break;
+		case "_xc":
+			excludeChords = true;
+			useColumns = false;			
+			defaultServiceOptions = false;
+			break;
+		default:
+			
+		}
+		if (!defaultServiceOptions) {
+			service_id = Long.parseLong(id.substring(0, id.length() - 3));
 		} else {
 			service_id = Long.parseLong(id);
 		}
-		
+
 		Service service = Service.find.byId(service_id);
 
 		ArrayList<PdfPrintable> songPrintList = new ArrayList<PdfPrintable>();
@@ -936,8 +963,8 @@ public class Application extends Controller {
 		// Manual sorting because of JPA OrderBy bidirectional relationship bug
 		Collections.sort(service.getSongs());
 
-		for (ServiceSong serviceSong : service.getSongs()) {			
-			if (excludeChords){
+		for (ServiceSong serviceSong : service.getSongs()) {
+			if (excludeChords) {
 				String lyricsWithoutChords = serviceSong.getContent();
 				lyricsWithoutChords = LineTypeChecker.removeChordLines(lyricsWithoutChords);
 				serviceSong.setSongLyrics(lyricsWithoutChords);
@@ -952,7 +979,7 @@ public class Application extends Controller {
 		String outputPdfPath = "resources/pdf/" + normalizedFileName + "_" + date + ".pdf";
 		try {
 			Logger.debug("Writing PDF: " + outputPdfPath);
-			PdfGenerator.writeListContent(outputPdfPath, songPrintList);
+			PdfGenerator.writeListContent(outputPdfPath, songPrintList, useColumns);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1039,10 +1066,17 @@ public class Application extends Controller {
 	}
 
 	public Result test() {
-		System.out.println("TEST!");
-		ChordLineTransposer.test();
-		return ok();
+		System.out.println("TEST!");	
+		return redirect(routes.Application.table());
 	}
+	
+	@Security.Authenticated(Secured.class)
+	public Result syncDb() {
+        PlaySongRestService psrs = new PlaySongRestService();
+        psrs.downloadSongsData();
+        psrs.downloadFavoritesSongsData();      
+        return redirect(routes.Application.table());
+    }
 
 	@Security.Authenticated(Secured.class)
 	public Result sanitizesongs() {
