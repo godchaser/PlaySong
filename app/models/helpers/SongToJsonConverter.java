@@ -1,6 +1,7 @@
 package models.helpers;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -22,112 +23,110 @@ import models.Song;
  */
 public class SongToJsonConverter {
 
-	public static ObjectNode convert(Song s) {
+    public static ObjectNode convert(Song s) {
 
-		ObjectMapper mapper = new ObjectMapper();
-		ObjectNode songLyricsIDs = mapper.createObjectNode();
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode songLyricsIDs = mapper.createObjectNode();
 
-		ArrayNode songLyricsIDsArray = songLyricsIDs.putArray("songLyricsIDs");
+        ArrayNode songLyricsIDsArray = songLyricsIDs.putArray("songLyricsIDs");
 
-		for (SongLyrics lyrics : s.songLyrics) {
-			songLyricsIDsArray.add(lyrics.getsongLyricsId());
-		}
+        for (SongLyrics lyrics : s.songLyrics) {
+            songLyricsIDsArray.add(lyrics.getsongLyricsId());
+        }
 
-		ObjectNode songObject = convert(s.songName, s.songLink, s.songOriginalTitle, s.songAuthor, s.id, s.songImporter,
-				s.dateCreated.getTime(), s.dateModified.getTime(), songLyricsIDsArray);
+        ObjectNode songObject = convert(s.songName, s.songLink, s.songOriginalTitle, s.songAuthor, s.id, s.songImporter, s.dateCreated.getTime(), s.dateModified.getTime(),
+                songLyricsIDsArray);
 
-		return songObject;
-	}
+        return songObject;
+    }
 
-	
-	public static ObjectNode convert(String songName, String songLink, String songOriginalTitle, String songAuthor,
-			Long id, String songImporter, ArrayList<String> songLyricsIDsArrayList) {
-		
-		ObjectMapper mapper = new ObjectMapper();
-		ObjectNode songLyricsIDs = mapper.createObjectNode();
-	
-		ArrayNode songLyricsIDsArray = songLyricsIDs.putArray("songLyricsIDs");
-	
-		for (String lyricsId : songLyricsIDsArrayList) {
-			songLyricsIDsArray.add(lyricsId);
-		}
-		ObjectNode songObject = Json.newObject();
-	
-		songObject.put("songName", songName);
-		songObject.put("songLink", songLink);
-		songObject.put("songOriginalTitle", songOriginalTitle);
-		songObject.put("songAuthor", songAuthor);
-		songObject.put("songId", id);
-		songObject.put("songImporter", songImporter);
-		songObject.putArray("songLyricsIDs").addAll(songLyricsIDsArray);
-	
-		return songObject;
-	}
-	
-	public static ObjectNode convert(String songName, String songLink, String songOriginalTitle, String songAuthor,
-			Long id, String songImporter, Long dateCreated, Long dateModified, ArrayNode songLyricsIDsArray) {
+    public static ObjectNode convert(String songName, String songLink, String songOriginalTitle, String songAuthor, Long id, String songImporter, ArrayList<String> songLyricsIDsArrayList) {
 
-		ObjectNode songObject = Json.newObject();
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode songLyricsIDs = mapper.createObjectNode();
 
-		songObject.put("songName", songName);
-		songObject.put("songLink", songLink);
-		songObject.put("songOriginalTitle", songOriginalTitle);
-		songObject.put("songAuthor", songAuthor);
-		songObject.put("songId", id);
-		songObject.put("songImporter", songImporter);
-		songObject.put("songImporter", songImporter);
-		songObject.put("dateCreated", dateCreated);
-		songObject.put("dateModified", dateModified);
-		songObject.putArray("songLyricsIDs").addAll(songLyricsIDsArray);
+        ArrayNode songLyricsIDsArray = songLyricsIDs.putArray("songLyricsIDs");
 
-		return songObject;
-	}
+        for (String lyricsId : songLyricsIDsArrayList) {
+            songLyricsIDsArray.add(lyricsId);
+        }
+        ObjectNode songObject = Json.newObject();
 
-	public static ObjectNode convertLyrics(SongLyrics s) {
+        songObject.put("songName", songName);
+        songObject.put("songLink", songLink);
+        songObject.put("songOriginalTitle", songOriginalTitle);
+        songObject.put("songAuthor", songAuthor);
+        songObject.put("songId", id);
+        songObject.put("songImporter", songImporter);
+        songObject.putArray("songLyricsIDs").addAll(songLyricsIDsArray);
 
-		ObjectNode songLyricsObject = Json.newObject();
+        return songObject;
+    }
 
-		songLyricsObject.put("songLyricsId", s.getId());
-		songLyricsObject.put("songLyrics", s.getsongLyrics());
-		songLyricsObject.put("songKey", s.getSongKey());
-		songLyricsObject.put("songId", s.getSong().getId());
+    public static ObjectNode convert(String songName, String songLink, String songOriginalTitle, String songAuthor, Long id, String songImporter, Long dateCreated, Long dateModified,
+            ArrayNode songLyricsIDsArray) {
 
-		return songLyricsObject;
-	}
+        ObjectNode songObject = Json.newObject();
 
-public static ObjectNode convert(Service s) {
-		
-		ArrayList <ObjectNode> serviceSongs = new ArrayList<>();
-		for (ServiceSong ss : s.getSongs()){
-			ObjectNode serviceObject = Json.newObject();
-			serviceObject.put("songName", ss.getSongName());
-			serviceObject.put("songId", ss.getSongId());
-			serviceObject.put("lyricsId", ss.getLyricsId());
-			serviceObject.put("songKey", ss.getSongKey());
-			serviceObject.put("songLyrics", ss.getSongLyrics());
-			serviceSongs.add(serviceObject);
-		}
-		
-		ObjectNode serviceObject = Json.newObject();
-		serviceObject.put("id", s.getId());
-		serviceObject.put("dateCreated", s.getDateCreated().getTime());
-		serviceObject.put("userEmail", s.getUserEmail());
-		serviceObject.put("userName", s.getUserName());
-		serviceObject.put("songBookName", s.getServiceName());
-		serviceObject.putArray("serviceSongs").addAll(serviceSongs);
+        songObject.put("songName", songName);
+        songObject.put("songLink", songLink);
+        songObject.put("songOriginalTitle", songOriginalTitle);
+        songObject.put("songAuthor", songAuthor);
+        songObject.put("songId", id);
+        songObject.put("songImporter", songImporter);
+        songObject.put("songImporter", songImporter);
+        songObject.put("dateCreated", dateCreated);
+        songObject.put("dateModified", dateModified);
+        songObject.putArray("songLyricsIDs").addAll(songLyricsIDsArray);
 
-		return serviceObject;
-	}
-	
-	public static List<ObjectNode> convert (List<Service> serviceList){
-		//ObjectNode servicesObject = Json.newObject();
-		ArrayList <ObjectNode> servicesArray = new ArrayList<>();
-		for (Service s : serviceList){
-			servicesArray.add(convert(s));
-		}
-		//servicesObject.putArray("services").addAll(servicesArray);
-		//return servicesObject;
-		return servicesArray;
-	}
+        return songObject;
+    }
+
+    public static ObjectNode convertLyrics(SongLyrics s) {
+
+        ObjectNode songLyricsObject = Json.newObject();
+
+        songLyricsObject.put("songLyricsId", s.getId());
+        songLyricsObject.put("songLyrics", s.getsongLyrics());
+        songLyricsObject.put("songKey", s.getSongKey());
+        songLyricsObject.put("songId", s.getSong().getId());
+
+        return songLyricsObject;
+    }
+
+    public static ObjectNode convert(Service s) {
+
+        ArrayList<ObjectNode> serviceSongs = new ArrayList<>();
+        for (ServiceSong ss : s.getSongs()) {
+            ObjectNode serviceObject = Json.newObject();
+            serviceObject.put("songName", ss.getSongName());
+            serviceObject.put("songId", ss.getSongId());
+            serviceObject.put("lyricsId", ss.getLyricsId());
+            serviceObject.put("songKey", ss.getSongKey());
+            serviceObject.put("songLyrics", ss.getSongLyrics());
+            serviceSongs.add(serviceObject);
+        }
+
+        ObjectNode serviceObject = Json.newObject();
+        serviceObject.put("id", s.getId());
+        serviceObject.put("dateCreated", s.getDateCreated().getTime());
+        serviceObject.put("userEmail", s.getUserEmail());
+        serviceObject.put("userName", s.getUserName());
+        serviceObject.put("songBookName", s.getServiceName());
+        serviceObject.putArray("serviceSongs").addAll(serviceSongs);
+
+        return serviceObject;
+    }
+
+    public static List <ObjectNode> convert(List<Service> serviceList) {
+        // ObjectNode servicesObject = Json.newObject();
+        ArrayList<ObjectNode> servicesArray = new ArrayList<>();
+        for (Service s : serviceList) {
+            servicesArray.add(convert(s));
+        }
+        // servicesObject.putArray("services").addAll(servicesArray);
+        // return servicesObject;
+        return servicesArray;
+    }
 
 }
