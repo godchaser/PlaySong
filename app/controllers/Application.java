@@ -497,8 +497,8 @@ public class Application extends Controller {
 	public Result emptyDb() {
 		Ebean.createSqlUpdate("delete from song_lyrics").execute();
 		Ebean.createSqlUpdate("delete from song").execute();
-		Ebean.createSqlUpdate("delete from service").execute();
 		Ebean.createSqlUpdate("delete from service_song").execute();
+		Ebean.createSqlUpdate("delete from service").execute();		
 		return ok();
 	}
 
