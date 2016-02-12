@@ -59,6 +59,7 @@ import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
 import play.mvc.Security;
+import rest.PlaySongRestService;
 import songimporters.SongImporter;
 import views.html.admin;
 import views.html.login;
@@ -496,6 +497,8 @@ public class Application extends Controller {
 	public Result emptyDb() {
 		Ebean.createSqlUpdate("delete from song_lyrics").execute();
 		Ebean.createSqlUpdate("delete from song").execute();
+		Ebean.createSqlUpdate("delete from service").execute();
+		Ebean.createSqlUpdate("delete from service_song").execute();
 		return ok();
 	}
 
@@ -1063,10 +1066,17 @@ public class Application extends Controller {
 	}
 
 	public Result test() {
-		System.out.println("TEST!");
-		ChordLineTransposer.test();
-		return ok();
+		System.out.println("TEST!");	
+		return redirect(routes.Application.table());
 	}
+	
+	@Security.Authenticated(Secured.class)
+	public Result syncDb() {
+        PlaySongRestService psrs = new PlaySongRestService();
+        psrs.downloadSongsData();
+        psrs.downloadFavoritesSongsData();      
+        return redirect(routes.Application.table());
+    }
 
 	@Security.Authenticated(Secured.class)
 	public Result sanitizesongs() {

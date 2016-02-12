@@ -56,6 +56,7 @@ GET      /inituser                    controllers.Application.inituser()
 GET      /sqlinit                     controllers.Application.sqlinit()
 GET      /yamlbackup                  controllers.Application.yamlbackup()
 GET      /yamlrestore                 controllers.Application.yamlrestore()
+GET      /sync                        controllers.Application.syncDb()
 # used for clearing all data from db
 GET      /empty                       controllers.Application.emptyDb()
 # db sanitize - update song keys (chords)

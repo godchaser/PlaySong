@@ -27,6 +27,10 @@ public class Service extends Model {
 	
 	public String serviceName;
 	
+	public static Service get(Long id) {
+        return find.byId(id);
+    }
+	
 	public Long getId() {
 		return id;
 	}

@@ -35,7 +35,9 @@ libraryDependencies ++= Seq( javaJdbc , cache , javaWs , filters, evolutions,
   "org.webjars" % "startbootstrap-sb-admin-2" % "1.0.7",
   "org.webjars.bower" % "font-awesome" % "4.5.0",
   "org.webjars" % "handsontable" % "0.15.0-beta2",
-  "org.yaml" % "snakeyaml" % "1.15"
+  "org.yaml" % "snakeyaml" % "1.15",
+  "com.squareup.retrofit2" % "retrofit" % "2.0.0-beta3",
+  "com.squareup.retrofit2" % "converter-gson" % "2.0.0-beta3"
   )
 
 dependencyOverrides += "org.webjars.bower" % "jquery" % "2.2.0"
