@@ -121,14 +121,15 @@ public class SongToJsonConverter {
 		return serviceObject;
 	}
 	
-	public static ObjectNode convert (List<Service> serviceList){
-		ObjectNode servicesObject = Json.newObject();
+	public static List<ObjectNode> convert (List<Service> serviceList){
+		//ObjectNode servicesObject = Json.newObject();
 		ArrayList <ObjectNode> servicesArray = new ArrayList<>();
 		for (Service s : serviceList){
 			servicesArray.add(convert(s));
 		}
-		servicesObject.putArray("services").addAll(servicesArray);
-		return servicesObject;
+		//servicesObject.putArray("services").addAll(servicesArray);
+		//return servicesObject;
+		return servicesArray;
 	}
 	
 	
