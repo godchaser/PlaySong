@@ -187,7 +187,7 @@
 	function unlockInlineSongEditor(id) {
     	var plainSongLyricsData = $('#songLyrics').data('plainSongLyricsData');
     	var songLyricsId = $('#songLyrics').data('songLyricsID');
- 		$('#songLyrics').replaceWith('<textarea id=songLyrics rows=30 cols=50 class="form-control monoSpaceTextArea">'+plainSongLyricsData+'</textarea>');		
+ 		$('#songLyrics').replaceWith('<textarea id=songLyrics rows=40 cols=35 class="form-textarea monoSpaceTextArea">'+plainSongLyricsData+'</textarea>');		
 		$('#editlyricsbutton').html('<i class="glyphicon glyphicon-saved"></i> Save Lyrics');
 		$('#editlyricsbutton').removeClass("btn-info").addClass("btn-success");
 		$('#editlyricsbutton').data("dataButtonAction", "saveMode");
