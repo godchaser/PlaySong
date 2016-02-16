@@ -35,6 +35,12 @@ public class PdfGenerator {
 
     String LiberationMonoFontPath = "resources/fonts/LiberationMono-Regular.ttf";
     String LiberationMonoBoldFontPath = "resources/fonts/LiberationMono-Bold.ttf";
+    
+    String LiberationSerifFontPath = "resources/fonts/LiberationSerif-Regular.ttf";
+    String LiberationSerifItalicFontPath = "resources/fonts/LiberationSerif-Italic.ttf";
+    String LiberationSerifBoldFontPath = "resources/fonts/LiberationSerif-Bold.ttf";
+    String LiberationSerifBoldItalicFontPath = "resources/fonts/LiberationSerif-BoldItalic.ttf";
+    
     String TimesNewRomanFontPath = "resources/fonts/Times_New_Roman.ttf";
     String TimesNewRomanBoldFontPath = "resources/fonts/Times_New_Roman_Bold.ttf";
 
@@ -48,10 +54,12 @@ public class PdfGenerator {
     BaseColor VERSE_BACKGROUND_COLOR = BaseColor.LIGHT_GRAY;
 
     int maxCharLenght = 35;
-    int maxLineNumber = 49;
     int maxLinesPerColumn = 44;
     int maxLinesPerPage = maxLinesPerColumn * 2;
     int maxNumberOfSongsPerPage = 6;
+
+    // This value is used in older implementation with Chapters
+    int maxLineNumber = 49;
 
     float secondTitleIndent = 240f;
 
@@ -61,9 +69,11 @@ public class PdfGenerator {
         protected PdfAction action;
         protected String title;
     }
+    
+    enum verseType {Verse, Chorus, Bridge, Intro, Ending};
 
     // Verse styling
-    String[] verseTypes = { "Verse", "Chorus", "Bridge", "Intro", "Ending" };
+    String[] verseTypes = { verseType.Verse.name(), verseType.Chorus.name(), verseType.Bridge.name(), verseType.Intro.name(), verseType.Ending.name() };
 
     // table to store placeholder for all chapters and sections
     private final Map<String, PdfTemplate> tocPlaceholder = new HashMap<>();
@@ -76,12 +86,14 @@ public class PdfGenerator {
     private class SongFonts {
 
         Font MONOSPACE;
+        Font MONOSPACE_BOLD;
         Font MONOSPACE_CHORDS;
         Font NORMAL;
         Font VERSETYPE_FONT;
         Font BOLD;
         Font ITALIC;
         Font BOLDITALIC;
+        Font TITLE_BOLD_UNDERLINE;
 
         public SongFonts() {
 
@@ -89,6 +101,12 @@ public class PdfGenerator {
             FontFactory.register(LiberationMonoBoldFontPath, LiberationMonoBoldFontPath);
             FontFactory.register(TimesNewRomanFontPath, TimesNewRomanFontPath);
             FontFactory.register(TimesNewRomanBoldFontPath, TimesNewRomanFontPath);
+          
+            FontFactory.register(LiberationSerifFontPath, LiberationSerifFontPath);
+            FontFactory.register(LiberationSerifItalicFontPath, LiberationSerifItalicFontPath);
+            FontFactory.register(LiberationSerifBoldFontPath, LiberationSerifBoldFontPath);
+            FontFactory.register(LiberationSerifBoldItalicFontPath, LiberationSerifBoldItalicFontPath);
+            
             // Get the font NB. last parameter indicates font needs to be
             // embedded
 
@@ -96,32 +114,42 @@ public class PdfGenerator {
             MONOSPACE.setSize(MONOSPACE_SIZE);
             MONOSPACE.setStyle(Font.NORMAL);
             MONOSPACE.setColor(DEFAULT_COLOR);
+            
+            MONOSPACE_BOLD = FontFactory.getFont(LiberationMonoFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
+            MONOSPACE_BOLD.setSize(MONOSPACE_SIZE);
+            MONOSPACE_BOLD.setStyle(Font.BOLD);
+            MONOSPACE_BOLD.setColor(DEFAULT_COLOR);
 
             MONOSPACE_CHORDS = FontFactory.getFont(LiberationMonoFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
             MONOSPACE_CHORDS.setSize(MONOSPACE_SIZE);
             MONOSPACE_CHORDS.setStyle(Font.BOLD);
             MONOSPACE_CHORDS.setColor(CHORDS_COLOR);
 
-            NORMAL = FontFactory.getFont(TimesNewRomanFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
+            NORMAL = FontFactory.getFont(LiberationSerifFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
             NORMAL.setStyle(Font.NORMAL);
             NORMAL.setSize(NORMAL_SIZE);
             NORMAL.setColor(DEFAULT_COLOR);
 
-            VERSETYPE_FONT = FontFactory.getFont(TimesNewRomanFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
-            VERSETYPE_FONT.setStyle(Font.BOLD);
+            VERSETYPE_FONT = FontFactory.getFont(LiberationSerifBoldFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
+            //VERSETYPE_FONT.setStyle(Font.BOLD);
             VERSETYPE_FONT.setSize(NORMAL_SIZE);
             VERSETYPE_FONT.setColor(VERSE_COLOR);
 
-            BOLD = FontFactory.getFont(TimesNewRomanBoldFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
+            TITLE_BOLD_UNDERLINE = FontFactory.getFont(LiberationSerifBoldFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
+            TITLE_BOLD_UNDERLINE.setStyle(Font.UNDERLINE);
+            TITLE_BOLD_UNDERLINE.setSize(BOLD_SIZE);
+            TITLE_BOLD_UNDERLINE.setColor(DEFAULT_COLOR);
+            
+            BOLD = FontFactory.getFont(LiberationSerifBoldFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
             BOLD.setStyle(Font.NORMAL);
             BOLD.setSize(BOLD_SIZE);
             BOLD.setColor(DEFAULT_COLOR);
 
-            ITALIC = FontFactory.getFont(TimesNewRomanFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
+            ITALIC = FontFactory.getFont(LiberationSerifBoldItalicFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
             ITALIC.setStyle(Font.ITALIC);
             ITALIC.setSize(12);
 
-            BOLDITALIC = FontFactory.getFont(TimesNewRomanFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
+            BOLDITALIC = FontFactory.getFont(LiberationSerifBoldItalicFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
             BOLDITALIC.setStyle(Font.BOLDITALIC);
             BOLDITALIC.setSize(12);
 
@@ -317,6 +345,9 @@ public class PdfGenerator {
     private ArrayList<SongParagraphs> getPrintableSongs(List<? extends PdfPrintable> printObject) {
         ArrayList<SongParagraphs> printableSongs = new ArrayList<SongParagraphs>();
 
+        // flag to make whole chorus text bolder 
+        boolean bolderChorus = false;
+        
         for (int i = 0; i < printObject.size(); i++) {
             ArrayList<Element> paragraphs = new ArrayList<Element>();
 
@@ -334,7 +365,7 @@ public class PdfGenerator {
                     if (lineStartsWithBrace) {
                         switch ("" + line.charAt(1)) {
                         case "C":
-                            line = line.replace("C", "Chorus ");
+                            line = line.replace("C", "Chorus ");                            
                             break;
                         case "V":
                             line = line.replace("V", "Verse ");
@@ -358,12 +389,24 @@ public class PdfGenerator {
                     Chunk c = new Chunk(line.trim(), fonts.VERSETYPE_FONT);
                     c.setBackground(VERSE_BACKGROUND_COLOR, 1.5f, 0f, 1.5f, 1.5f);
                     styledParagraph = new Paragraph(c);
+                    
+                    // starting bolding chorus lyrics
+                    if (line.contains(verseType.Chorus.name())){
+                        bolderChorus = true;
+                    } else {
+                        // reset chorus bolding
+                        bolderChorus = false;
+                    }
                 } else if (LineTypeChecker.isChordLine(line)) {
                     // CHORD STYLING
                     styledParagraph = new Paragraph(line, fonts.MONOSPACE_CHORDS);
                 } else {
                     // STANDARD STYLING
-                    styledParagraph = new Paragraph(line, fonts.MONOSPACE);
+                    if (bolderChorus) {
+                        styledParagraph = new Paragraph(line, fonts.MONOSPACE_BOLD);
+                    } else {
+                        styledParagraph = new Paragraph(line, fonts.MONOSPACE);
+                    }
                 }
                 // find longest line
                 longestLine = (line.length() > longestLine) ? line.length() : longestLine;
@@ -685,7 +728,7 @@ public class PdfGenerator {
                     forceNextColumn = true;
                 }
 
-                Chunk c = new Chunk(songTitle, fonts.BOLD);
+                Chunk c = new Chunk(songTitle, fonts.TITLE_BOLD_UNDERLINE);
                 c.setGenericTag(songTitle);
                 ct.addElement(c);
 
@@ -781,12 +824,12 @@ public class PdfGenerator {
         PdfGenerator pdfGenerator;
         try {
             pdfGenerator = new PdfGenerator(outputPdfPath, true);
-            if (!useColumns){
+            if (!useColumns) {
                 // TODO: Bug - page number header is missing?
                 pdfGenerator.createSongsTOC(songPrintObjects);
                 pdfGenerator.createSongsChapters(songPrintObjects, useColumns);
             } else {
-                pdfGenerator.createSongColumns(songPrintObjects, useColumns); 
+                pdfGenerator.createSongColumns(songPrintObjects, useColumns);
             }
             pdfGenerator.document.close();
         } catch (Exception e) {
