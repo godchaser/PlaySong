@@ -5,14 +5,19 @@ import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 
 import chord.tools.LineTypeChecker;
+import document.tools.PdfGenerator.TOCEntry;
 import helpers.ArrayHelper;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import play.Logger;
 import models.helpers.PdfPrintable;
@@ -25,6 +30,7 @@ import models.helpers.PdfPrintable;
 public class PdfGenerator {
     private final Document document;
     private final PdfWriter writer;
+    private final ByteArrayOutputStream baos;
 
     /** The header text. */
     String header;
@@ -35,12 +41,12 @@ public class PdfGenerator {
 
     String LiberationMonoFontPath = "resources/fonts/LiberationMono-Regular.ttf";
     String LiberationMonoBoldFontPath = "resources/fonts/LiberationMono-Bold.ttf";
-    
+
     String LiberationSerifFontPath = "resources/fonts/LiberationSerif-Regular.ttf";
     String LiberationSerifItalicFontPath = "resources/fonts/LiberationSerif-Italic.ttf";
     String LiberationSerifBoldFontPath = "resources/fonts/LiberationSerif-Bold.ttf";
     String LiberationSerifBoldItalicFontPath = "resources/fonts/LiberationSerif-BoldItalic.ttf";
-    
+
     String TimesNewRomanFontPath = "resources/fonts/Times_New_Roman.ttf";
     String TimesNewRomanBoldFontPath = "resources/fonts/Times_New_Roman_Bold.ttf";
 
@@ -69,8 +75,10 @@ public class PdfGenerator {
         protected PdfAction action;
         protected String title;
     }
-    
-    enum verseType {Verse, Chorus, Bridge, Intro, Ending};
+
+    enum verseType {
+        Verse, Chorus, Bridge, Intro, Ending
+    };
 
     // Verse styling
     String[] verseTypes = { verseType.Verse.name(), verseType.Chorus.name(), verseType.Bridge.name(), verseType.Intro.name(), verseType.Ending.name() };
@@ -101,12 +109,12 @@ public class PdfGenerator {
             FontFactory.register(LiberationMonoBoldFontPath, LiberationMonoBoldFontPath);
             FontFactory.register(TimesNewRomanFontPath, TimesNewRomanFontPath);
             FontFactory.register(TimesNewRomanBoldFontPath, TimesNewRomanFontPath);
-          
+
             FontFactory.register(LiberationSerifFontPath, LiberationSerifFontPath);
             FontFactory.register(LiberationSerifItalicFontPath, LiberationSerifItalicFontPath);
             FontFactory.register(LiberationSerifBoldFontPath, LiberationSerifBoldFontPath);
             FontFactory.register(LiberationSerifBoldItalicFontPath, LiberationSerifBoldItalicFontPath);
-            
+
             // Get the font NB. last parameter indicates font needs to be
             // embedded
 
@@ -114,7 +122,7 @@ public class PdfGenerator {
             MONOSPACE.setSize(MONOSPACE_SIZE);
             MONOSPACE.setStyle(Font.NORMAL);
             MONOSPACE.setColor(DEFAULT_COLOR);
-            
+
             MONOSPACE_BOLD = FontFactory.getFont(LiberationMonoFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
             MONOSPACE_BOLD.setSize(MONOSPACE_SIZE);
             MONOSPACE_BOLD.setStyle(Font.BOLD);
@@ -131,7 +139,7 @@ public class PdfGenerator {
             NORMAL.setColor(DEFAULT_COLOR);
 
             VERSETYPE_FONT = FontFactory.getFont(LiberationSerifBoldFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
-            //VERSETYPE_FONT.setStyle(Font.BOLD);
+            // VERSETYPE_FONT.setStyle(Font.BOLD);
             VERSETYPE_FONT.setSize(NORMAL_SIZE);
             VERSETYPE_FONT.setColor(VERSE_COLOR);
 
@@ -139,7 +147,7 @@ public class PdfGenerator {
             TITLE_BOLD_UNDERLINE.setStyle(Font.UNDERLINE);
             TITLE_BOLD_UNDERLINE.setSize(BOLD_SIZE);
             TITLE_BOLD_UNDERLINE.setColor(DEFAULT_COLOR);
-            
+
             BOLD = FontFactory.getFont(LiberationSerifBoldFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
             BOLD.setStyle(Font.NORMAL);
             BOLD.setSize(BOLD_SIZE);
@@ -157,6 +165,7 @@ public class PdfGenerator {
     }
 
     public PdfGenerator(String outputPdfPath) throws Exception {
+        this.baos = new ByteArrayOutputStream();
         this.document = new Document(songPageSize);
         this.document.setMargins(50, 50, 60, 40);
         this.document.setMarginMirroring(false);
@@ -176,19 +185,22 @@ public class PdfGenerator {
     }
 
     public PdfGenerator(String outputPdfPath, boolean newEngine) throws Exception {
+        this.baos = new ByteArrayOutputStream();
         this.document = new Document(songPageSize);
         this.document.setMargins(50, 50, 60, 40);
         this.document.setMarginMirroring(false);
-        this.writer = PdfWriter.getInstance(this.document, new FileOutputStream(outputPdfPath));
+        this.writer = PdfWriter.getInstance(this.document, baos);
         this.setEvent(new TOCCreation());
         this.writer.setPageEvent(this.getEvent());
         this.document.open();
+        // this.writer.setLinearPageMode();
         this.getEvent().setRoot(this.writer.getRootOutline());
     }
 
     public class TOCCreation extends PdfPageEventHelper {
 
         protected PdfOutline root;
+
         protected List<TOCEntry> toc = new ArrayList<TOCEntry>();
 
         public TOCCreation() {
@@ -211,6 +223,7 @@ public class PdfGenerator {
             entry.title = text;
             toc.add(entry);
         }
+
     }
 
     public void onChapter(final PdfGenerator writer, final Document document, final float paragraphPosition, final Paragraph title) {
@@ -345,9 +358,9 @@ public class PdfGenerator {
     private ArrayList<SongParagraphs> getPrintableSongs(List<? extends PdfPrintable> printObject) {
         ArrayList<SongParagraphs> printableSongs = new ArrayList<SongParagraphs>();
 
-        // flag to make whole chorus text bolder 
+        // flag to make whole chorus text bolder
         boolean bolderChorus = false;
-        
+
         for (int i = 0; i < printObject.size(); i++) {
             ArrayList<Element> paragraphs = new ArrayList<Element>();
 
@@ -365,7 +378,7 @@ public class PdfGenerator {
                     if (lineStartsWithBrace) {
                         switch ("" + line.charAt(1)) {
                         case "C":
-                            line = line.replace("C", "Chorus ");                            
+                            line = line.replace("C", "Chorus ");
                             break;
                         case "V":
                             line = line.replace("V", "Verse ");
@@ -389,9 +402,9 @@ public class PdfGenerator {
                     Chunk c = new Chunk(line.trim(), fonts.VERSETYPE_FONT);
                     c.setBackground(VERSE_BACKGROUND_COLOR, 1.5f, 0f, 1.5f, 1.5f);
                     styledParagraph = new Paragraph(c);
-                    
+
                     // starting bolding chorus lyrics
-                    if (line.contains(verseType.Chorus.name())){
+                    if (line.contains(verseType.Chorus.name())) {
                         bolderChorus = true;
                     } else {
                         // reset chorus bolding
@@ -589,10 +602,10 @@ public class PdfGenerator {
         return table;
     }
 
-    private void createSongColumns(List<? extends PdfPrintable> printObject, boolean useColumns) throws IOException, DocumentException {
+    private int createSongColumns(List<? extends PdfPrintable> printObject, boolean useColumns) throws IOException, DocumentException {
 
         ArrayList<SongParagraphs> printableSongs = getPrintableSongs(printObject);
-
+     
         int numberOfSongs = printableSongs.size();
 
         ColumnText ct = new ColumnText(writer.getDirectContent());
@@ -687,7 +700,7 @@ public class PdfGenerator {
                     fitOnSamePage = true;
                 }
 
-                String songTitle = i + j + ". " + song.getName();
+                String songTitle = i + j + 1 + ". " + song.getName();
 
                 writtenLines = writtenLines + songNumberOfLines;
 
@@ -730,9 +743,9 @@ public class PdfGenerator {
 
                 Chunk c = new Chunk(songTitle, fonts.TITLE_BOLD_UNDERLINE);
                 c.setGenericTag(songTitle);
+                c.setLocalGoto(songTitle);
                 ct.addElement(c);
 
-                // TODO: Implement check if song too long for one column - I should move chord line to second column
                 for (Element songParagraph : song.getParagraphs()) {
                     if (songParagraph != null) {
                         ct.addElement(songParagraph);
@@ -777,13 +790,26 @@ public class PdfGenerator {
 
         // Now start writing TOC
         this.document.newPage();
+        
+        final Chapter intro = new Chapter(new Paragraph("Table Of Content", fonts.BOLD), 0);
+        intro.setNumberDepth(0);
+        this.document.add(intro);
+        
+        int tocStartPage = this.writer.getPageNumber();
 
+        int i = 1;
         for (TOCEntry entry : this.getEvent().getToc()) {
             Chunk c = new Chunk(entry.title, fonts.NORMAL);
             c.setAction(entry.action);
             // c.setLocalGoto(entry.title);
             this.document.add(new Paragraph(c));
+            i++;
         }
+        
+        System.out.println("TOC PAGE NR: " + tocStartPage);
+
+        return tocStartPage;
+
     }
 
     private void createChapters(List<? extends PdfPrintable> printObject) throws DocumentException {
@@ -824,14 +850,29 @@ public class PdfGenerator {
         PdfGenerator pdfGenerator;
         try {
             pdfGenerator = new PdfGenerator(outputPdfPath, true);
+            int tocStartPage = 0;
             if (!useColumns) {
                 // TODO: Bug - page number header is missing?
                 pdfGenerator.createSongsTOC(songPrintObjects);
                 pdfGenerator.createSongsChapters(songPrintObjects, useColumns);
             } else {
-                pdfGenerator.createSongColumns(songPrintObjects, useColumns);
+                tocStartPage = pdfGenerator.createSongColumns(songPrintObjects, useColumns);
             }
             pdfGenerator.document.close();
+
+            PdfReader reader = new PdfReader(pdfGenerator.baos.toByteArray());
+
+            // reordering pages if ToC is on the end of the document
+            if (tocStartPage != 0) {
+                int n = reader.getNumberOfPages();
+                reader.selectPages(String.format("%s-%s, 1-%s, %s", tocStartPage, n, tocStartPage-1, n));
+                PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(outputPdfPath));
+                stamper.close();
+            } else {
+                PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(outputPdfPath));
+                stamper.close();
+            }
+
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
