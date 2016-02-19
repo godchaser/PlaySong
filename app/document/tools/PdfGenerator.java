@@ -8,6 +8,7 @@ import chord.tools.LineTypeChecker;
 import helpers.ArrayHelper;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -125,6 +126,7 @@ public class PdfGenerator extends PdfPageEventHelper {
             NORMAL.setColor(DEFAULT_COLOR);
 
             VERSETYPE_FONT = FontFactory.getFont(LiberationSerifBoldFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
+            VERSETYPE_FONT.setStyle(Font.BOLD);
             VERSETYPE_FONT.setSize(NORMAL_SIZE);
             VERSETYPE_FONT.setColor(VERSE_COLOR);
 
@@ -875,6 +877,14 @@ public class PdfGenerator extends PdfPageEventHelper {
         copy.setOutlines(bookmarks);
         // step 5
         document.close();
+
+        // delete tmp file
+        try {
+            File file = new File(outputPdfPath + "_tmp.pdf");
+            file.delete();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // public method for PDF generation

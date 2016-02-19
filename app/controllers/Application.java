@@ -845,12 +845,14 @@ public class Application extends Controller {
             e.printStackTrace();
         }
 
-        // Random rand = new Random();
-        // int hash = rand.nextInt(100);
-
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_hhmmss");
         Date date = new Date();
-        String hash = (dateFormat.format(date));
+
+        // use songbook name as file hash if available
+        String hash = songBookName + "_" + dateFormat.format(date);
+        if (songBookName == null || songBookName.isEmpty()) {
+            hash = "Songbook_"+(dateFormat.format(date));
+        }
 
         try {
             if ("word".equals(format)) {
