@@ -5,7 +5,6 @@ import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 
 import chord.tools.LineTypeChecker;
-import document.tools.PdfGenerator.TOCEntry;
 import helpers.ArrayHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -15,21 +14,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import play.Logger;
 import models.helpers.PdfPrintable;
 
-;
-
 /**
  * Created by samuel on 5/23/15.
  */
-public class PdfGenerator {
+public class PdfGenerator extends PdfPageEventHelper {
     private final Document document;
     private final PdfWriter writer;
     private final ByteArrayOutputStream baos;
@@ -38,8 +32,14 @@ public class PdfGenerator {
     String header;
     /** The template with the total number of pages. */
     PdfTemplate total;
-
     private Rectangle songPageSize = PageSize.A4;
+
+    enum verseType {
+        Verse, Chorus, Bridge, Intro, Ending
+    };
+
+    // Verse styling
+    String[] verseTypes = { verseType.Verse.name(), verseType.Chorus.name(), verseType.Bridge.name(), verseType.Intro.name(), verseType.Ending.name() };
 
     String LiberationMonoFontPath = "resources/fonts/LiberationMono-Regular.ttf";
     String LiberationMonoBoldFontPath = "resources/fonts/LiberationMono-Bold.ttf";
@@ -66,24 +66,10 @@ public class PdfGenerator {
     int maxLinesPerPage = maxLinesPerColumn * 2;
     int maxNumberOfSongsPerPage = 6;
 
-    // This value is used in older implementation with Chapters
+    // These values are used in older implementation with Chapters
     int maxLineNumber = 49;
-
     float secondTitleIndent = 240f;
-
     public static final Rectangle[] COLUMNS = { new Rectangle(60f, 60f, 280f, 760f), new Rectangle(300f, 60f, 520f, 760f) };
-
-    public class TOCEntry {
-        protected PdfAction action;
-        protected String title;
-    }
-
-    enum verseType {
-        Verse, Chorus, Bridge, Intro, Ending
-    };
-
-    // Verse styling
-    String[] verseTypes = { verseType.Verse.name(), verseType.Chorus.name(), verseType.Bridge.name(), verseType.Intro.name(), verseType.Ending.name() };
 
     // table to store placeholder for all chapters and sections
     private final Map<String, PdfTemplate> tocPlaceholder = new HashMap<>();
@@ -94,7 +80,6 @@ public class PdfGenerator {
     private SongFonts fonts = new SongFonts();
 
     private class SongFonts {
-
         Font MONOSPACE;
         Font MONOSPACE_BOLD;
         Font MONOSPACE_CHORDS;
@@ -106,7 +91,6 @@ public class PdfGenerator {
         Font TITLE_BOLD_UNDERLINE;
 
         public SongFonts() {
-
             FontFactory.register(LiberationMonoFontPath, LiberationMonoFontPath);
             FontFactory.register(LiberationMonoBoldFontPath, LiberationMonoBoldFontPath);
             FontFactory.register(TimesNewRomanFontPath, TimesNewRomanFontPath);
@@ -141,7 +125,6 @@ public class PdfGenerator {
             NORMAL.setColor(DEFAULT_COLOR);
 
             VERSETYPE_FONT = FontFactory.getFont(LiberationSerifBoldFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
-            // VERSETYPE_FONT.setStyle(Font.BOLD);
             VERSETYPE_FONT.setSize(NORMAL_SIZE);
             VERSETYPE_FONT.setColor(VERSE_COLOR);
 
@@ -162,70 +145,18 @@ public class PdfGenerator {
             BOLDITALIC = FontFactory.getFont(LiberationSerifBoldItalicFontPath, BaseFont.CP1250, BaseFont.EMBEDDED);
             BOLDITALIC.setStyle(Font.BOLDITALIC);
             BOLDITALIC.setSize(12);
-
         }
     }
 
+    // SSPP (single song per page) engine constructor - using Chapter
     public PdfGenerator(String outputPdfPath) throws Exception {
         this.baos = new ByteArrayOutputStream();
         this.document = new Document(songPageSize);
         this.document.setMargins(50, 50, 60, 40);
         this.document.setMarginMirroring(false);
-        this.writer = PdfWriter.getInstance(this.document, new FileOutputStream(outputPdfPath));
-        // this.writer.setPageEvent(this);
-        this.document.open();
-    }
-
-    TOCCreation event;
-
-    public TOCCreation getEvent() {
-        return event;
-    }
-
-    public void setEvent(TOCCreation event) {
-        this.event = event;
-    }
-
-    public PdfGenerator(String outputPdfPath, boolean newEngine) throws Exception {
-        this.baos = new ByteArrayOutputStream();
-        this.document = new Document(songPageSize);
-        this.document.setMargins(50, 50, 60, 40);
-        this.document.setMarginMirroring(false);
         this.writer = PdfWriter.getInstance(this.document, baos);
-        this.setEvent(new TOCCreation());
-        this.writer.setPageEvent(this.getEvent());
+        this.writer.setPageEvent(this);
         this.document.open();
-        // this.writer.setLinearPageMode();
-        this.getEvent().setRoot(this.writer.getRootOutline());
-    }
-
-    public class TOCCreation extends PdfPageEventHelper {
-
-        protected PdfOutline root;
-
-        protected List<TOCEntry> toc = new ArrayList<TOCEntry>();
-
-        public TOCCreation() {
-        }
-
-        public void setRoot(PdfOutline root) {
-            this.root = root;
-        }
-
-        public List<TOCEntry> getToc() {
-            return toc;
-        }
-
-        @Override
-        public void onGenericTag(PdfWriter writer, Document document, Rectangle rect, String text) {
-            PdfDestination dest = new PdfDestination(PdfDestination.XYZ, rect.getLeft(), rect.getTop(), 0);
-            new PdfOutline(root, dest, text);
-            TOCEntry entry = new TOCEntry();
-            entry.action = PdfAction.gotoLocalPage(writer.getPageNumber(), dest, writer);
-            entry.title = text;
-            toc.add(entry);
-        }
-
     }
 
     public void onChapter(final PdfGenerator writer, final Document document, final float paragraphPosition, final Paragraph title) {
@@ -277,7 +208,7 @@ public class PdfGenerator {
      * @see com.itextpdf.text.pdf.PdfPageEventHelper#onCloseDocument(com.itextpdf.text.pdf.PdfWriter, com.itextpdf.text.Document)
      */
     public void onCloseDocument(PdfWriter writer, Document document) {
-        ColumnText.showTextAligned(total, Element.ALIGN_LEFT, new Phrase(String.valueOf(writer.getPageNumber())), 2, 2, 0);
+        ColumnText.showTextAligned(total, Element.ALIGN_LEFT, new Phrase(String.valueOf(writer.getPageNumber() - 1)), 2, 2, 0);
     }
 
     /**
@@ -289,36 +220,62 @@ public class PdfGenerator {
         total = writer.getDirectContent().createTemplate(30, 16);
     }
 
-    private void createSongsTOC(List<? extends PdfPrintable> printObject) throws DocumentException {
-        // add a small introduction chapter the shouldn't be counted.
-        final Chapter intro = new Chapter(new Paragraph("Table Of Content", fonts.BOLD), 0);
-        intro.setNumberDepth(0);
-        this.document.add(intro);
+    // MCP engine constructor - multi column support
+    public PdfGenerator(String outputPdfPath, boolean newEngine) throws Exception {
+        this.baos = new ByteArrayOutputStream();
+        this.document = new Document(songPageSize);
+        this.document.setMargins(50, 50, 60, 40);
+        this.document.setMarginMirroring(false);
+        this.writer = PdfWriter.getInstance(this.document, baos);
+        this.setEvent(new TOCCreation());
+        this.writer.setPageEvent(this.getEvent());
+        this.document.open();
+        this.getEvent().setRoot(this.writer.getRootOutline());
+    }
 
-        for (int i = 0; i < printObject.size(); i++) {
+    TOCCreation event;
 
-            final String title = printObject.get(i).getTitle();
-            // final String songTitle = songPrintObjects.get(i).getSong();
-            // So that song count does not start from 0
-            int idxPlusOne = i + 1;
-            final Chunk chunk = new Chunk(idxPlusOne + ". " + title, fonts.NORMAL).setLocalGoto(title);
-            this.document.add(new Paragraph(chunk));
+    public TOCCreation getEvent() {
+        return event;
+    }
 
-            final String songTitleId = title + idxPlusOne;
+    public void setEvent(TOCCreation event) {
+        this.event = event;
+    }
 
-            // Add a placeholder for the page reference
-            this.document.add(new VerticalPositionMark() {
-                @Override
-                public void draw(final PdfContentByte canvas, final float llx, final float lly, final float urx, final float ury, final float y) {
-                    final PdfTemplate createTemplate = canvas.createTemplate(50, 50);
-                    PdfGenerator.this.tocPlaceholder.put(songTitleId, createTemplate);
+    public class TOCEntry {
+        protected PdfAction action;
+        protected String title;
+    }
 
-                    canvas.addTemplate(createTemplate, urx - 50, y);
-                }
-            });
+    public class TOCCreation extends PdfPageEventHelper {
+
+        protected PdfOutline root;
+        protected List<TOCEntry> toc = new ArrayList<TOCEntry>();
+
+        public TOCCreation() {
+        }
+
+        public void setRoot(PdfOutline root) {
+            this.root = root;
+        }
+
+        public List<TOCEntry> getToc() {
+            return toc;
+        }
+
+        @Override
+        public void onGenericTag(PdfWriter writer, Document document, Rectangle rect, String text) {
+            PdfDestination dest = new PdfDestination(PdfDestination.XYZ, rect.getLeft(), rect.getTop(), 0);
+            new PdfOutline(root, dest, text);
+            TOCEntry entry = new TOCEntry();
+            entry.action = PdfAction.gotoLocalPage(writer.getPageNumber(), dest, writer);
+            entry.title = text;
+            toc.add(entry);
         }
     }
 
+    // Reusable methods
     private class SongParagraphs {
         String name;
         ArrayList<Element> paragraphs = new ArrayList<Element>();
@@ -432,21 +389,40 @@ public class PdfGenerator {
         return printableSongs;
     }
 
-    public PdfPCell getCell(String text, int alignment) {
-        PdfPCell cell = new PdfPCell(new Phrase(text));
-        cell.setPadding(0);
-        cell.setHorizontalAlignment(alignment);
-        cell.setBorder(PdfPCell.NO_BORDER);
-        return cell;
+    // **** SPPS IMPLEMENTATION ****
+
+    private void createSongsTOC(List<? extends PdfPrintable> printObject) throws DocumentException {
+        // add a small introduction chapter the shouldn't be counted.
+        final Chapter intro = new Chapter(new Paragraph("Table Of Content", fonts.BOLD), 0);
+        intro.setNumberDepth(0);
+        this.document.add(intro);
+
+        for (int i = 0; i < printObject.size(); i++) {
+            final String title = printObject.get(i).getTitle();
+            // final String songTitle = songPrintObjects.get(i).getSong();
+            // So that song count does not start from 0
+            int idxPlusOne = i + 1;
+            final Chunk chunk = new Chunk(idxPlusOne + ". " + title, fonts.NORMAL).setLocalGoto(title);
+            this.document.add(new Paragraph(chunk));
+            final String songTitleId = title + idxPlusOne;
+
+            // Add a placeholder for the page reference
+            this.document.add(new VerticalPositionMark() {
+                @Override
+                public void draw(final PdfContentByte canvas, final float llx, final float lly, final float urx, final float ury, final float y) {
+                    final PdfTemplate createTemplate = canvas.createTemplate(50, 50);
+                    PdfGenerator.this.tocPlaceholder.put(songTitleId, createTemplate);
+                    canvas.addTemplate(createTemplate, urx - 50, y);
+                }
+            });
+        }
     }
 
     private void createSongsChapters(List<? extends PdfPrintable> printObject, boolean useColumns) throws DocumentException {
-
         PdfContentByte cb = writer.getDirectContent();
         ArrayList<SongParagraphs> printableSongs = getPrintableSongs(printObject);
 
         int numberOfSongs = printableSongs.size();
-
         boolean skipNextSong = false;
 
         for (int i = 0; i < numberOfSongs; i++) {
@@ -595,31 +571,23 @@ public class PdfGenerator {
 
     }
 
-    public PdfPTable createTable(int start, int end) throws IOException {
-        PdfPTable table = new PdfPTable(2);
-        for (int i = start; i <= end; i++) {
-            table.addCell(String.valueOf(i));
-            table.addCell("Test");
-        }
-        return table;
-    }
+    // **** MCS IMPLEMENTATION ****
 
     private int createSongColumns(List<? extends PdfPrintable> printObject, boolean useColumns) throws IOException, DocumentException {
+        total = writer.getDirectContent().createTemplate(30, 16);
 
+        Map<String, Integer> pageNumberMap = new HashMap<>();
         ArrayList<SongParagraphs> printableSongs = getPrintableSongs(printObject);
-
-        int numberOfSongs = printableSongs.size();
-
         ColumnText ct = new ColumnText(writer.getDirectContent());
 
+        int numberOfSongs = printableSongs.size();
         int count = 0;
         boolean hasMoreText = false;
-        int writtenSongs = 0;
+        int currentlyWrittenSongs = 0;
         int lastWrittenSong = 0;
 
         // iterate through all songs
         for (int i = 0; i < numberOfSongs; i++) {
-
             // skip song if it is already merged
             if ((i != 0) && (i <= lastWrittenSong)) {
                 Logger.trace("!!! SKIPPING SONG BY INDEX: " + i);
@@ -743,6 +711,9 @@ public class PdfGenerator {
                     forceNextColumn = true;
                 }
 
+                // update page number map
+                pageNumberMap.put(songTitle, this.writer.getPageNumber());
+
                 Chunk c = new Chunk(songTitle, fonts.TITLE_BOLD_UNDERLINE);
                 c.setGenericTag(songTitle);
                 c.setLocalGoto(songTitle);
@@ -754,7 +725,7 @@ public class PdfGenerator {
                     }
                 }
                 // count written songs
-                writtenSongs = writtenSongs + 1;
+                currentlyWrittenSongs = currentlyWrittenSongs + 1;
 
                 // checking if text didn't fit in one column - overflows to next
                 int status = ct.go();
@@ -783,11 +754,30 @@ public class PdfGenerator {
                 }
             }
 
+            // update page number
+            PdfPTable table = new PdfPTable(3);
+            try {
+                table.setWidths(new int[] { 24, 24, 2 });
+                table.setTotalWidth(527);
+                table.setLockedWidth(true);
+                table.getDefaultCell().setFixedHeight(20);
+                table.getDefaultCell().setBorder(Rectangle.BOTTOM);
+                table.addCell(header);
+                table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_RIGHT);
+                table.addCell(String.format("Page %d of", writer.getPageNumber()));
+                PdfPCell cell = new PdfPCell(Image.getInstance(total));
+                cell.setBorder(Rectangle.BOTTOM);
+                table.addCell(cell);
+                table.writeSelectedRows(0, -1, 34, 803, writer.getDirectContent());
+            } catch (DocumentException de) {
+                throw new ExceptionConverter(de);
+            }
+
             Logger.trace("NEW PAGE");
             this.document.newPage();
 
             count++;
-            Logger.trace("STATUS: " + count + " : " + writtenSongs + " : " + hasMoreText);
+            Logger.trace("STATUS: " + count + " : " + currentlyWrittenSongs + " : " + hasMoreText);
         }
 
         // Now start writing TOC
@@ -799,85 +789,40 @@ public class PdfGenerator {
 
         int tocStartPage = this.writer.getPageNumber();
 
-        int i = 1;
         for (TOCEntry entry : this.getEvent().getToc()) {
             Chunk c = new Chunk(entry.title, fonts.NORMAL);
             c.setAction(entry.action);
-            // c.setLocalGoto(entry.title);
             this.document.add(new Paragraph(c));
-            i++;
-        }
-
-        Logger.trace("TOC PAGE NR: " + tocStartPage);
-
-        return tocStartPage;
-
-    }
-
-    private void createChapters(List<? extends PdfPrintable> printObject) throws DocumentException {
-
-        for (int i = 0; i < printObject.size(); i++) {
-            // append the chapter
-            String title = printObject.get(i).getTitle();
-            // final String songTitle = songPrintObjects.get(i).getSong();
-
-            final Chunk chunk = new Chunk(title, fonts.BOLD).setLocalDestination(title);
-
-            final Chapter chapter = new Chapter(new Paragraph(chunk), i);
-            // chapter.setNumberDepth(0);
-
-            String content = printObject.get(i).getContent();
-
-            // Logger.trace(content);
-
-            chapter.addSection(new Paragraph(content, fonts.MONOSPACE), 0);
-            // chapter.setNumberDepth(0);
-
-            this.document.add(chapter);
-
-            String titleId = title + i;
-
-            // When we wrote the chapter, we now the pagenumber
-            final PdfTemplate template = this.tocPlaceholder.get(titleId);
+            // Add a placeholder for the page reference
+            this.document.add(new VerticalPositionMark() {
+                @Override
+                public void draw(final PdfContentByte canvas, final float llx, final float lly, final float urx, final float ury, final float y) {
+                    final PdfTemplate createTemplate = canvas.createTemplate(50, 50);
+                    PdfGenerator.this.tocPlaceholder.put(entry.title, createTemplate);
+                    canvas.addTemplate(createTemplate, urx - 50, y);
+                }
+            });
+            // update the placeholder
+            final PdfTemplate template = this.tocPlaceholder.get(entry.title);
+            String pgNumber = null;
+            pgNumber = String.valueOf(pageNumberMap.get(entry.title));
             template.beginText();
             template.setFontAndSize(fonts.NORMAL.getBaseFont(), 12);
-            template.setTextMatrix(50 - fonts.NORMAL.getBaseFont().getWidthPoint(String.valueOf(this.writer.getPageNumber()), 12), 0);
-            template.showText(String.valueOf(this.writer.getPageNumber()));
+            template.setTextMatrix(50 - fonts.NORMAL.getBaseFont().getWidthPoint(pgNumber, 12), 0);
+            template.showText(pgNumber);
             template.endText();
-
         }
+
+        Logger.trace("TOC PAGE STARTS AT: " + tocStartPage);
+
+        int numberOfTocPages = writer.getPageNumber() - tocStartPage + 1;
+        Logger.trace("TOC NUMBER OFPAGES: " + numberOfTocPages);
+
+        // update total number of pages
+        ColumnText.showTextAligned(total, Element.ALIGN_LEFT, new Phrase(String.valueOf(writer.getPageNumber() - numberOfTocPages)), 2, 2, 0);
+
+        return tocStartPage;
     }
-
-    public static void writeListContent(String outputPdfPath, List<? extends PdfPrintable> songPrintObjects, boolean useColumns) {
-        PdfGenerator pdfGenerator;
-        try {
-            pdfGenerator = new PdfGenerator(outputPdfPath, true);
-            int tocStartPage = 0;
-            if (!useColumns) {
-                // TODO: Bug - page number header is missing?
-                pdfGenerator.createSongsTOC(songPrintObjects);
-                pdfGenerator.createSongsChapters(songPrintObjects, useColumns);
-            } else {
-                tocStartPage = pdfGenerator.createSongColumns(songPrintObjects, useColumns);
-            }
-            pdfGenerator.document.close();
-
-            PdfReader reader = new PdfReader(pdfGenerator.baos.toByteArray());
-
-            // reordering pages while ToC is on the end of the document
-            if (tocStartPage != 0) {
-                reorderToC(reader, tocStartPage, outputPdfPath);
-            } else {
-                PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(outputPdfPath));
-                stamper.close();
-            }
-
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-    
 
     private static void reorderToC(PdfReader reader, int tocStartPage, String outputPdfPath) throws FileNotFoundException, DocumentException, IOException {
         int n = reader.getNumberOfPages();
@@ -896,7 +841,7 @@ public class PdfGenerator {
         // step 4
         // Create a list for the bookmarks
         ArrayList<HashMap<String, Object>> bookmarks = new ArrayList<HashMap<String, Object>>();
-        List<HashMap<String, Object>> tmp; 
+        List<HashMap<String, Object>> tmp;
         for (int i = 0; i < numberOfPdfs; i++) {
             reader = new PdfReader(outputPdfPath + "_tmp.pdf");
             // merge the bookmarks
@@ -932,23 +877,36 @@ public class PdfGenerator {
         document.close();
     }
 
-    public static void simpleTest() {
+    // public method for PDF generation
+    public static void writeListContent(String outputPdfPath, List<? extends PdfPrintable> songPrintObjects, boolean useColumns) {
         PdfGenerator pdfGenerator;
         try {
-            pdfGenerator = new PdfGenerator("resources/pdf/test.pdf");
+            int tocStartPage = 0;
+            if (!useColumns) {
+                // SSPP Engine
+                pdfGenerator = new PdfGenerator(outputPdfPath);
+                pdfGenerator.createSongsTOC(songPrintObjects);
+                pdfGenerator.createSongsChapters(songPrintObjects, useColumns);
+            } else {
+                // MCS Engine
+                pdfGenerator = new PdfGenerator(outputPdfPath, true);
+                tocStartPage = pdfGenerator.createSongColumns(songPrintObjects, useColumns);
+            }
             pdfGenerator.document.close();
+
+            PdfReader reader = new PdfReader(pdfGenerator.baos.toByteArray());
+
+            // reordering pages while ToC is on the end of the document
+            if (tocStartPage != 0) {
+                reorderToC(reader, tocStartPage, outputPdfPath);
+            } else {
+                PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(outputPdfPath));
+                stamper.close();
+            }
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
-
-    public Rectangle getSongPageSize() {
-        return songPageSize;
-    }
-
-    public void setSongPageSize(Rectangle songPageSize) {
-        this.songPageSize = songPageSize;
     }
 
     public static void main(final String[] args) throws Exception {
