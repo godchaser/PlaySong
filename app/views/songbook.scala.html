@@ -55,7 +55,7 @@
 				<option value="2">Droid Sans</option>
 				<option value="3">Courier New</option>
 			</select>
-			-->
+			
 			<select id="lyrics-font" class="btn btn-group btn-default">
 				<option value="1">Courier New</option>
 				<option value="2">Droid Sans Mono</option>
@@ -65,6 +65,8 @@
 				<option value="1">pdf</option>
 				<option value="2">word</option>
 			</select>
+			-->
+			
 			<div class="checkbox">
 				  <label><input type="checkbox" id="exclude-chords-checkbox" checked> <i class="fa fa-music">  Chords</i></label>
 			</div>
@@ -80,7 +82,7 @@
 			<br>
 			<input type="text" class="form-control" id="songbook-name">
 			<div class="checkbox">
-				  <label><input type="checkbox" id="publish-service-checkbox" value="">Publish?</label>
+				  <label><input type="checkbox" id="publish-playlist-checkbox" value="">Save playlist</label>
 			</div>
 		</div>	
 		}
@@ -277,7 +279,7 @@
 				songBookData.format = format;
 				
 				@if(user.email != "Guest"){
-				songBookData.publishService = document.getElementById('publish-service-checkbox').checked;
+				songBookData.publishPlaylist = document.getElementById('publish-playlist-checkbox').checked;
 				songBookData.songBookName = $('#songbook-name').val();
 				}
 				if (document.getElementById('exclude-chords-checkbox').checked){

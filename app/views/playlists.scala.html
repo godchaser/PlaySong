@@ -9,7 +9,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-12">
-				<h3>Services </h3>
+				<h3>Playlists </h3>
 				<div class="checkbox">
 				  <label hidden><input type="checkbox" id="exclude-chords-checkbox" value="">Exclude chords</label>
 				</div>
@@ -35,7 +35,7 @@
 							<li><i class="fa fa-music"></i>  @song.songName</li>
 						}
 						</ol>				
-						<a href="@routes.Application.generateService(service.id.toString())" download><i class="fa fa-download"></i> Download service </a>					
+						<a href="@routes.Application.generateService(service.id.toString())" download><i class="fa fa-download"></i> Download playlist </a>					
 						<a href='@routes.Application.generateService(service.id.toString()+"_x0")' download><i class="fa fa-download"></i> No chords</a>			
 					    <a href='@routes.Application.generateService(service.id.toString()+"_0c")' download><i class="fa fa-download"></i> No columns</a>							
 					    <a href='@routes.Application.generateService(service.id.toString()+"_xc")' download><i class="fa fa-download"></i> No chords&columns</a>
@@ -55,7 +55,7 @@
 		$('#service_wrapper').remove();
 	
 		function deleteService(id) {
-			console.log("Delete service : " + id);
+			console.log("Delete playlist : " + id);
 			jsRoutes.controllers.Application.deleteservice(id).ajax({
 				type : 'DELETE',
 				success : function() {
@@ -80,14 +80,14 @@
 						link = link.concat("?hash=" + data);
 						link = link.concat("&format=" + format);
 						window.open(link, '_self');
-						$('#notificationdiv').html('<div class="alert alert-info close" data-dismiss="alert">Songbook downloaded</div>');		
+						$('#notificationdiv').html('<div class="alert alert-info close" data-dismiss="alert">Playlist downloaded</div>');		
 					},
 					contentType : 'application/json'
 				});
 				*/
 
 		$('.deletebutton').click(function(event) {
-			if( ! confirm("Do you really want to delete service?") ){
+			if( ! confirm("Do you really want to delete playlist?") ){
 		            event.preventDefault();
 		        } 
 		        else {

@@ -13,7 +13,7 @@ GET      /songeditor/:id              controllers.Application.songeditor(id: Lon
 GET      /newsongeditor               controllers.Application.newsongeditor()
 GET      /songview/:id                controllers.Application.songview(id: Long)
 GET      /songsbackup                 controllers.Application.songs()
-GET      /services                    controllers.Application.services()
+GET      /playlists                   controllers.Application.services()
 
 # Authentication routes
 GET      /login                       controllers.Application.login()
@@ -28,8 +28,8 @@ GET      /json/favoritesongs           controllers.Application.getfavoritessongs
 POST     /songs                       controllers.Application.newsong()
 DELETE   /songs/:id                   controllers.Application.deletesong(id: Long)
 
-DELETE   /services/:id                controllers.Application.deleteservice(id: Long)
-GET      /services/:id                controllers.Application.generateService(id: String)
+DELETE   /playlist/:id                controllers.Application.deleteservice(id: Long)
+GET      /playlist/:id                controllers.Application.generateService(id: String)
 
 # used for retrieving specific song info in json format
 GET      /songs/:id                   controllers.Application.getsongjson(id: Long)
