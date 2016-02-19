@@ -276,6 +276,9 @@
 				songBookData.fonts = songFont;
 				
 				var format = $('#document-format' + ' option:selected').text();
+				if (!format){
+				format = "pdf";
+				}
 				songBookData.format = format;
 				
 				@if(user.email != "Guest"){

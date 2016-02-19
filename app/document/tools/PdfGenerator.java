@@ -9,9 +9,11 @@ import document.tools.PdfGenerator.TOCEntry;
 import helpers.ArrayHelper;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -349,7 +351,7 @@ public class PdfGenerator {
         }
 
         public void setLongestLine(int longestLine) {
-            // System.out.println("#### Longest line" + name + " : " +
+            // Logger.trace("#### Longest line" + name + " : " +
             // longestLine);
             this.longestLine = longestLine;
         }
@@ -605,7 +607,7 @@ public class PdfGenerator {
     private int createSongColumns(List<? extends PdfPrintable> printObject, boolean useColumns) throws IOException, DocumentException {
 
         ArrayList<SongParagraphs> printableSongs = getPrintableSongs(printObject);
-     
+
         int numberOfSongs = printableSongs.size();
 
         ColumnText ct = new ColumnText(writer.getDirectContent());
@@ -620,7 +622,7 @@ public class PdfGenerator {
 
             // skip song if it is already merged
             if ((i != 0) && (i <= lastWrittenSong)) {
-                System.out.println("!!! SKIPPING SONG BY INDEX: " + i);
+                Logger.trace("!!! SKIPPING SONG BY INDEX: " + i);
                 continue;
             }
 
@@ -652,35 +654,35 @@ public class PdfGenerator {
                 int songLongestLine = song.getLongestLine();
                 boolean songHasTooLongLine = (songLongestLine > maxCharLenght) ? true : false;
 
-                System.out.println("#### writtenLines: " + writtenLines);
+                Logger.trace("#### writtenLines: " + writtenLines);
 
-                System.out.println("+++ STARTING SONG: " + song.getName());
+                Logger.trace("+++ STARTING SONG: " + song.getName());
 
                 // check if there is enough lines in current column - switch to next column (and not first iteration)
                 if (((songNumberOfLines + writtenLines) > maxLinesPerColumn) && (j != 0) && !secondColumnActive) {
                     firstColumn = false;
                     writtenLines = maxLinesPerColumn;
-                    System.out.println("##### moved to second column, now writtenLines: " + writtenLines);
+                    Logger.trace("##### moved to second column, now writtenLines: " + writtenLines);
                 }
 
                 // if second column active, and I don't have any more place in it or if any of the song has too long line
                 if (secondColumnActive || (writtenLines >= maxLinesPerColumn)) {
-                    System.out.println("++++ SECOND COLUMN ACTIVE: ");
+                    Logger.trace("++++ SECOND COLUMN ACTIVE: ");
                     SongParagraphs previousSong = printableSongs.get(i + j - 1);
                     // check if I started writing to new column
                     if (writtenLines >= maxLinesPerColumn) {
-                        System.out.println("++++ SECOND COLUMN ACTIVE: 0");
+                        Logger.trace("++++ SECOND COLUMN ACTIVE: 0");
                         // lines of both songs won't fit in column
                         // minus maxLinesPerColumn because first column is filled
                         if (((songNumberOfLines + writtenLines - maxLinesPerColumn) > maxLinesPerColumn)) {
-                            System.out.println("!BREAK! ADDITIONAL SONG WONT FIT IN COLUMN");
+                            Logger.trace("!BREAK! ADDITIONAL SONG WONT FIT IN COLUMN");
                             break;
                         }
 
                         // if any of the column has too long lines break
                         boolean previousSongHasTooLongLine = (previousSong.getLongestLine() > maxCharLenght) ? true : false;
                         if (songHasTooLongLine || previousSongHasTooLongLine) {
-                            System.out.println("!BREAK! ADDITIONAL SONG HAS TOO LONG LINE ");
+                            Logger.trace("!BREAK! ADDITIONAL SONG HAS TOO LONG LINE ");
                             break;
                         }
                     }
@@ -689,7 +691,7 @@ public class PdfGenerator {
                 // if there is no more space on page then break and move to next
                 // page
                 if ((songNumberOfLines + writtenLines) > maxLinesPerPage) {
-                    System.out.println("!BREAK! NO MORE SPACE ON PAGE ");
+                    Logger.trace("!BREAK! NO MORE SPACE ON PAGE ");
                     break;
                 }
 
@@ -712,7 +714,7 @@ public class PdfGenerator {
                     // first column is filled
                     writtenLines = maxLinesPerColumn;
                     forceNextColumn = false;
-                    System.out.println("$$$ FORCING NEXT COLUMN");
+                    Logger.trace("$$$ FORCING NEXT COLUMN");
                 } else if (songHasTooLongLine && (j != 0)) {
                     if (!secondColumnActive) {
                         ct.setSimpleColumn(COLUMNS[1]);
@@ -724,7 +726,7 @@ public class PdfGenerator {
                 // write to first column if the lines are too long
                 else if (fitOnSamePage && !songHasTooLongLine) {
                     // do nothing
-                    System.out.println("$$$$$$ FITTING ON SAME PAGE" + song.getName());
+                    Logger.trace("$$$$$$ FITTING ON SAME PAGE" + song.getName());
                 } else if (firstColumn) {
                     ct.setSimpleColumn(COLUMNS[0]);
                 } else {
@@ -761,9 +763,9 @@ public class PdfGenerator {
                     writtenLines = writtenLines + songNumberOfLines;
                 }
 
-                System.out.println("========= WRITING SONG: " + songTitle);
-                System.out.println("========= SONG LINES: " + songNumberOfLines);
-                System.out.println("========= WRITTEN LINES: " + writtenLines);
+                Logger.trace("========= WRITING SONG: " + songTitle);
+                Logger.trace("========= SONG LINES: " + songNumberOfLines);
+                Logger.trace("========= WRITTEN LINES: " + writtenLines);
 
                 hasMoreText = ColumnText.hasMoreText(status);
 
@@ -776,25 +778,25 @@ public class PdfGenerator {
                     }
                     secondColumnActive = true;
                     status = ct.go();
-                    System.out.println("*** COLUMN HAS MORE TEXTS - OVERFLOW *** " + songTitle);
+                    Logger.trace("*** COLUMN HAS MORE TEXTS - OVERFLOW *** " + songTitle);
                     break;
                 }
             }
 
-            System.out.println("NEW PAGE");
+            Logger.trace("NEW PAGE");
             this.document.newPage();
 
             count++;
-            System.out.println("STATUS: " + count + " : " + writtenSongs + " : " + hasMoreText);
+            Logger.trace("STATUS: " + count + " : " + writtenSongs + " : " + hasMoreText);
         }
 
         // Now start writing TOC
         this.document.newPage();
-        
+
         final Chapter intro = new Chapter(new Paragraph("Table Of Content", fonts.BOLD), 0);
         intro.setNumberDepth(0);
         this.document.add(intro);
-        
+
         int tocStartPage = this.writer.getPageNumber();
 
         int i = 1;
@@ -805,8 +807,8 @@ public class PdfGenerator {
             this.document.add(new Paragraph(c));
             i++;
         }
-        
-        System.out.println("TOC PAGE NR: " + tocStartPage);
+
+        Logger.trace("TOC PAGE NR: " + tocStartPage);
 
         return tocStartPage;
 
@@ -826,7 +828,7 @@ public class PdfGenerator {
 
             String content = printObject.get(i).getContent();
 
-            // System.out.println(content);
+            // Logger.trace(content);
 
             chapter.addSection(new Paragraph(content, fonts.MONOSPACE), 0);
             // chapter.setNumberDepth(0);
@@ -862,12 +864,9 @@ public class PdfGenerator {
 
             PdfReader reader = new PdfReader(pdfGenerator.baos.toByteArray());
 
-            // reordering pages if ToC is on the end of the document
+            // reordering pages while ToC is on the end of the document
             if (tocStartPage != 0) {
-                int n = reader.getNumberOfPages();
-                reader.selectPages(String.format("%s-%s, 1-%s, %s", tocStartPage, n, tocStartPage-1, n));
-                PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(outputPdfPath));
-                stamper.close();
+                reorderToC(reader, tocStartPage, outputPdfPath);
             } else {
                 PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(outputPdfPath));
                 stamper.close();
@@ -877,6 +876,60 @@ public class PdfGenerator {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+    
+
+    private static void reorderToC(PdfReader reader, int tocStartPage, String outputPdfPath) throws FileNotFoundException, DocumentException, IOException {
+        int n = reader.getNumberOfPages();
+        reader.selectPages(String.format("%s-%s, 1-%s, %s", tocStartPage, n, tocStartPage - 1, n));
+
+        PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(outputPdfPath + "_tmp.pdf"));
+        stamper.close();
+
+        int numberOfPdfs = 1;
+        // step 1
+        Document document = new Document();
+        // step 2
+        PdfCopy copy = new PdfCopy(document, new FileOutputStream(outputPdfPath));
+        // step 3
+        document.open();
+        // step 4
+        // Create a list for the bookmarks
+        ArrayList<HashMap<String, Object>> bookmarks = new ArrayList<HashMap<String, Object>>();
+        List<HashMap<String, Object>> tmp; 
+        for (int i = 0; i < numberOfPdfs; i++) {
+            reader = new PdfReader(outputPdfPath + "_tmp.pdf");
+            // merge the bookmarks
+            tmp = SimpleBookmark.getBookmark(reader);
+            // SimpleBookmark.shiftPageNumbers(tmp, page_offset, null);
+
+            for (int idx = 0; idx < (tmp.size() - 1); idx++) {
+                // last element
+                int from = tmp.size() - 1;
+                // increase index in every iteration
+                int to = idx;
+                // 0 1 2 3 4 5 6 7
+                // 7 1 2 3 4 5 6 0
+                // 7 0 2 3 4 5 6 1
+                // 7 0 1 3 4 5 6 2
+                // 7 0 1 2 4 5 6 3
+                Logger.trace("Swapping elements - from: " + from + " to: " + to);
+                Collections.swap(tmp, from, to);
+            }
+
+            bookmarks.addAll(tmp);
+            // add the pages
+
+            for (int page = 0; page < n;) {
+                copy.addPage(copy.getImportedPage(reader, ++page));
+            }
+            copy.freeReader(reader);
+            reader.close();
+        }
+        // Add the merged bookmarks
+        copy.setOutlines(bookmarks);
+        // step 5
+        document.close();
     }
 
     public static void simpleTest() {

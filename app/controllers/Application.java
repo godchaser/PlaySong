@@ -375,8 +375,18 @@ public class Application extends Controller {
             user = new UserAccount("Guest", "", "");
         }
 
-        // Manual sorting because of JPA OrderBy bidirectional relationship bug
         List<Service> serviceList = Service.find.all();
+
+        // sort by date created
+        Collections.sort(serviceList, new Comparator<Service>() {
+            public int compare(Service o1, Service o2) {
+                if (o1.getDateCreated() == null || o2.getDateCreated() == null)
+                    return 0;
+                return o1.getDateCreated().compareTo(o2.getDateCreated());
+            }
+        });
+
+        // Manual sorting because of JPA OrderBy bidirectional relationship bug
         for (Service service : serviceList) {
             Collections.sort(service.getSongs());
         }
@@ -804,7 +814,7 @@ public class Application extends Controller {
             format = jsonSongbook.getFormat();
             Map<String, Object> additionalProperties = jsonSongbook.getAdditionalProperties();
             if (additionalProperties != null) {
-                if (additionalProperties.get("publishService") != null) {
+                if (additionalProperties.get("publishPlaylist") != null) {
                     publishPlaylist = Boolean.parseBoolean(additionalProperties.get("publishPlaylist").toString());
                 }
                 if (additionalProperties.get("songBookName") != null) {
