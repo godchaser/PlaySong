@@ -506,7 +506,8 @@ public class Application extends Controller {
         Ebean.createSqlUpdate("delete from song").execute();
         Ebean.createSqlUpdate("delete from service_song").execute();
         Ebean.createSqlUpdate("delete from service").execute();
-        return ok();
+        Ebean.createSqlUpdate("delete from song_book").execute();
+        return redirect(routes.Application.table());
     }
 
     @Security.Authenticated(Secured.class)
@@ -1069,7 +1070,7 @@ public class Application extends Controller {
     public Result syncDb() {
         PlaySongRestService psrs = new PlaySongRestService();
         psrs.downloadSongsData();
-        psrs.downloadFavoritesSongsData();
+        //psrs.downloadFavoritesSongsData();
         return redirect(routes.Application.table());
     }
 

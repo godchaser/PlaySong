@@ -12,23 +12,24 @@ import java.util.List;
 import models.Service;
 import models.ServiceSong;
 import models.Song;
+import models.SongBook;
 import models.SongLyrics;
 import play.Logger;
 
 public class DatabaseHelper {
-    
-    public void writeJsonSongLyricsToDb(List<SongLyricsJson> songLyricsJson, List<Long> updatedSongs){
-        //TODO: IMPLEMENT OPTIONAL DELETION OF MISSING REMOTE SONGS
+
+    public void writeJsonSongLyricsToDb(List<SongLyricsJson> songLyricsJson, List<Long> updatedSongs) {
+        // TODO: IMPLEMENT OPTIONAL DELETION OF MISSING REMOTE SONGS
         for (SongLyricsJson songlyrics : songLyricsJson) {
             Logger.trace("PlaySongDatabase : Checkin if song lyrics is already in db: " + songlyrics.getSongLyricsId() + " : " + songlyrics.getSongId());
             SongLyrics foundSongLyrics = SongLyrics.get(songlyrics.getSongLyricsId());
             boolean shouldUpdateSong = false;
             boolean songUpdated = updatedSongs.contains(songlyrics.getSongId());
             // UPDATE SONG LYRICS IF IT IS PRESENT AND SONG WAS UPDATED ALREADY
-            if (foundSongLyrics!=null && songUpdated){
+            if (foundSongLyrics != null && songUpdated) {
                 Logger.trace("PlaySongDatabase : Updating songlyrics (id) to db = " + songlyrics.getSongLyricsId());
                 shouldUpdateSong = true;
-            } else if (!songUpdated){
+            } else if (!songUpdated) {
                 Logger.trace("PlaySongDatabase : Song Lyrics up to date: " + songlyrics.getSongLyricsId());
                 continue;
             }
@@ -37,8 +38,8 @@ public class DatabaseHelper {
 
             Song song = Song.get(songlyrics.getSongId());
             // DELETE PREVIOUS LOCAL SONG LYRICS IF REMOTE SONG HAS ONLY 1 SONG LYRICS - THIS I SFOR SAVE
-            if (!shouldUpdateSong && song != null && song.getSongLyrics().size()<2){
-                Logger.trace("PlaySongDatabase : Deleting stale songlyrics!");         
+            if (!shouldUpdateSong && song != null && song.getSongLyrics().size() < 2) {
+                Logger.trace("PlaySongDatabase : Deleting stale songlyrics!");
                 SongLyrics.deleteSongLyricsForSong(song);
             }
 
@@ -47,31 +48,31 @@ public class DatabaseHelper {
             songlyricsdb.setId((songlyrics.getSongLyricsId()));
             songlyricsdb.setSongKey(songlyrics.getSongKey());
             songlyricsdb.setsongLyrics(songlyrics.getSongLyrics());
-            //songlyricsdb.setSongLyricsHtml(LyricsHtmlBuilder.buildHtmlFromSongLyrics(songlyrics.getSongLyrics()));
-            //.setSongLyricsWithoutChordsHtml(LyricsHtmlBuilder.buildHtmlFromSongLyrics(LineTypeChecker.removeChordLines(songlyrics.getSongLyrics())));
+            // songlyricsdb.setSongLyricsHtml(LyricsHtmlBuilder.buildHtmlFromSongLyrics(songlyrics.getSongLyrics()));
+            // .setSongLyricsWithoutChordsHtml(LyricsHtmlBuilder.buildHtmlFromSongLyrics(LineTypeChecker.removeChordLines(songlyrics.getSongLyrics())));
             if (song != null) {
                 songlyricsdb.setSong(song);
             } else {
                 Logger.trace("PlaySongDatabase : Could not find song for songlyrics!!! Song ID: " + songlyrics.getSongId());
             }
-            if (shouldUpdateSong){
+            if (shouldUpdateSong) {
                 songlyricsdb.update();
             } else {
                 songlyricsdb.save();
             }
-         }
+        }
     }
 
-    public List<Long> writeJsonSongsToDb(List<SongsJson> songsJson){
+    public List<Long> writeJsonSongsToDb(List<SongsJson> songsJson) {
         List<Long> updatedSongs = new ArrayList<>();
-        for (SongsJson song : songsJson){
+        for (SongsJson song : songsJson) {
             boolean shouldUpdateSong = false;
             Logger.trace("PlaySongDatabase : Checkin if songs is already in db: " + song.getSongId() + " : " + song.getSongName());
             Song foundSong = Song.get(song.getSongId());
-            if (foundSong!=null){
-                if (foundSong.getDateModified().getTime()<song.getDateModified()){
-                    //UPDATE SONG
-                    shouldUpdateSong= true;
+            if (foundSong != null) {
+                if (foundSong.getDateModified().getTime() < song.getDateModified()) {
+                    // UPDATE SONG
+                    shouldUpdateSong = true;
                 } else {
                     Logger.trace("PlaySongDatabase : Song in db already up to date: " + song.getSongId() + " : " + song.getSongName());
                     continue;
@@ -91,7 +92,34 @@ public class DatabaseHelper {
             songdb.setSongLink(song.getSongLink());
             songdb.setDateCreated(new Date(song.getDateCreated()));
             songdb.setDateModified(new Date(song.getDateModified()));
-            if (shouldUpdateSong){
+            boolean songBookExists = false;
+            if (song.getSongBookId() != null) {        
+                SongBook foundSongBook = SongBook.get(song.getSongBookId());                
+                if (foundSongBook != null) {
+                    Logger.trace("PlaySongDatabase : found songbook = " + foundSongBook.getSongBookName());
+                    // found existing songbook
+                    // TODO: Think about reusing updateOrCreate Song method
+                    songdb.setSongBook(foundSongBook);
+                }
+            }
+
+            if (!songBookExists) {
+                Logger.trace("PlaySongDatabase : songbook does not exist");
+                // setting default songbook
+                SongBook defaultSongbook = SongBook.get(1l);
+                if (defaultSongbook == null) {
+                    Logger.trace("PlaySongDatabase : creating default songbook");
+                    defaultSongbook = new SongBook();
+                    defaultSongbook.setId(1l);
+                    defaultSongbook.setSongBookName("default");
+                    defaultSongbook.setPrivateSongbook(false);
+                    defaultSongbook.save();
+                }              
+                songdb.setSongBook(defaultSongbook);
+            }
+
+            // song
+            if (shouldUpdateSong) {
                 songdb.update();
             } else {
                 songdb.save();
@@ -101,16 +129,16 @@ public class DatabaseHelper {
         return updatedSongs;
     }
 
-    public List<Long> writeJsonFavoritesSongsToDb(List<ServiceJson> servicesJson){
+    public List<Long> writeJsonFavoritesSongsToDb(List<ServiceJson> servicesJson) {
         List<Long> updatedFavorites = new ArrayList<>();
         Logger.trace("PlaySongDatabase : Trying to writes json favorites to db");
-        for (ServiceJson favorite : servicesJson){
+        for (ServiceJson favorite : servicesJson) {
             // first checking if service already imported
-            Service foundService =  Service.get(favorite.getId());
+            Service foundService = Service.get(favorite.getId());
             Logger.trace("PlaySongDatabase : Checkin if service is already in db: " + favorite.getSongBookName());
-            if (foundService!=null){
-                if (foundService.getDateCreated().getTime()<favorite.getDateCreated().longValue()){
-                    //UPDATE SERVICE
+            if (foundService != null) {
+                if (foundService.getDateCreated().getTime() < favorite.getDateCreated().longValue()) {
+                    // UPDATE SERVICE
                 } else {
                     Logger.trace("PlaySongDatabase : Service in db already up to date");
                     continue;

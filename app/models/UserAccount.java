@@ -1,5 +1,9 @@
 package models;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.*;
 
 import play.data.validation.Constraints.Required;
@@ -15,8 +19,11 @@ public class UserAccount extends Model {
 	public String name;
 	@Required
 	public String password;
+	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	public List<SongBook> songbooks = new ArrayList<SongBook>();
 
-	public UserAccount(String email, String name, String password) {
+    public UserAccount(String email, String name, String password) {
 		this.email = email;
 		this.name = name;
 		this.password = password;
@@ -55,6 +62,14 @@ public class UserAccount extends Model {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+	
+	   public List<SongBook> getSongbooks() {
+	        return songbooks;
+	    }
+
+	    public void setSongbooks(List<SongBook> songbooks) {
+	        this.songbooks = songbooks;
+	    }
 	
 	
 }

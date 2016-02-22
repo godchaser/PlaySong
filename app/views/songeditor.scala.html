@@ -8,12 +8,14 @@
             @helper.inputText(songForm("songOriginalTitle"), args = '_label -> "Original title: ", 'class -> "form-control")
             @helper.inputText(songForm("songAuthor"), args = '_label -> "Author: ", 'class -> "form-control")
             @helper.inputText(songForm("songLink"), args = '_label -> "Link: ", 'class -> "form-control")
+            @helper.inputText(songForm("songBook.songBookName"), args = '_label -> "Songbook Name: ", 'class -> "form-control")
             @helper.textarea(field = songForm("songLyrics[0].songLyrics"), args = '_label -> "Lyrics: ", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
             @helper.textarea(field = songForm("songLyrics[1].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
             @helper.textarea(field = songForm("songLyrics[2].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
             @helper.textarea(field = songForm("songLyrics[3].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
             <input type="submit" value="Save" class="btn btn-default">
             @helper.inputText(songForm("id"), args = 'style -> "display:none;", 'class -> "form-control monoSpaceTextArea")
+            @helper.inputText(songForm("songBook.id"), args = 'style -> "display:none;", 'class -> "form-control monoSpaceTextArea")
         }
         <button type="button" id="addAdditionalLyricsButton" class="btn btn-default">Add additional lyrics</button>
     </div>
@@ -46,6 +48,8 @@
                         $('#songOriginalTitle').attr("value", data.songOriginalTitle);
                         $('#songAuthor').attr("value", data.songAuthor);
                         $('#songLink').attr("value", data.songLink);
+                        $('#songBook_songBookName').attr("value", data.songBookName);
+                        $('#songBook_songBookId').attr("value", data.songBookId);
                         songLyricsIDs = data.songLyricsIDs;
 
                         $.each(songLyricsIDs, function(i,s){

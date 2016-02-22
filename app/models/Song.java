@@ -16,221 +16,243 @@ import com.avaje.ebean.Model;
 @Entity
 public class Song extends Model implements Comparator<Song> {
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE)
-	public Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    public Long id;
 
-	@Required
-	public String songName;
+    @Required
+    public String songName;
 
-	public String songOriginalTitle;
+    public String songOriginalTitle;
 
-	public String songAuthor;
+    public String songAuthor;
 
-	public String songLink;
+    public String songLink;
 
-	public String songImporter;
+    public String songImporter;
 
-	public String songLastModifiedBy;
+    public String songLastModifiedBy;
 
-	public int songBookId;
+    @ManyToOne()
+    public SongBook songBook;
 
-	@Column(updatable = false)
-	@Formats.DateTime(pattern = "dd/MM/yyyy hh:mm")
-	public Date dateCreated = new Date();
+    @Column(updatable = false)
+    @Formats.DateTime(pattern = "dd/MM/yyyy hh:mm")
+    public Date dateCreated = new Date();
 
-	@Formats.DateTime(pattern = "dd/MM/yyyy hh:mm")
-	public Date dateModified = new Date();
+    @Formats.DateTime(pattern = "dd/MM/yyyy hh:mm")
+    public Date dateModified = new Date();
 
-	@OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
-	public List<SongLyrics> songLyrics = new ArrayList<>();
+    @OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
+    public List<SongLyrics> songLyrics = new ArrayList<>();
 
-	public static List<Song> all() {
-		return find.all();
-	}
+    public static List<Song> all() {
+        return find.all();
+    }
 
-	public static int getNumberOfSongsInDatabase() {
-		return find.all().size();
-	}
+    public static int getNumberOfSongsInDatabase() {
+        return find.all().size();
+    }
 
-	public static Song get(Long id) {
-		return find.byId(id);
-	}
+    public static Song get(Long id) {
+        return find.byId(id);
+    }
 
-	public static void updateOrCreateSong(Song song) {
-		// delete empty lyrics
-		List<SongLyrics> removedList = new ArrayList<SongLyrics>();
-		for (int i = 0; i < song.songLyrics.size(); i++) {
-			if (song.songLyrics.get(i).getsongLyrics().length() < 2) {
-				removedList.add(song.songLyrics.get(i));
-			}
-		}
-		song.songLyrics.removeAll(removedList);
+    public static void updateOrCreateSong(Song song) {
+        // delete empty lyrics
+        List<SongLyrics> removedList = new ArrayList<SongLyrics>();
+        for (int i = 0; i < song.songLyrics.size(); i++) {
+            if (song.songLyrics.get(i).getsongLyrics().length() < 2) {
+                removedList.add(song.songLyrics.get(i));
+            }
+        }
+        song.songLyrics.removeAll(removedList);
 
-		// song must have lyrics
-		if (song.songLyrics.size() > 0) {
-			for (SongLyrics songLyrics : song.songLyrics) {
-				songLyrics.updateSongKeys();
-				songLyrics.sanitizeLyrics();
-			}
-			if (song.id != null && song.id > 0) {
-				// DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
-				Date date = new Date();
-				song.setDateModified(date);
-				song.update();
-			} else {
-				song.id = null;
-				// DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
-				Date date = new Date();
-				song.setDateCreated(date);
-				song.save();
-			}
-			Logger.debug("Song updated by user: " + song.songLastModifiedBy);
-			Logger.debug("Song updated on: " + song.getDateModified().toString());
-		} else {
-			Logger.debug("Will not save song without lyrics");
-		}
-	}
+        // if songbook is set, and it is not default songbook
+        if (song.getSongBook() != null && song.getSongBook().getId() != 0l) {
+            if (!song.getSongBook().getSongBookName().isEmpty()) {
+                Logger.debug("Updading songbook name: " + song.getSongBook().getSongBookName());
+                SongBook newSongbook = new SongBook();
+                newSongbook.setSongBookName(song.getSongBook().getSongBookName());
+                newSongbook.setPrivateSongbook(false);
+                song.setSongBook(newSongbook);
+            }
+        } else {
+            // set default songbook if not set
+            //if (song.getSongBook() == null) {
+                Logger.debug("Using default songbook");
+                SongBook defaultSongbook = new SongBook();
+                defaultSongbook.setId(0L);
+                defaultSongbook.setSongBookName("default");
+                defaultSongbook.setPrivateSongbook(false);
+                song.setSongBook(defaultSongbook);
+           // }
+        }
 
-	public static void delete(Long id) {
-		find.ref(id).delete();
-	}
+        Logger.debug("Using songbook: " + song.getSongBook().getSongBookName());
 
-	public static Finder<Long, Song> find = new Finder<>(Song.class);
+        // song must have lyrics
+        if (song.songLyrics.size() > 0) {
+            for (SongLyrics songLyrics : song.songLyrics) {
+                songLyrics.updateSongKeys();
+                songLyrics.sanitizeLyrics();
+            }
+            if (song.id != null && song.id > 0) {
+                // DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+                Date date = new Date();
+                song.setDateModified(date);
+                song.update();
+            } else {
+                song.id = null;
+                // DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+                Date date = new Date();
+                song.setDateCreated(date);
+                song.save();
+            }
+            Logger.debug("Song updated by user: " + song.songLastModifiedBy);
+            Logger.debug("Song updated on: " + song.getDateModified().toString());
+        } else {
+            Logger.debug("Will not save song without lyrics");
+        }
+    }
 
-	@Override
-	public int compare(Song song1, Song song2) {
-		return song1.songName.compareTo(song2.songName);
-	}
+    public static void delete(Long id) {
+        find.ref(id).delete();
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public static Finder<Long, Song> find = new Finder<>(Song.class);
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    @Override
+    public int compare(Song song1, Song song2) {
+        return song1.songName.compareTo(song2.songName);
+    }
 
-	public List<SongLyrics> getSongLyrics() {
-		return songLyrics;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setSongLyrics(List<SongLyrics> songLyrics) {
-		this.songLyrics = songLyrics;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public String getSongName() {
-		return songName;
-	}
+    public List<SongLyrics> getSongLyrics() {
+        return songLyrics;
+    }
 
-	public void setSongName(String songName) {
-		this.songName = songName;
-	}
+    public void setSongLyrics(List<SongLyrics> songLyrics) {
+        this.songLyrics = songLyrics;
+    }
 
-	public String getSongOriginalTitle() {
-		return songOriginalTitle;
-	}
+    public String getSongName() {
+        return songName;
+    }
 
-	public void setSongOriginalTitle(String songOriginalTitle) {
-		this.songOriginalTitle = songOriginalTitle;
-	}
+    public void setSongName(String songName) {
+        this.songName = songName;
+    }
 
-	public String getSongAuthor() {
-		return songAuthor;
-	}
+    public String getSongOriginalTitle() {
+        return songOriginalTitle;
+    }
 
-	public void setSongAuthor(String songAuthor) {
-		this.songAuthor = songAuthor;
-	}
+    public void setSongOriginalTitle(String songOriginalTitle) {
+        this.songOriginalTitle = songOriginalTitle;
+    }
 
-	public String getSongLink() {
-		return songLink;
-	}
+    public String getSongAuthor() {
+        return songAuthor;
+    }
 
-	public void setSongLink(String songLink) {
-		this.songLink = songLink;
-	}
+    public void setSongAuthor(String songAuthor) {
+        this.songAuthor = songAuthor;
+    }
 
-	public String getSongImporter() {
-		return songImporter;
-	}
+    public String getSongLink() {
+        return songLink;
+    }
 
-	public void setSongImporter(String songImporter) {
-		this.songImporter = songImporter;
-	}
+    public void setSongLink(String songLink) {
+        this.songLink = songLink;
+    }
 
-	public String getSongLastModifiedBy() {
-		return songLastModifiedBy;
-	}
+    public String getSongImporter() {
+        return songImporter;
+    }
 
-	public void setSongLastModifiedBy(String songLastModifiedBy) {
-		this.songLastModifiedBy = songLastModifiedBy;
-	}
+    public void setSongImporter(String songImporter) {
+        this.songImporter = songImporter;
+    }
 
-	public int getSongBookId() {
-		return songBookId;
-	}
+    public String getSongLastModifiedBy() {
+        return songLastModifiedBy;
+    }
 
-	public void setSongBookId(int songBookId) {
-		this.songBookId = songBookId;
-	}
+    public void setSongLastModifiedBy(String songLastModifiedBy) {
+        this.songLastModifiedBy = songLastModifiedBy;
+    }
 
-	public Date getDateCreated() {
-		return dateCreated;
-	}
+    public SongBook getSongBook() {
+        return songBook;
+    }
 
-	public void setDateCreated(Date dateCreated) {
-		this.dateCreated = dateCreated;
-	}
+    public void setSongBook(SongBook songBook) {
+        this.songBook = songBook;
+    }
 
-	public Date getDateModified() {
-		return dateModified;
-	}
+    public Date getDateCreated() {
+        return dateCreated;
+    }
 
-	public void setDateModified(Date dateModified) {
-		this.dateModified = dateModified;
-	}
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
 
-	public static List<SongSuggestion> getSongModifiedList() {
+    public Date getDateModified() {
+        return dateModified;
+    }
 
-		int minusMonth = 1;
+    public void setDateModified(Date dateModified) {
+        this.dateModified = dateModified;
+    }
 
-		Calendar calNow = Calendar.getInstance();
-		// adding -1 month
-		calNow.add(Calendar.MONTH, -minusMonth);
-		Date dateBeforeAMonth = calNow.getTime();
+    public static List<SongSuggestion> getSongModifiedList() {
 
-		Date dateNow = Calendar.getInstance().getTime();
+        int minusMonth = 1;
 
-		List<Song> songsModifiedInLastMonth = Song.find.where().between("date_modified", dateBeforeAMonth, dateNow)
-				.orderBy("date_modified desc").findList();
+        Calendar calNow = Calendar.getInstance();
+        // adding -1 month
+        calNow.add(Calendar.MONTH, -minusMonth);
+        Date dateBeforeAMonth = calNow.getTime();
 
-		List<SongSuggestion> songModifiedList = new ArrayList<>();
-		for (Song song : songsModifiedInLastMonth) {
-			songModifiedList.add(new SongSuggestion(song.getId(), song.getSongName(), song.getDateModified()));
-		}
-		return songModifiedList;
-	}
+        Date dateNow = Calendar.getInstance().getTime();
 
-	public static List<SongSuggestion> getSongCreatedList() {
+        List<Song> songsModifiedInLastMonth = Song.find.where().between("date_modified", dateBeforeAMonth, dateNow).orderBy("date_modified desc").findList();
 
-		int minusMonth = 1;
+        List<SongSuggestion> songModifiedList = new ArrayList<>();
+        for (Song song : songsModifiedInLastMonth) {
+            songModifiedList.add(new SongSuggestion(song.getId(), song.getSongName(), song.getDateModified()));
+        }
+        return songModifiedList;
+    }
 
-		Calendar calNow = Calendar.getInstance();
-		// adding -1 month
-		calNow.add(Calendar.MONTH, -minusMonth);
-		Date dateBeforeAMonth = calNow.getTime();
+    public static List<SongSuggestion> getSongCreatedList() {
 
-		Date dateNow = Calendar.getInstance().getTime();
+        int minusMonth = 1;
 
-		List<Song> songsCreatedInLastMonth = Song.find.where().between("date_created", dateBeforeAMonth, dateNow)
-				.orderBy("date_created desc").findList();
+        Calendar calNow = Calendar.getInstance();
+        // adding -1 month
+        calNow.add(Calendar.MONTH, -minusMonth);
+        Date dateBeforeAMonth = calNow.getTime();
 
-		List<SongSuggestion> songCreatedList = new ArrayList<>();
-		for (Song song : songsCreatedInLastMonth) {
-			songCreatedList.add(new SongSuggestion(song.getId(), song.getSongName(), song.getDateModified()));
-		}
-		return songCreatedList;
-	}
+        Date dateNow = Calendar.getInstance().getTime();
+
+        List<Song> songsCreatedInLastMonth = Song.find.where().between("date_created", dateBeforeAMonth, dateNow).orderBy("date_created desc").findList();
+
+        List<SongSuggestion> songCreatedList = new ArrayList<>();
+        for (Song song : songsCreatedInLastMonth) {
+            songCreatedList.add(new SongSuggestion(song.getId(), song.getSongName(), song.getDateModified()));
+        }
+        return songCreatedList;
+    }
 
 }
