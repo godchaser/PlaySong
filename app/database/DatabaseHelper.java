@@ -106,16 +106,8 @@ public class DatabaseHelper {
             if (!songBookExists) {
                 Logger.trace("PlaySongDatabase : songbook does not exist");
                 // setting default songbook
-                SongBook defaultSongbook = SongBook.get(1l);
-                if (defaultSongbook == null) {
-                    Logger.trace("PlaySongDatabase : creating default songbook");
-                    defaultSongbook = new SongBook();
-                    defaultSongbook.setId(1l);
-                    defaultSongbook.setSongBookName("default");
-                    defaultSongbook.setPrivateSongbook(false);
-                    defaultSongbook.save();
-                }              
-                songdb.setSongBook(defaultSongbook);
+                Logger.trace("PlaySongDatabase : using default songbook");
+                songdb.setSongBook(SongBook.getDefaultSongbook());
             }
 
             // song

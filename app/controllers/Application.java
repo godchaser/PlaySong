@@ -282,7 +282,7 @@ public class Application extends Controller {
         if (user == null) {
             user = new UserAccount("Guest", "", "");
         }
-        return ok(songeditor.render(id, songForm, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
+        return ok(songeditor.render(id, songForm, user, Song.getSongModifiedList(), Song.getSongCreatedList(), user.getSongbooks()));
     }
 
     @Security.Authenticated(Secured.class)
@@ -473,7 +473,7 @@ public class Application extends Controller {
     }
 
     @Security.Authenticated(Secured.class)
-    public Result newsong() {
+    public Result updateorcreatesong() {
         Form<Song> filledForm = songForm.bindFromRequest();
         if (filledForm.hasErrors()) {
             return badRequest(views.html.error.render());
@@ -495,7 +495,7 @@ public class Application extends Controller {
             Song updatedSong = filledForm.get();
             updatedSong.setSongLastModifiedBy(userName);
             Logger.debug("Update or create song");
-            Song.updateOrCreateSong(filledForm.get());
+            Song.updateOrCreateSong(filledForm.get(), userEmail);
             return redirect(routes.Application.table());
         }
     }
@@ -852,7 +852,7 @@ public class Application extends Controller {
         // use songbook name as file hash if available
         String hash = songBookName + "_" + dateFormat.format(date);
         if (songBookName == null || songBookName.isEmpty()) {
-            hash = "Songbook_"+(dateFormat.format(date));
+            hash = "Songbook_" + (dateFormat.format(date));
         }
 
         try {
@@ -1070,7 +1070,7 @@ public class Application extends Controller {
     public Result syncDb() {
         PlaySongRestService psrs = new PlaySongRestService();
         psrs.downloadSongsData();
-        //psrs.downloadFavoritesSongsData();
+        // psrs.downloadFavoritesSongsData();
         return redirect(routes.Application.table());
     }
 
@@ -1094,7 +1094,7 @@ public class Application extends Controller {
         // Sanitizing all songs
         for (Song s : Song.all()) {
             s.setSongLastModifiedBy(ua.name.toString());
-            Song.updateOrCreateSong(s);
+            Song.updateOrCreateSong(s, ua.getEmail());
         }
 
         return redirect(routes.Application.index());

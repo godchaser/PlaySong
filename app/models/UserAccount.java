@@ -12,64 +12,70 @@ import com.avaje.ebean.Model;
 @Entity
 public class UserAccount extends Model {
 
-	@Id
-	@Required
-	public String email;
-	@Required
-	public String name;
-	@Required
-	public String password;
-	
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-	public List<SongBook> songbooks = new ArrayList<SongBook>();
+    @Id
+    @Required
+    public String email;
+    @Required
+    public String name;
+    @Required
+    public String password;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    public List<SongBook> songbooks = new ArrayList<SongBook>();
 
     public UserAccount(String email, String name, String password) {
-		this.email = email;
-		this.name = name;
-		this.password = password;
-	}
+        this.email = email;
+        this.name = name;
+        this.password = password;
+        getSongbooks().add(SongBook.getDefaultSongbook());
+    }
 
-	public static Finder<String, UserAccount> find = new Finder<>(UserAccount.class);
+    public static Finder<String, UserAccount> find = new Finder<>(UserAccount.class);
 
-	public static UserAccount authenticate(String email, String password) {
-		return find.where().eq("email", email).eq("password", password).findUnique();
-	}
+    public static UserAccount authenticate(String email, String password) {
+        return find.where().eq("email", email).eq("password", password).findUnique();
+    }
+    
+    public static UserAccount getByEmail(String userEmail){
+        return find.where().eq("email", userEmail).findUnique();
+    }
 
-	public static String getNameFromEmail(String email) {
-		return find.where().eq("email", email).findUnique().name;
-	}
-	
-	public String getEmail() {
-		return email;
-	}
+    public static String getNameFromEmail(String email) {
+        return find.where().eq("email", email).findUnique().name;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	
-	   public List<SongBook> getSongbooks() {
-	        return songbooks;
-	    }
+    public String getPassword() {
+        return password;
+    }
 
-	    public void setSongbooks(List<SongBook> songbooks) {
-	        this.songbooks = songbooks;
-	    }
-	
-	
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public List<SongBook> getSongbooks() {
+        return songbooks;
+    }
+
+    public void setSongbooks(List<SongBook> songbooks) {
+        this.songbooks = songbooks;
+    }
+    
+    
+
 }

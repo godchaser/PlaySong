@@ -35,7 +35,7 @@ public class SongToJsonConverter {
         }
 
         ObjectNode songObject = convert(s.songName, s.songLink, s.songOriginalTitle, s.songAuthor, s.id, s.songImporter, s.dateCreated.getTime(), s.dateModified.getTime(),
-                songLyricsIDsArray, s.songBook.songBookName, s.songBook.id);
+                songLyricsIDsArray, s.getSongBook().getSongBookName(), s.getSongBook().getId());
 
         return songObject;
     }
@@ -78,9 +78,9 @@ public class SongToJsonConverter {
         songObject.put("songImporter", songImporter);
         songObject.put("dateCreated", dateCreated);
         songObject.put("dateModified", dateModified);
-        songObject.putArray("songLyricsIDs").addAll(songLyricsIDsArray);
         songObject.put("songBookName", songBookName);
         songObject.put("songBookId", songBookId);
+        songObject.putArray("songLyricsIDs").addAll(songLyricsIDsArray);
 
         return songObject;
     }
