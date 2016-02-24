@@ -35,8 +35,8 @@ public class UserAccount extends Model {
     public static UserAccount authenticate(String email, String password) {
         return find.where().eq("email", email).eq("password", password).findUnique();
     }
-    
-    public static UserAccount getByEmail(String userEmail){
+
+    public static UserAccount getByEmail(String userEmail) {
         return find.where().eq("email", userEmail).findUnique();
     }
 
@@ -75,7 +75,11 @@ public class UserAccount extends Model {
     public void setSongbooks(List<SongBook> songbooks) {
         this.songbooks = songbooks;
     }
-    
-    
+
+    public boolean containsSongbook(Long id) {
+        SongBook searchedSongbook = new SongBook();
+        searchedSongbook.setId(id);
+        return getSongbooks().contains(searchedSongbook);
+    }
 
 }

@@ -69,7 +69,7 @@ public class XmlSongsParser {
 					songLyrics.add(lyrics);
 				}
 				song.setSongLyrics(songLyrics);
-				Song.updateOrCreateSong(song, "");
+				Song.updateOrCreateSong(song, "", false);
 			}
 		} else {
 			System.out

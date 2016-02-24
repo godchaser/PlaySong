@@ -4,6 +4,8 @@
     <div id="songEditor">
         <h2>Edit or create song</h2>
         @helper.form(action = routes.Application.updateorcreatesong()) {
+        	<div class="row">
+			<div class="col-lg-3 col-md-6">		
             @helper.inputText(songForm("songName"), args = '_label -> "Song name: ", 'class -> "form-control")
             @helper.inputText(songForm("songOriginalTitle"), args = '_label -> "Original title: ", 'class -> "form-control")
             @helper.inputText(songForm("songAuthor"), args = '_label -> "Author: ", 'class -> "form-control")
@@ -11,24 +13,30 @@
             @helper.inputText(songForm("songBook.songBookName"), args = '_label -> "Songbook Name: ", 'class -> "form-control")
             
             @if(songBooks.size>0){
-            	<label for="songbook-select">Available songbooks:</label>
-	           	<select class="form-control" id="songbook-select">
+            	<label for="songbook-select">Add To Songbook:</label>
+	           	<select class="selectpicker form-control" id="songbook-select">
 				  @songBooks.map { songBookItem =>
 					    <option value="@songBookItem.getId()">@songBookItem.getSongBookName()</option>
 				  	}
 				 </select>
 	        }
-
+	        <br>
+	        <br>
+			@helper.checkbox(songForm("songBook.privateSongbook"), args = '_label -> "Private songbook: ", 'class -> "form-inline", 'checked -> "checked")
+			<button type="button" id="addAdditionalLyricsButton" class="btn btn-default">Add additional lyrics</button>
+			<input type="submit" value="Save" class="btn btn-default">
+			</div>
+			<div class="col-lg-3 col-md-
             @helper.textarea(field = songForm("songLyrics[0].songLyrics"), args = '_label -> "Lyrics: ", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
             @helper.textarea(field = songForm("songLyrics[1].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
             @helper.textarea(field = songForm("songLyrics[2].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
-            @helper.textarea(field = songForm("songLyrics[3].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
-            <input type="submit" value="Save" class="btn btn-default">
+            @helper.textarea(field = songForm("songLyrics[3].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")           
             @helper.inputText(songForm("id"), args = 'style -> "display:none;", 'hidden -> "hidden")
             @helper.inputText(songForm("songBook.id"), args = 'style -> "display:none;", 'hidden -> "hidden")
+			</div>
+            </div>          
         }
-        <button type="button" id="addAdditionalLyricsButton" class="btn btn-default">Add additional lyrics</button>
-    </div>
+        </div>
 
     <script src="@routes.Assets.at("lib/jquery/dist/jquery.min.js")" ></script>
     <script src="@routes.Application.javascriptRoutes()"  ></script>

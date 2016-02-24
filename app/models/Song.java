@@ -58,7 +58,7 @@ public class Song extends Model implements Comparator<Song> {
         return find.byId(id);
     }
 
-    public static void updateOrCreateSong(Song song, String userEmail) {
+    public static void updateOrCreateSong(Song song, String userEmail, boolean isPrivateSongBook) {
         // delete empty lyrics
         List<SongLyrics> removedList = new ArrayList<SongLyrics>();
         for (int i = 0; i < song.songLyrics.size(); i++) {
@@ -78,7 +78,8 @@ public class Song extends Model implements Comparator<Song> {
             if (songBookid == SongBook.DEFAULT_SONGBOOK_ID) {
                 songBookid = null;
             }
-            activeSongbook = SongBook.updateOrCreate(songBookid, songBookName, userEmail);
+            
+            activeSongbook = SongBook.updateOrCreate(songBookid, songBookName, userEmail, song.getSongBook().getPrivateSongbook());
             song.setSongBook(activeSongbook);
         } else {
             // set default songbook if not set

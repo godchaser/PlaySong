@@ -19,11 +19,11 @@ public class SongBook extends Model {
     public Long id;
 
     public String songBookName;
+    
+    public boolean privateSongbook = false;
 
     @ManyToOne
     public UserAccount user;
-
-    public boolean privateSongbook;
 
     public static SongBook getDefaultSongbook() {
         SongBook defaultSongbook = SongBook.get(1l);
@@ -37,7 +37,7 @@ public class SongBook extends Model {
         return defaultSongbook;
     }
 
-    public static SongBook updateOrCreate(Long id, String songbookName, String userEmail) {
+    public static SongBook updateOrCreate(Long id, String songbookName, String userEmail, boolean isPrivateSongBook) {
         SongBook foundSongbook = null;
         if (id != null) {
             foundSongbook = get(id);
@@ -47,16 +47,20 @@ public class SongBook extends Model {
             } else {
                 // try finding if I have songbook already by that name
                 foundSongbook = getByNameAndEmail(songbookName, userEmail);
-                // I should create new songbook
-                // foundSongbook = null;
-                // delete stale songbooks
-                // deleteIfNoMoreSongs(id);
             }
+            // now update private flag if needed
+            if (foundSongbook!=null){
+                if (foundSongbook.getPrivateSongbook() != isPrivateSongBook){
+                    foundSongbook.setPrivateSongbook(isPrivateSongBook);
+                    foundSongbook.update();
+                }
+            }
+            
         }
         if (foundSongbook == null) {
             foundSongbook = new SongBook();
             foundSongbook.setSongBookName(songbookName);
-            foundSongbook.setPrivateSongbook(false);
+            foundSongbook.setPrivateSongbook(isPrivateSongBook);
             // if email is set then find user by it
             if (!"".equals(userEmail)) {
                 foundSongbook.setUser(UserAccount.getByEmail(userEmail));
@@ -104,7 +108,7 @@ public class SongBook extends Model {
         this.songBookName = songBookName;
     }
 
-    public boolean isPrivateSongbook() {
+    public boolean getPrivateSongbook() {
         return privateSongbook;
     }
 
@@ -119,6 +123,20 @@ public class SongBook extends Model {
                 find.byId(id).delete();
             }
         }
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if ((o instanceof SongBook) && (((SongBook) o).getId().equals(getId()))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
     }
 
 }
