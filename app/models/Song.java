@@ -33,8 +33,8 @@ public class Song extends Model implements Comparator<Song> {
 
     public String songLastModifiedBy;
 
-    @ManyToOne()
-    public SongBook songBook;
+    @ManyToMany(mappedBy = "songs")
+    public List<SongBook> songbooks = new ArrayList<SongBook>();
 
     @Column(updatable = false)
     @Formats.DateTime(pattern = "dd/MM/yyyy hh:mm")
@@ -67,28 +67,45 @@ public class Song extends Model implements Comparator<Song> {
             }
         }
         song.songLyrics.removeAll(removedList);
+
         SongBook activeSongbook = null;
-        Long sentSonbookId = song.getSongBook().getId();
-        // if songbook name is not default then create songbook or use existing one
-        if (song.getSongBook() != null && !"default".equals(song.getSongBook().getSongBookName())) {
-            Long songBookid = song.getSongBook().getId();
-            String songBookName = song.getSongBook().getSongBookName();
-            Logger.debug("Updating songbook: " + songBookName + ": id : " + songBookid);
-            // if I have default songbook id forwarded, then just delete it
-            if (songBookid == SongBook.DEFAULT_SONGBOOK_ID) {
-                songBookid = null;
-            }
-            
-            activeSongbook = SongBook.updateOrCreate(songBookid, songBookName, userEmail, song.getSongBook().getPrivateSongbook());
-            song.setSongBook(activeSongbook);
-        } else {
-            // set default songbook if not set
-            Logger.debug("Using default songbook");
-            activeSongbook = SongBook.getDefaultSongbook();
-            song.setSongBook(activeSongbook);
+        boolean savedToDefaultSongbook = false;
+
+        // first handle if songbooks is empty - create default songbook
+        if (song.getSongbooks().isEmpty()) {
+            Logger.debug("Using default songbook while song does not have any songbooks");
+            activeSongbook = SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail));
+            song.setSongBook(activeSongbook, userEmail);
+            savedToDefaultSongbook = true;
         }
 
-        Logger.debug("Using songbook: " + song.getSongBook().getSongBookName());
+        if (!savedToDefaultSongbook) {
+            for (SongBook songBook : song.getSongbooks()) {
+
+                Long sentSonbookId = songBook.getId();
+                // if songbook name is not default then create songbook or use existing one
+                if (songBook != null && !"default".equals(songBook.getSongBookName())) {
+                    Long songBookid = songBook.getId();
+                    String songBookName = songBook.getSongBookName();
+                    Logger.debug("Updating songbook: " + songBookName + ": id : " + songBookid);
+                    // if I have default songbook id forwarded, then just delete it
+                    if (songBookid == SongBook.DEFAULT_SONGBOOK_ID) {
+                        songBookid = null;
+                    }
+
+                    activeSongbook = SongBook.updateOrCreate(songBookid, songBookName, userEmail, songBook.getPrivateSongbook());
+                    song.setSongBook(activeSongbook, userEmail);
+                } else {
+                    // TODO: maybe this is redundant
+                    // set default songbook if not set
+                    Logger.debug("Using default songbook");
+                    activeSongbook = SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail));
+                    song.setSongBook(activeSongbook, userEmail);
+                }
+
+                Logger.debug("Using songbook: " + songBook.getSongBookName());
+            }
+        }
 
         // song must have lyrics
         if (song.songLyrics.size() > 0) {
@@ -111,18 +128,25 @@ public class Song extends Model implements Comparator<Song> {
             Logger.debug("Song updated by user: " + song.songLastModifiedBy);
             Logger.debug("Song updated on: " + song.getDateModified().toString());
             Logger.debug("Removing stale songbook references, if they exist");
-            SongBook.deleteIfNoMoreSongs(sentSonbookId);
+            // SongBook.deleteIfNoMoreSongs(sentSonbookId);
         } else {
             Logger.debug("Will not save song without lyrics");
         }
     }
 
+    public void setSongBook(SongBook activeSongbook, String userEmail) {
+        // Add songbook to song - skip if song already contains songbook
+        if (!getSongbooks().contains(SongBook.getByNameAndEmail(activeSongbook.getSongBookName(), userEmail))) {
+            getSongbooks().add(activeSongbook);
+        }
+    }
+
     public static void delete(Long id) {
         Song thisSong = find.ref(id);
-        Long songBookId = thisSong.getSongBook().getId();
+        // Long songBookId = thisSong.getSongBook().getId();
         thisSong.delete();
         // delete songbooks that are associated, but not needed anymore if no more songs pointing to it
-        SongBook.deleteIfNoMoreSongs(songBookId);
+        // SongBook.deleteIfNoMoreSongs(songBookId);
     }
 
     public static Finder<Long, Song> find = new Finder<>(Song.class);
@@ -196,14 +220,6 @@ public class Song extends Model implements Comparator<Song> {
         this.songLastModifiedBy = songLastModifiedBy;
     }
 
-    public SongBook getSongBook() {
-        return songBook;
-    }
-
-    public void setSongBook(SongBook songBook) {
-        this.songBook = songBook;
-    }
-
     public Date getDateCreated() {
         return dateCreated;
     }
@@ -218,6 +234,14 @@ public class Song extends Model implements Comparator<Song> {
 
     public void setDateModified(Date dateModified) {
         this.dateModified = dateModified;
+    }
+
+    public List<SongBook> getSongbooks() {
+        return songbooks;
+    }
+
+    public void setSongbooks(List<SongBook> songbooks) {
+        this.songbooks = songbooks;
     }
 
     public static List<SongSuggestion> getSongModifiedList() {

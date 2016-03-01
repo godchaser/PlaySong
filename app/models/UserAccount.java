@@ -20,14 +20,13 @@ public class UserAccount extends Model {
     @Required
     public String password;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "users")
     public List<SongBook> songbooks = new ArrayList<SongBook>();
 
     public UserAccount(String email, String name, String password) {
         this.email = email;
         this.name = name;
-        this.password = password;
-        getSongbooks().add(SongBook.getDefaultSongbook());
+        this.password = password;       
     }
 
     public static Finder<String, UserAccount> find = new Finder<>(UserAccount.class);
@@ -75,11 +74,29 @@ public class UserAccount extends Model {
     public void setSongbooks(List<SongBook> songbooks) {
         this.songbooks = songbooks;
     }
+    
+    public void setDefaultSongbook(){
+        getSongbooks().add(SongBook.getDefaultSongbook(UserAccount.getByEmail(email)));
+    }
 
     public boolean containsSongbook(Long id) {
         SongBook searchedSongbook = new SongBook();
         searchedSongbook.setId(id);
         return getSongbooks().contains(searchedSongbook);
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if ((o instanceof UserAccount) && (((UserAccount) o).getEmail().equals(getEmail()))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return getEmail().hashCode();
     }
 
 }

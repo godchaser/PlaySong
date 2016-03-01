@@ -1,8 +1,11 @@
 package models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.*;
+
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.UsersDocument;
 
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.Expression;
@@ -21,17 +24,21 @@ public class SongBook extends Model {
     public String songBookName;
     
     public boolean privateSongbook = false;
+    
+    @ManyToMany
+    public List<Song> songs = new ArrayList<>();
 
-    @ManyToOne
-    public UserAccount user;
+    @ManyToMany
+    public List<UserAccount> users = new ArrayList<>();
 
-    public static SongBook getDefaultSongbook() {
+    public static SongBook getDefaultSongbook(UserAccount user) {
         SongBook defaultSongbook = SongBook.get(1l);
         if (defaultSongbook == null) {
             defaultSongbook = new SongBook();
             defaultSongbook.setId(DEFAULT_SONGBOOK_ID);
             defaultSongbook.setSongBookName("default");
             defaultSongbook.setPrivateSongbook(false);
+            defaultSongbook.setUser(user);
             defaultSongbook.save();
         }
         return defaultSongbook;
@@ -70,6 +77,13 @@ public class SongBook extends Model {
         return foundSongbook;
     }
 
+    private void setUser(UserAccount user) {
+        // Add user to owners of songbook - skip if user is already owning this songbook
+        if (! getUsers().contains(UserAccount.getByEmail(user.getEmail()))){
+            getUsers().add(user);
+        }        
+    }
+
     public static Finder<Long, SongBook> find = new Finder<>(SongBook.class);
 
     public static SongBook get(Long id) {
@@ -92,14 +106,6 @@ public class SongBook extends Model {
         this.id = id;
     }
 
-    public UserAccount getUser() {
-        return user;
-    }
-
-    public void setUser(UserAccount user) {
-        this.user = user;
-    }
-
     public String getSongBookName() {
         return songBookName;
     }
@@ -114,6 +120,22 @@ public class SongBook extends Model {
 
     public void setPrivateSongbook(boolean privateSongbook) {
         this.privateSongbook = privateSongbook;
+    }
+    
+    public List<Song> getSongs() {
+        return songs;
+    }
+
+    public void setSongs(List<Song> songs) {
+        this.songs = songs;
+    }
+    
+    public List<UserAccount> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<UserAccount> users) {
+        this.users = users;
     }
 
     public static void deleteIfNoMoreSongs(Long id) {

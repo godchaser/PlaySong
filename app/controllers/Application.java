@@ -138,6 +138,9 @@ public class Application extends Controller {
         } else {
             message = "Adding new user: " + newUser.email;
             newUser.save();
+            newUser.setDefaultSongbook();
+            newUser.update();
+
         }
         Logger.trace(message);
         return redirect(routes.Application.admin());
@@ -394,6 +397,8 @@ public class Application extends Controller {
         try {
             UserAccount test = new UserAccount("test@test.com", "test", "test");
             test.save();
+            test.setDefaultSongbook();
+            test.update();
         } catch (Exception e) {
             Logger.error("Exception occured during init" + e.getStackTrace());
             e.printStackTrace();
@@ -888,8 +893,10 @@ public class Application extends Controller {
 
     @Security.Authenticated(Secured.class)
     public Result syncDb() {
+        UserAccount user = getUserFromCookie();
+
         PlaySongRestService psrs = new PlaySongRestService();
-        psrs.downloadSongsData();
+        psrs.downloadSongsData(user.getEmail());
         // psrs.downloadFavoritesSongsData();
         return redirect(routes.Application.table());
     }

@@ -14,6 +14,7 @@ import models.ServiceSong;
 import models.Song;
 import models.SongBook;
 import models.SongLyrics;
+import models.UserAccount;
 import play.Logger;
 
 public class DatabaseHelper {
@@ -63,7 +64,7 @@ public class DatabaseHelper {
         }
     }
 
-    public List<Long> writeJsonSongsToDb(List<SongsJson> songsJson) {
+    public List<Long> writeJsonSongsToDb(List<SongsJson> songsJson, String userEmail) {
         List<Long> updatedSongs = new ArrayList<>();
         for (SongsJson song : songsJson) {
             boolean shouldUpdateSong = false;
@@ -92,6 +93,7 @@ public class DatabaseHelper {
             songdb.setSongLink(song.getSongLink());
             songdb.setDateCreated(new Date(song.getDateCreated()));
             songdb.setDateModified(new Date(song.getDateModified()));
+            
             boolean songBookExists = false;
             if (song.getSongBookId() != null) {        
                 SongBook foundSongBook = SongBook.get(song.getSongBookId());                
@@ -99,7 +101,7 @@ public class DatabaseHelper {
                     Logger.trace("PlaySongDatabase : found songbook = " + foundSongBook.getSongBookName());
                     // found existing songbook
                     // TODO: Think about reusing updateOrCreate Song method
-                    songdb.setSongBook(foundSongBook);
+                    songdb.setSongBook(foundSongBook, userEmail);
                 }
             }
 
@@ -107,8 +109,9 @@ public class DatabaseHelper {
                 Logger.trace("PlaySongDatabase : songbook does not exist");
                 // setting default songbook
                 Logger.trace("PlaySongDatabase : using default songbook");
-                songdb.setSongBook(SongBook.getDefaultSongbook());
+                songdb.setSongBook(SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail)), userEmail);
             }
+            
 
             // song
             if (shouldUpdateSong) {

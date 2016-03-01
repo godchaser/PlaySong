@@ -17,6 +17,7 @@ import play.libs.Json;
 import models.Service;
 import models.ServiceSong;
 import models.Song;
+import models.SongBook;
 
 /**
  * Created by samuel on 4/1/15.
@@ -33,10 +34,10 @@ public class SongToJsonConverter {
         for (SongLyrics lyrics : s.songLyrics) {
             songLyricsIDsArray.add(lyrics.getsongLyricsId());
         }
-
+        
         ObjectNode songObject = convert(s.songName, s.songLink, s.songOriginalTitle, s.songAuthor, s.id, s.songImporter, s.dateCreated.getTime(), s.dateModified.getTime(),
-                songLyricsIDsArray, s.getSongBook().getSongBookName(), s.getSongBook().getId());
-
+                songLyricsIDsArray, s.getSongbooks());
+       
         return songObject;
     }
 
@@ -65,7 +66,7 @@ public class SongToJsonConverter {
     }
 
     public static ObjectNode convert(String songName, String songLink, String songOriginalTitle, String songAuthor, Long id, String songImporter, Long dateCreated, Long dateModified,
-            ArrayNode songLyricsIDsArray, String songBookName, Long songBookId) {
+            ArrayNode songLyricsIDsArray, List<SongBook> songbooks) {
 
         ObjectNode songObject = Json.newObject();
 
@@ -78,9 +79,10 @@ public class SongToJsonConverter {
         songObject.put("songImporter", songImporter);
         songObject.put("dateCreated", dateCreated);
         songObject.put("dateModified", dateModified);
-        songObject.put("songBookName", songBookName);
-        songObject.put("songBookId", songBookId);
+        //songObject.put("songBookName", songBookName);
+        //songObject.put("songBookId", songBookId);
         songObject.putArray("songLyricsIDs").addAll(songLyricsIDsArray);
+        songObject.putPOJO("songbooks", songbooks);
 
         return songObject;
     }

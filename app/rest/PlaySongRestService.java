@@ -58,7 +58,7 @@ public class PlaySongRestService extends Observable {
         
     }
 
-    private void getSongsData() {
+    private void getSongsData(String userEmail) {
         // Fetching song json data
         Call<SongsJson[]> getsongscall = playsong.getSongs();
         getsongscall.enqueue(new Callback<SongsJson[]>() {
@@ -82,7 +82,7 @@ public class PlaySongRestService extends Observable {
                     //200
                    Logger.trace("PlaySongRestService", "Song Data successfully fetched");
                    Logger.trace("PlaySongRestService", "Writing song data to db");
-                   List<Long> updatedSongs = db.writeJsonSongsToDb(Arrays.asList((SongsJson[]) model));
+                   List<Long> updatedSongs = db.writeJsonSongsToDb(Arrays.asList((SongsJson[]) model), userEmail);
                    Logger.trace("PlaySongRestService", "Notifying observer that songs are fetched");
                     setChanged();
                     //notifyObservers(updatedSongs);
@@ -136,8 +136,8 @@ public class PlaySongRestService extends Observable {
         });
     }
 
-    public void downloadSongsData(){
-        getSongsData();
+    public void downloadSongsData(String userEmail){
+        getSongsData(userEmail);
     }
 
     private void getFavoritesSongsData() {
