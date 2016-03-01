@@ -20,7 +20,7 @@ public class UserAccount extends Model {
     @Required
     public String password;
 
-    @ManyToMany(mappedBy = "users")
+    @ManyToMany
     public List<SongBook> songbooks = new ArrayList<SongBook>();
 
     public UserAccount(String email, String name, String password) {

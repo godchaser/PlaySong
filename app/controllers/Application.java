@@ -447,20 +447,19 @@ public class Application extends Controller {
         /**
          * Get needed params
          */
-        
+
         // TODO: implement public - private songbooks
 
         UserAccount user = getUserFromCookie();
-        
+
         Long songBookIdFilter = 1L;
         // check if user is owner of this songbooko
-        if (user.containsSongbook(songBookId)){
+        if (user.containsSongbook(songBookId)) {
             songBookIdFilter = songBookId;
         }
 
         Map<String, String[]> params = request().queryString();
 
-        
         String filter = params.get("sSearch")[0].toLowerCase();
 
         /**
@@ -489,23 +488,48 @@ public class Application extends Controller {
 
         // searching without full text search filter
         if (filter.isEmpty()) {
+            /*
+             * queryResult = Ebean.createSqlQuery(
+             * "select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id from song t0 join song_lyrics u1 on u1.song_id = t0.id "
+             * + "where t0.song_book_id = " + songBookIdFilter.toString() + " " + "order by " + sortBy + " " + order) .findList();
+             */
+            /*
+             * select t0.id, t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.date_created, t0.date_modified, u1.id as l_id,
+             * u2.song_book_id as r_id from song t0 join song_lyrics u1 on u1.song_id = t0.id join song_book_song u2 on u2.song_id = t0.id where u2.song_book_id = 2 order by song_name asc;
+             */
+            //@formatter:off
             queryResult = Ebean.createSqlQuery(
-                    "select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id from song t0 join song_lyrics u1 on u1.song_id = t0.id "
-                            + "where t0.song_book_id = " + songBookIdFilter.toString() + " "
-                            + "order by "
-                            + sortBy + " " + order)
+                    "select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.date_created, t0.date_modified, u1.id as l_id, u2.song_book_id as r_id "
+                            + "from song t0 " 
+                            + "join song_lyrics u1 on u1.song_id = t0.id " 
+                            + "join song_book_song u2 on u2.song_id = t0.id " 
+                            + "where u2.song_book_id = " + songBookIdFilter.toString() + " "
+                            + "order by " + sortBy + " " + order)
                     .findList();
+
         } else {
+            // TODO : fix this so support songbook 
             queryResult = Ebean
                     .createSqlQuery(
-                            "(select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id from song t0 join song_lyrics u1 on u1.song_id = t0.id  where lower(t0.song_name) like :songnamefilter AND where t0.song_book_id = " + songBookIdFilter.toString() + ") " + "UNION ALL"
-                                    + " (select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id from song t0 join song_lyrics u1 on u1.song_id = t0.id  where lower(t0.song_name) like :songnameinlinefilter AND where t0.song_book_id = " + songBookIdFilter.toString() + ") " + "UNION ALL"
-                                    + " (select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id from song t0 join song_lyrics u1 on u1.song_id = t0.id  where lower(u1.song_lyrics) like :songlyricsfilter AND where t0.song_book_id = " + songBookIdFilter.toString() + ") " + "UNION ALL"
-                                    + " (select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id from song t0 join song_lyrics u1 on u1.song_id = t0.id  where lower(t0.song_author) like :songauthorfilter AND where t0.song_book_id = " + songBookIdFilter.toString() + ") ")
+                            "(select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id "
+                            + "from song t0 "
+                            + "join song_lyrics u1 on u1.song_id = t0.id  where lower(t0.song_name) like :songnamefilter AND where t0.song_book_id = " + songBookIdFilter.toString() + ") " + "UNION ALL"
+                            
+                            + " (select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id "
+                            + "from song t0 "                         
+                            + "join song_lyrics u1 on u1.song_id = t0.id  where lower(t0.song_name) like :songnameinlinefilter AND where t0.song_book_id = " + songBookIdFilter.toString() + ") " + "UNION ALL"
+                            
+                            + " (select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id "
+                            + "from song t0 "
+                            + "join song_lyrics u1 on u1.song_id = t0.id where lower(u1.song_lyrics) like :songlyricsfilter AND where t0.song_book_id = " + songBookIdFilter.toString() + ") " + "UNION ALL"
+                            
+                            + " (select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id "
+                            + "from song t0 "
+                            + "song_lyrics u1 on u1.song_id = t0.id  where lower(t0.song_author) like :songauthorfilter AND where t0.song_book_id = " + songBookIdFilter.toString() + ") ")
                     .setParameter("songnamefilter", filter + "%").setParameter("songnameinlinefilter", "%" + filter + "%").setParameter("songlyricsfilter", "%" + filter + "%")
                     .setParameter("songauthorfilter", "%" + filter + "%").findList();
         }
-
+        // @formatter:on
         Map<Long, SongTableData> songTableDataMap = new LinkedHashMap<Long, SongTableData>();
 
         for (SqlRow res : queryResult) {
@@ -571,7 +595,7 @@ public class Application extends Controller {
         }
 
         int iTotalRecords = queryResult.size();
-        
+
         result.put("sEcho", Integer.valueOf(params.get("sEcho")[0]));
         result.put("iTotalRecords", iTotalRecords);
         result.put("iTotalDisplayRecords", iTotalDisplayRecords);

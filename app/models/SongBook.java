@@ -90,8 +90,9 @@ public class SongBook extends Model {
         return find.byId(id);
     }
 
+    // INTERESTING: I have to fetch users first and then query it's members
     public static SongBook getByNameAndEmail(String name, String email) {
-        return find.where().and(Expr.eq("user_email", email), Expr.eq("song_book_name", name)).findUnique();
+        return find.fetch("users").where().and(Expr.eq("users.email", email), Expr.eq("song_book_name", name)).findUnique();
     }
 
     public static List<SongBook> all() {
