@@ -3,6 +3,7 @@ package database;
 import rest.json.ServiceJson;
 import rest.json.ServiceSongJson;
 import rest.json.SongLyricsJson;
+import rest.json.SongbookJson;
 import rest.json.SongsJson;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class DatabaseHelper {
     public void writeJsonSongLyricsToDb(List<SongLyricsJson> songLyricsJson, List<Long> updatedSongs) {
         // TODO: IMPLEMENT OPTIONAL DELETION OF MISSING REMOTE SONGS
         for (SongLyricsJson songlyrics : songLyricsJson) {
-            Logger.trace("PlaySongDatabase : Checkin if song lyrics is already in db: " + songlyrics.getSongLyricsId() + " : " + songlyrics.getSongId());
+            Logger.trace("PlaySongDatabase : Checking if song lyrics is already in db: " + songlyrics.getSongLyricsId() + " : " + songlyrics.getSongId());
             SongLyrics foundSongLyrics = SongLyrics.get(songlyrics.getSongLyricsId());
             boolean shouldUpdateSong = false;
             boolean songUpdated = updatedSongs.contains(songlyrics.getSongId());
@@ -68,7 +69,7 @@ public class DatabaseHelper {
         List<Long> updatedSongs = new ArrayList<>();
         for (SongsJson song : songsJson) {
             boolean shouldUpdateSong = false;
-            Logger.trace("PlaySongDatabase : Checkin if songs is already in db: " + song.getSongId() + " : " + song.getSongName());
+            Logger.trace("PlaySongDatabase : Checking if songs is already in db: " + song.getSongId() + " : " + song.getSongName());
             Song foundSong = Song.get(song.getSongId());
             if (foundSong != null) {
                 if (foundSong.getDateModified().getTime() < song.getDateModified()) {
@@ -93,25 +94,21 @@ public class DatabaseHelper {
             songdb.setSongLink(song.getSongLink());
             songdb.setDateCreated(new Date(song.getDateCreated()));
             songdb.setDateModified(new Date(song.getDateModified()));
-            
+            songdb.setPrivateSong(song.getPrivateSong());
+
             boolean songBookExists = false;
-            if (song.getSongBookId() != null) {        
-                SongBook foundSongBook = SongBook.get(song.getSongBookId());                
+            if (song.getSongBookId() != null) {
+                SongBook foundSongBook = SongBook.get(song.getSongBookId());
                 if (foundSongBook != null) {
-                    Logger.trace("PlaySongDatabase : found songbook = " + foundSongBook.getSongBookName());
-                    // found existing songbook
-                    // TODO: Think about reusing updateOrCreate Song method
+                    Logger.trace("PlaySongDatabase : found songbook = " + foundSongBook.getSongBookName()); // found existing songbook // TODO: Think about reusing updateOrCreate Song method
                     songdb.setSongBook(foundSongBook, userEmail);
                 }
             }
 
             if (!songBookExists) {
-                Logger.trace("PlaySongDatabase : songbook does not exist");
-                // setting default songbook
-                Logger.trace("PlaySongDatabase : using default songbook");
+                Logger.trace("PlaySongDatabase : songbook does not exist"); // setting default songbook Logger.trace("PlaySongDatabase : using default songbook");
                 songdb.setSongBook(SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail)), userEmail);
             }
-            
 
             // song
             if (shouldUpdateSong) {
@@ -124,13 +121,20 @@ public class DatabaseHelper {
         return updatedSongs;
     }
 
+    public void writeJsonSongbooksToDb(List<SongbookJson> SongbookJson) {
+        for (SongbookJson songbook : SongbookJson) {
+            Logger.trace("PlaySongDatabase : Trying to writes json songbook to db: " + songbook.getSongBookName());
+            SongBook.updateOrCreate(songbook.getId(), songbook.getSongBookName(), songbook.getSongbookOwner(), songbook.getPrivateSongbook());
+        }
+    }
+
     public List<Long> writeJsonFavoritesSongsToDb(List<ServiceJson> servicesJson) {
         List<Long> updatedFavorites = new ArrayList<>();
         Logger.trace("PlaySongDatabase : Trying to writes json favorites to db");
         for (ServiceJson favorite : servicesJson) {
-            // first checking if service already imported
+            // first Checkinggg if service already imported
             Service foundService = Service.get(favorite.getId());
-            Logger.trace("PlaySongDatabase : Checkin if service is already in db: " + favorite.getSongBookName());
+            Logger.trace("PlaySongDatabase : Checking if service is already in db: " + favorite.getSongBookName());
             if (foundService != null) {
                 if (foundService.getDateCreated().getTime() < favorite.getDateCreated().longValue()) {
                     // UPDATE SERVICE

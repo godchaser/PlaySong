@@ -38,12 +38,13 @@ import document.tools.DocxGenerator;
 import document.tools.PdfGenerator;
 import document.tools.XlsHelper;
 import document.tools.XmlSongsParser;
-import helpers.ArrayHelper;
 import models.Service;
 import models.ServiceSong;
 import models.Song;
+import models.SongBook;
 import models.SongLyrics;
 import models.UserAccount;
+import models.helpers.ArrayHelper;
 import models.helpers.PdfPrintable;
 import models.helpers.SongPrint;
 import models.helpers.SongTableData;
@@ -312,6 +313,10 @@ public class Application extends Controller {
         List<Service> services = Service.all();
         return ok(Json.toJson(SongToJsonConverter.convert(services)));
     }
+    
+    public Result getsongbooksdata(){
+        return ok(Json.toJson(SongBook.all()));
+    }
 
     @Security.Authenticated(Secured.class)
     public Result updateFromOnlineSpreadsheet() {
@@ -358,12 +363,11 @@ public class Application extends Controller {
             return badRequest(views.html.error.render());
         } else {
             UserAccount user = getUserFromCookie();
-
             String userName = UserAccount.getNameFromEmail(user.getEmail());
             Song updatedSong = filledForm.get();
-            updatedSong.setSongLastModifiedBy(userName);
+            updatedSong.setSongLastModifiedBy(userName);;
             Logger.debug("Update or create song");
-            Song.updateOrCreateSong(filledForm.get(), user.getEmail(), false);
+            Song.updateOrCreateSong(updatedSong, user.getEmail());
             return redirect(routes.Application.table());
         }
     }
@@ -371,6 +375,10 @@ public class Application extends Controller {
     @Security.Authenticated(Secured.class)
     public Result emptyDb() {
         Ebean.createSqlUpdate("delete from song_lyrics").execute();
+        Ebean.createSqlUpdate("delete from song_book_song").execute();
+        Ebean.createSqlUpdate("delete from song_book_user_account").execute();
+        Ebean.createSqlUpdate("delete from user_account_song_book").execute();
+        Ebean.createSqlUpdate("delete from song_book").execute();
         Ebean.createSqlUpdate("delete from song").execute();
         Ebean.createSqlUpdate("delete from service_song").execute();
         Ebean.createSqlUpdate("delete from service").execute();
@@ -395,6 +403,7 @@ public class Application extends Controller {
 
     public Result inituser() {
         try {
+            Ebean.createSqlUpdate("delete from user_account").execute();
             UserAccount test = new UserAccount("test@test.com", "test", "test");
             test.save();
             test.setDefaultSongbook();
@@ -934,7 +943,7 @@ public class Application extends Controller {
         // Sanitizing all songs
         for (Song s : Song.all()) {
             s.setSongLastModifiedBy(ua.getName().toString());
-            Song.updateOrCreateSong(s, ua.getEmail(), false);
+            Song.updateOrCreateSong(s, ua.getEmail());
         }
 
         return redirect(routes.Application.index());

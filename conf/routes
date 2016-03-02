@@ -24,6 +24,7 @@ GET      /logout                          controllers.Application.logout()
 GET      /json/songs                      controllers.Application.getsongdata()
 GET      /json/songlyrics                 controllers.Application.getsonglyricsdata()
 GET      /json/favoritesongs              controllers.Application.getfavoritessongsdata()
+GET      /json/songbooks              	  controllers.Application.getsongbooksdata()
 # POST add song - from form - not JSON
 POST     /songs                           controllers.Application.updateorcreatesong()
 DELETE   /songs/:id                       controllers.Application.deletesong(id: Long)

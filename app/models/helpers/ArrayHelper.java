@@ -1,4 +1,4 @@
-package helpers;
+package models.helpers;
 
 import java.util.ArrayList;
 import java.util.HashSet;

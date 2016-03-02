@@ -3,6 +3,7 @@ package models;
 import java.util.*;
 
 import javax.persistence.*;
+import javax.persistence.Transient;
 
 import models.helpers.SongSuggestion;
 import play.Logger;
@@ -33,6 +34,8 @@ public class Song extends Model implements Comparator<Song> {
 
     public String songLastModifiedBy;
 
+    public boolean privateSong = false;
+
     @ManyToMany(mappedBy = "songs")
     public List<SongBook> songbooks = new ArrayList<SongBook>();
 
@@ -46,6 +49,14 @@ public class Song extends Model implements Comparator<Song> {
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
     public List<SongLyrics> songLyrics = new ArrayList<>();
 
+    // this is for form validation
+    @Transient
+    public String songBookName;
+    @Transient
+    public Long songBookId;
+    @Transient
+    public boolean isPrivateSongBook;
+
     public static List<Song> all() {
         return find.all();
     }
@@ -58,7 +69,8 @@ public class Song extends Model implements Comparator<Song> {
         return find.byId(id);
     }
 
-    public static void updateOrCreateSong(Song song, String userEmail, boolean isPrivateSongBook) {
+    public static void updateOrCreateSong(Song song, String userEmail) {
+
         // delete empty lyrics
         List<SongLyrics> removedList = new ArrayList<SongLyrics>();
         for (int i = 0; i < song.songLyrics.size(); i++) {
@@ -67,46 +79,22 @@ public class Song extends Model implements Comparator<Song> {
             }
         }
         song.songLyrics.removeAll(removedList);
-
+        
         SongBook activeSongbook = null;
-        boolean savedToDefaultSongbook = false;
-
+            
         // first handle if songbooks is empty - create default songbook
-        if (song.getSongbooks().isEmpty()) {
+        if (song.getSongBookName().isEmpty()) {
             Logger.debug("Using default songbook while song does not have any songbooks");
             activeSongbook = SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail));
             song.setSongBook(activeSongbook, userEmail);
-            savedToDefaultSongbook = true;
+            //savedToDefaultSongbook = true;
         }
-
-        if (!savedToDefaultSongbook) {
-            for (SongBook songBook : song.getSongbooks()) {
-
-                Long sentSonbookId = songBook.getId();
-                // if songbook name is not default then create songbook or use existing one
-                if (songBook != null && !"default".equals(songBook.getSongBookName())) {
-                    Long songBookid = songBook.getId();
-                    String songBookName = songBook.getSongBookName();
-                    Logger.debug("Updating songbook: " + songBookName + ": id : " + songBookid);
-                    // if I have default songbook id forwarded, then just delete it
-                    if (songBookid == SongBook.DEFAULT_SONGBOOK_ID) {
-                        songBookid = null;
-                    }
-
-                    activeSongbook = SongBook.updateOrCreate(songBookid, songBookName, userEmail, songBook.getPrivateSongbook());
-                    song.setSongBook(activeSongbook, userEmail);
-                } else {
-                    // TODO: maybe this is redundant
-                    // set default songbook if not set
-                    Logger.debug("Using default songbook");
-                    activeSongbook = SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail));
-                    song.setSongBook(activeSongbook, userEmail);
-                }
-
-                Logger.debug("Using songbook: " + songBook.getSongBookName());
-            }
+        else {
+            // TODO: Bug - User is not updated as owner of the songbook
+            activeSongbook = SongBook.updateOrCreate(null, song.getSongBookName(), userEmail, song.getPrivateSongBook());
+            song.setSongBook(activeSongbook, userEmail);
         }
-
+        
         // song must have lyrics
         if (song.songLyrics.size() > 0) {
             for (SongLyrics songLyrics : song.songLyrics) {
@@ -154,6 +142,46 @@ public class Song extends Model implements Comparator<Song> {
     @Override
     public int compare(Song song1, Song song2) {
         return song1.songName.compareTo(song2.songName);
+    }
+
+    public static List<SongSuggestion> getSongModifiedList() {
+
+        int minusMonth = 1;
+
+        Calendar calNow = Calendar.getInstance();
+        // adding -1 month
+        calNow.add(Calendar.MONTH, -minusMonth);
+        Date dateBeforeAMonth = calNow.getTime();
+
+        Date dateNow = Calendar.getInstance().getTime();
+
+        List<Song> songsModifiedInLastMonth = Song.find.where().between("date_modified", dateBeforeAMonth, dateNow).orderBy("date_modified desc").findList();
+
+        List<SongSuggestion> songModifiedList = new ArrayList<>();
+        for (Song song : songsModifiedInLastMonth) {
+            songModifiedList.add(new SongSuggestion(song.getId(), song.getSongName(), song.getDateModified()));
+        }
+        return songModifiedList;
+    }
+
+    public static List<SongSuggestion> getSongCreatedList() {
+
+        int minusMonth = 1;
+
+        Calendar calNow = Calendar.getInstance();
+        // adding -1 month
+        calNow.add(Calendar.MONTH, -minusMonth);
+        Date dateBeforeAMonth = calNow.getTime();
+
+        Date dateNow = Calendar.getInstance().getTime();
+
+        List<Song> songsCreatedInLastMonth = Song.find.where().between("date_created", dateBeforeAMonth, dateNow).orderBy("date_created desc").findList();
+
+        List<SongSuggestion> songCreatedList = new ArrayList<>();
+        for (Song song : songsCreatedInLastMonth) {
+            songCreatedList.add(new SongSuggestion(song.getId(), song.getSongName(), song.getDateModified()));
+        }
+        return songCreatedList;
     }
 
     public Long getId() {
@@ -244,44 +272,36 @@ public class Song extends Model implements Comparator<Song> {
         this.songbooks = songbooks;
     }
 
-    public static List<SongSuggestion> getSongModifiedList() {
-
-        int minusMonth = 1;
-
-        Calendar calNow = Calendar.getInstance();
-        // adding -1 month
-        calNow.add(Calendar.MONTH, -minusMonth);
-        Date dateBeforeAMonth = calNow.getTime();
-
-        Date dateNow = Calendar.getInstance().getTime();
-
-        List<Song> songsModifiedInLastMonth = Song.find.where().between("date_modified", dateBeforeAMonth, dateNow).orderBy("date_modified desc").findList();
-
-        List<SongSuggestion> songModifiedList = new ArrayList<>();
-        for (Song song : songsModifiedInLastMonth) {
-            songModifiedList.add(new SongSuggestion(song.getId(), song.getSongName(), song.getDateModified()));
-        }
-        return songModifiedList;
+    public boolean getPrivateSong() {
+        return privateSong;
     }
 
-    public static List<SongSuggestion> getSongCreatedList() {
+    public void setPrivateSong(boolean privateSong) {
+        this.privateSong = privateSong;
+    }
 
-        int minusMonth = 1;
+    public String getSongBookName() {
+        return songBookName;
+    }
 
-        Calendar calNow = Calendar.getInstance();
-        // adding -1 month
-        calNow.add(Calendar.MONTH, -minusMonth);
-        Date dateBeforeAMonth = calNow.getTime();
+    public void setSongBookName(String songBookName) {
+        this.songBookName = songBookName;
+    }
 
-        Date dateNow = Calendar.getInstance().getTime();
+    public Long getSongBookId() {
+        return songBookId;
+    }
 
-        List<Song> songsCreatedInLastMonth = Song.find.where().between("date_created", dateBeforeAMonth, dateNow).orderBy("date_created desc").findList();
+    public void setSongBookId(Long songBookId) {
+        this.songBookId = songBookId;
+    }
 
-        List<SongSuggestion> songCreatedList = new ArrayList<>();
-        for (Song song : songsCreatedInLastMonth) {
-            songCreatedList.add(new SongSuggestion(song.getId(), song.getSongName(), song.getDateModified()));
-        }
-        return songCreatedList;
+    public boolean getPrivateSongBook() {
+        return isPrivateSongBook;
+    }
+
+    public void setPrivateSongBook(boolean isPrivateSongBook) {
+        this.isPrivateSongBook = isPrivateSongBook;
     }
 
 }

@@ -1,6 +1,5 @@
 package models;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +42,30 @@ public class UserAccount extends Model {
         return find.where().eq("email", email).findUnique().name;
     }
 
+    public void setDefaultSongbook(){
+        getSongbooks().add(SongBook.getDefaultSongbook(UserAccount.getByEmail(email)));
+    }
+
+    public boolean containsSongbook(Long id) {
+        SongBook searchedSongbook = new SongBook();
+        searchedSongbook.setId(id);
+        return getSongbooks().contains(searchedSongbook);
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if ((o instanceof UserAccount) && (((UserAccount) o).getEmail().equals(getEmail()))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return getEmail().hashCode();
+    }
+    
     public String getEmail() {
         return email;
     }
@@ -73,30 +96,6 @@ public class UserAccount extends Model {
 
     public void setSongbooks(List<SongBook> songbooks) {
         this.songbooks = songbooks;
-    }
-    
-    public void setDefaultSongbook(){
-        getSongbooks().add(SongBook.getDefaultSongbook(UserAccount.getByEmail(email)));
-    }
-
-    public boolean containsSongbook(Long id) {
-        SongBook searchedSongbook = new SongBook();
-        searchedSongbook.setId(id);
-        return getSongbooks().contains(searchedSongbook);
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        if ((o instanceof UserAccount) && (((UserAccount) o).getEmail().equals(getEmail()))) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return getEmail().hashCode();
     }
 
 }

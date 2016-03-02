@@ -33,6 +33,7 @@ create table song (
   song_link                     varchar(255),
   song_importer                 varchar(255),
   song_last_modified_by         varchar(255),
+  private_song                  boolean,
   date_created                  timestamp,
   date_modified                 timestamp,
   constraint pk_song primary key (id)
@@ -75,6 +76,12 @@ create table user_account (
   constraint pk_user_account primary key (email)
 );
 
+create table user_account_song_book (
+  user_account_email            varchar(255) not null,
+  song_book_id                  bigint not null,
+  constraint pk_user_account_song_book primary key (user_account_email,song_book_id)
+);
+
 alter table service_song add constraint fk_service_song_service_id foreign key (service_id) references service (id) on delete restrict on update restrict;
 create index ix_service_song_service_id on service_song (service_id);
 
@@ -92,6 +99,12 @@ create index ix_song_book_user_account_user_account on song_book_user_account (u
 
 alter table song_lyrics add constraint fk_song_lyrics_song_id foreign key (song_id) references song (id) on delete restrict on update restrict;
 create index ix_song_lyrics_song_id on song_lyrics (song_id);
+
+alter table user_account_song_book add constraint fk_user_account_song_book_user_account foreign key (user_account_email) references user_account (email) on delete restrict on update restrict;
+create index ix_user_account_song_book_user_account on user_account_song_book (user_account_email);
+
+alter table user_account_song_book add constraint fk_user_account_song_book_song_book foreign key (song_book_id) references song_book (id) on delete restrict on update restrict;
+create index ix_user_account_song_book_song_book on user_account_song_book (song_book_id);
 
 
 # --- !Downs
@@ -114,6 +127,12 @@ drop index if exists ix_song_book_user_account_user_account;
 alter table song_lyrics drop constraint if exists fk_song_lyrics_song_id;
 drop index if exists ix_song_lyrics_song_id;
 
+alter table user_account_song_book drop constraint if exists fk_user_account_song_book_user_account;
+drop index if exists ix_user_account_song_book_user_account;
+
+alter table user_account_song_book drop constraint if exists fk_user_account_song_book_song_book;
+drop index if exists ix_user_account_song_book_song_book;
+
 drop table if exists service;
 drop sequence if exists service_seq;
 
@@ -134,4 +153,6 @@ drop table if exists song_lyrics;
 drop sequence if exists song_lyrics_seq;
 
 drop table if exists user_account;
+
+drop table if exists user_account_song_book;
 

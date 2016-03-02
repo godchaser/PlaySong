@@ -10,7 +10,7 @@
             @helper.inputText(songForm("songOriginalTitle"), args = '_label -> "Original title: ", 'class -> "form-control")
             @helper.inputText(songForm("songAuthor"), args = '_label -> "Author: ", 'class -> "form-control")
             @helper.inputText(songForm("songLink"), args = '_label -> "Link: ", 'class -> "form-control")
-            @helper.inputText(songForm("songBook.songBookName"), args = '_label -> "Songbook Name: ", 'class -> "form-control")
+            @helper.inputText(songForm("songBookName"), args = '_label -> "Songbook Name: ", 'class -> "form-control")
             
             @if(songBooks.size>0){
             	<label for="songbook-select">Add To Songbook:</label>
@@ -22,7 +22,8 @@
 	        }
 	        <br>
 	        <br>
-			@helper.checkbox(songForm("songBook.privateSongbook"), args = '_label -> "Private songbook: ", 'class -> "form-inline", 'checked -> "checked")
+			@helper.checkbox(songForm("isPrivateSongBook"), args = '_label -> "Private songbook: ", 'class -> "form-inline")
+			@helper.checkbox(songForm("privateSong"), args = '_label -> "Private song: ", 'class -> "form-inline")
 			<button type="button" id="addAdditionalLyricsButton" class="btn btn-default">Add additional lyrics</button>
 			<input type="submit" value="Save" class="btn btn-default">
 			</div>
@@ -32,7 +33,7 @@
             @helper.textarea(field = songForm("songLyrics[2].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
             @helper.textarea(field = songForm("songLyrics[3].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")           
             @helper.inputText(songForm("id"), args = 'style -> "display:none;", 'hidden -> "hidden")
-            @helper.inputText(songForm("songBook.id"), args = 'style -> "display:none;", 'hidden -> "hidden")
+            @helper.inputText(songForm("songBookId"), args = 'style -> "display:none;", 'hidden -> "hidden")
 			</div>
             </div>          
         }

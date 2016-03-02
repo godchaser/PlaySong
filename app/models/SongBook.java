@@ -99,6 +99,29 @@ public class SongBook extends Model {
         return find.all();
     }
 
+    public static void deleteIfNoMoreSongs(Long id) {
+        if (id != DEFAULT_SONGBOOK_ID) {
+            List <Song> songsUsingSongbook = Song.find.where().eq("song_book_id", id).findList();
+            if (songsUsingSongbook == null || songsUsingSongbook.isEmpty()) {
+                find.byId(id).delete();
+            }
+        }
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if ((o instanceof SongBook) && (((SongBook) o).getId().equals(getId()))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
+    
     public Long getId() {
         return id;
     }
@@ -139,27 +162,5 @@ public class SongBook extends Model {
         this.users = users;
     }
 
-    public static void deleteIfNoMoreSongs(Long id) {
-        if (id != DEFAULT_SONGBOOK_ID) {
-            List <Song> songsUsingSongbook = Song.find.where().eq("song_book_id", id).findList();
-            if (songsUsingSongbook == null || songsUsingSongbook.isEmpty()) {
-                find.byId(id).delete();
-            }
-        }
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        if ((o instanceof SongBook) && (((SongBook) o).getId().equals(getId()))) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return getId().hashCode();
-    }
 
 }

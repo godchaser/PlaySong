@@ -32,6 +32,43 @@ public class SongLyrics extends Model {
 
     public String songKey;
 
+    public static SongLyrics get(Long id) {
+        return find.byId(id);
+    }
+
+    public static Finder<Long, SongLyrics> find = new Finder<>(SongLyrics.class);
+
+    public static List<SongLyrics> all() {
+        return find.all();
+    }
+
+    public void updateSongLyrics() {
+        updateSongKeys();
+        sanitizeLyrics();
+        update();
+        // Automatically update song modification journal
+        Date date = new Date();
+        getSong().setDateModified(date);
+        getSong().update();
+    }
+
+    public static void deleteSongLyricsForSong(Song song) {
+        List<SongLyrics> songLyrics = song.getSongLyrics();
+        for (SongLyrics songLyric : songLyrics) {
+            songLyric.delete();
+        }
+    }
+
+    public void updateSongKeys() {
+        String songKey = LineTypeChecker.getSongKey(songLyrics);
+        setSongKey(songKey);
+    }
+
+    public void sanitizeLyrics() {
+        String newSongLyrics = SongSanitizer.sanitizeSong(songLyrics);
+        setsongLyrics(newSongLyrics);
+    }
+
     public String getsongLyrics() {
         return songLyrics;
     }
@@ -52,16 +89,6 @@ public class SongLyrics extends Model {
         this.songKey = songKey;
     }
 
-    public static SongLyrics get(Long id) {
-        return find.byId(id);
-    }
-
-    public static Finder<Long, SongLyrics> find = new Finder<>(SongLyrics.class);
-
-    public static List<SongLyrics> all() {
-        return find.all();
-    }
-
     public Long getId() {
         return id;
     }
@@ -78,30 +105,4 @@ public class SongLyrics extends Model {
         this.song = song;
     }
 
-    public void updateSongLyrics() {
-        updateSongKeys();
-        sanitizeLyrics();
-        update();
-        // Automatically update song modification journal
-        Date date = new Date();
-        getSong().setDateModified(date);
-        getSong().update();
-    }
-
-    public static void deleteSongLyricsForSong(Song song) {
-        List<SongLyrics> songLyrics = song.getSongLyrics();
-        for (SongLyrics songLyric : songLyrics){
-            songLyric.delete();
-        }
-    }
-
-    public void updateSongKeys() {
-        String songKey = LineTypeChecker.getSongKey(songLyrics);
-        setSongKey(songKey);
-    }
-
-    public void sanitizeLyrics() {
-        String newSongLyrics = SongSanitizer.sanitizeSong(songLyrics);
-        setsongLyrics(newSongLyrics);
-    }
 }

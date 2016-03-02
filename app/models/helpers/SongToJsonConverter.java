@@ -34,10 +34,10 @@ public class SongToJsonConverter {
         for (SongLyrics lyrics : s.songLyrics) {
             songLyricsIDsArray.add(lyrics.getsongLyricsId());
         }
-        
+
         ObjectNode songObject = convert(s.songName, s.songLink, s.songOriginalTitle, s.songAuthor, s.id, s.songImporter, s.dateCreated.getTime(), s.dateModified.getTime(),
                 songLyricsIDsArray, s.getSongbooks());
-       
+
         return songObject;
     }
 
@@ -60,7 +60,6 @@ public class SongToJsonConverter {
         songObject.put("songId", id);
         songObject.put("songImporter", songImporter);
         songObject.putArray("songLyricsIDs").addAll(songLyricsIDsArray);
- 
 
         return songObject;
     }
@@ -79,10 +78,20 @@ public class SongToJsonConverter {
         songObject.put("songImporter", songImporter);
         songObject.put("dateCreated", dateCreated);
         songObject.put("dateModified", dateModified);
-        //songObject.put("songBookName", songBookName);
-        //songObject.put("songBookId", songBookId);
+
+        //ObjectNode songbooksObject = Json.newObject();
+        ArrayNode songbookArray = Json.newArray();
+        for (SongBook songbook : songbooks) {
+            ObjectNode songbookObject = Json.newObject();
+            songbookObject.put("songBookName", songbook.getSongBookName());
+            songbookObject.put("songBookId", songbook.getId());
+            songbookObject.put("songBookPrivate", songbook.getPrivateSongbook());
+            songbookArray.add(songbookObject);
+        }
+        songObject.putArray("songBooks").addAll(songbookArray);
+        //songObject.set("songBooks", songbooksObject);
+        
         songObject.putArray("songLyricsIDs").addAll(songLyricsIDsArray);
-        songObject.putPOJO("songbooks", songbooks);
 
         return songObject;
     }
@@ -123,7 +132,7 @@ public class SongToJsonConverter {
         return serviceObject;
     }
 
-    public static List <ObjectNode> convert(List<Service> serviceList) {
+    public static List<ObjectNode> convert(List<Service> serviceList) {
         // ObjectNode servicesObject = Json.newObject();
         ArrayList<ObjectNode> servicesArray = new ArrayList<>();
         for (Service s : serviceList) {
