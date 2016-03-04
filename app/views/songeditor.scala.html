@@ -67,8 +67,8 @@
                         $('#songOriginalTitle').attr("value", data.songOriginalTitle);
                         $('#songAuthor').attr("value", data.songAuthor);
                         $('#songLink').attr("value", data.songLink);
-                        $('#songBook_songBookName').attr("value", data.songBookName);
-                        $('#songBook_id').attr("value", data.songBookId);
+                        $('#songBookName').attr("value", data.songBooks[0].songBookName);
+                        $('#songBookId').attr("value", data.songBooks[0].songBookId);
                         songLyricsIDs = data.songLyricsIDs;
 
                         $.each(songLyricsIDs, function(i,s){
@@ -96,17 +96,18 @@
         $("#songbook-select").change(function(){
 		   var selectedSongbookId = this.value;
 		   var selectedSongbookName = $("#songbook-select option:selected" ).text();
-		   $('#songBook_id').attr("value", selectedSongbookId);
-		   $('#songBook_songBookName').attr("value", selectedSongbookName);
+		   $('#songBookId').attr("value", selectedSongbookId);
+		   $('#songBookName').attr("value", selectedSongbookName);
 		});
         
-        $( "#addAdditionalLyricsButton" ).click(function() {
+        $("#addAdditionalLyricsButton" ).click(function() {
             $('#songLyrics_'+songLyricsCount+'_songLyrics').attr("style", "display:block;");
             songLyricsCount = songLyricsCount + 1;
         });
 
     CreateSongEditor(id);
-
+    // hide label
+	$('label[for="songBookId"]').hide();
     });
     </script>
 }

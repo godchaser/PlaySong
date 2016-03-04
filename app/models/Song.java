@@ -90,8 +90,8 @@ public class Song extends Model implements Comparator<Song> {
             //savedToDefaultSongbook = true;
         }
         else {
-            // TODO: Bug - User is not updated as owner of the songbook
-            activeSongbook = SongBook.updateOrCreate(null, song.getSongBookName(), userEmail, song.getPrivateSongBook());
+            Logger.debug("Updating or creating new songbook");
+            activeSongbook = SongBook.updateOrCreate(song.getSongBookId(), song.getSongBookName(), userEmail, song.getPrivateSongBook());
             song.setSongBook(activeSongbook, userEmail);
         }
         
@@ -115,8 +115,10 @@ public class Song extends Model implements Comparator<Song> {
             }
             Logger.debug("Song updated by user: " + song.songLastModifiedBy);
             Logger.debug("Song updated on: " + song.getDateModified().toString());
+            Logger.debug("Adding song to songbook");
+            SongBook.addSong(song, activeSongbook);
             Logger.debug("Removing stale songbook references, if they exist");
-            // SongBook.deleteIfNoMoreSongs(sentSonbookId);
+            SongBook.staleSongbookCleanup(userEmail, activeSongbook);
         } else {
             Logger.debug("Will not save song without lyrics");
         }
@@ -302,6 +304,20 @@ public class Song extends Model implements Comparator<Song> {
 
     public void setPrivateSongBook(boolean isPrivateSongBook) {
         this.isPrivateSongBook = isPrivateSongBook;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if ((o instanceof Song) && (((Song) o).getId().equals(getId()))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
     }
 
 }

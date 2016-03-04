@@ -7,6 +7,7 @@ import javax.persistence.*;
 
 import play.data.validation.Constraints.Required;
 import com.avaje.ebean.Model;
+import play.Logger;
 
 @Entity
 public class UserAccount extends Model {
@@ -25,7 +26,7 @@ public class UserAccount extends Model {
     public UserAccount(String email, String name, String password) {
         this.email = email;
         this.name = name;
-        this.password = password;       
+        this.password = password;
     }
 
     public static Finder<String, UserAccount> find = new Finder<>(UserAccount.class);
@@ -42,8 +43,27 @@ public class UserAccount extends Model {
         return find.where().eq("email", email).findUnique().name;
     }
 
-    public void setDefaultSongbook(){
+    public void setDefaultSongbook() {
         getSongbooks().add(SongBook.getDefaultSongbook(UserAccount.getByEmail(email)));
+    }
+
+    public void addSongbook(SongBook songbook) {
+        // Add songbook to user if he is not owner already
+        if (!getSongbooks().contains(songbook)) {
+            getSongbooks().add(songbook);
+        }
+        update();
+    }
+
+    public void removeSongbook(SongBook songbook) {
+        // Remove songbook user if he is not owner already
+        // if (!getSongbooks().contains(songbook)) {
+        Logger.debug("Removing songbook from user: " + getEmail());
+        getSongbooks().remove(songbook);
+        // }
+
+        update();
+        Logger.debug("Removed songbook from user");
     }
 
     public boolean containsSongbook(Long id) {
@@ -51,7 +71,7 @@ public class UserAccount extends Model {
         searchedSongbook.setId(id);
         return getSongbooks().contains(searchedSongbook);
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if ((o instanceof UserAccount) && (((UserAccount) o).getEmail().equals(getEmail()))) {
@@ -65,7 +85,7 @@ public class UserAccount extends Model {
     public int hashCode() {
         return getEmail().hashCode();
     }
-    
+
     public String getEmail() {
         return email;
     }
