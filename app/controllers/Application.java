@@ -243,17 +243,40 @@ public class Application extends Controller {
         return ok(songviewer.render(id, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
     }
 
-    public Result songbook() {
+    public Result songbook(Long id) {
+        
+        UserAccount user = getUserFromCookie();
+        
+        // switch songbooks according to id - but should also check credentials first to account the owner
+        List<SongBook> songbooks = user.getSongbooks();
+        songbooks.addAll(SongBook.getAllPublicSongbooks());
+        // remove duplicates
+        Set<SongBook> songbooksWithoutDuplicates = new LinkedHashSet<>(songbooks);
+
+        
+        SongBook filteredSongbook = SongBook.get(SongBook.DEFAULT_SONGBOOK_ID);
+        
+        for (SongBook songbook : songbooksWithoutDuplicates ){
+            Logger.debug("Checking songbook: " + songbook.getId() + " with matched Id: " + id);
+            if (songbook.getId().equals(id)){
+                Logger.debug("Found songbook match by ID: " + id);
+                filteredSongbook = songbook;
+                break;
+            }
+        }
+   
+        
+
         HR_COLLATOR.setStrength(Collator.PRIMARY);
-        List<Song> sortedSongs = Song.all();
+        List<Song> sortedSongs = filteredSongbook.getSongs();
         Collections.sort(sortedSongs, new Comparator<Song>() {
             @Override
             public int compare(Song s1, Song s2) {
                 return HR_COLLATOR.compare(s1.songName, s2.songName);
             }
         });
-        UserAccount user = getUserFromCookie();
-        return ok(songbook.render(sortedSongs, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
+        
+        return ok(songbook.render(sortedSongs, new ArrayList(songbooksWithoutDuplicates), user, Song.getSongModifiedList(), Song.getSongCreatedList()));
     }
 
     public Result services() {

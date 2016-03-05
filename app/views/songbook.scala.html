@@ -1,4 +1,4 @@
-@(songs: List[Song],  user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
+@(songs: List[Song],  songBooks : List [SongBook], user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
 
 @admintheme("", user, songsModified, songsCreated) {
 	<!-- 
@@ -31,6 +31,18 @@
 			</div>
 		</div>
 	</div>
+	<select id="select-songbooks" class="selectpicker">
+		  <option value="1">All Songs</option>
+		   @if(songBooks.size>0){
+			  @songBooks.map { songBookItem =>
+			  	    @if(songBookItem.getId()!=1){
+				    	<option value="@songBookItem.getId()">@songBookItem.getSongBookName()</option>
+				    }
+			  	}
+			 </select>
+	        }
+	</select>
+	<br><br>
 	<form class="btn-group form-inline" id="songbook-form">
 		<div class="btn-group">
 			<select id="song-selector" class="btn-group btn-info active" multiple="multiple">
@@ -119,6 +131,14 @@
 			enableClickableOptGroups : false,
 			nonSelectedText : 'Select songs',
 			maxHeight : 400
+		});
+		
+		// change songbook event handling	
+		$("#select-songbooks").change(function(){
+		   var selectedSongbookId = this.value;
+		   var songBookDefaultUrl = "@routes.Application.songbook(1)";
+		   var songBookUrl = songBookDefaultUrl.substring(0,songBookDefaultUrl.length-1) + selectedSongbookId;
+		   window.open(songBookUrl, '_self');
 		});
 
 		function setSelected() {

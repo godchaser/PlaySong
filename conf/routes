@@ -8,7 +8,7 @@ GET      /                                controllers.Application.index()
 # views
 GET      /admin                           controllers.Application.admin()
 GET      /table                           controllers.Application.table()
-GET      /songbook                        controllers.Application.songbook()
+GET      /songbook/:id                    controllers.Application.songbook(id: Long)
 GET      /songeditor/:id                  controllers.Application.songeditor(id: Long)
 GET      /newsongeditor                   controllers.Application.newsongeditor()
 GET      /songview/:id                    controllers.Application.songview(id: Long)
