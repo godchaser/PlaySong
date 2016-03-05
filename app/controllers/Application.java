@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -217,8 +218,12 @@ public class Application extends Controller {
 
     public Result table() {
         UserAccount user = getUserFromCookie();
+        List<SongBook> songbooks = user.getSongbooks();
+        songbooks.addAll(SongBook.getAllPublicSongbooks());
 
-        return ok(table.render(Song.getNumberOfSongsInDatabase(), Song.getSongModifiedList(), Song.getSongCreatedList(), user, user.getSongbooks()));
+        // remove duplicates
+        Set<SongBook> songbooksWithoutDuplicates = new LinkedHashSet<>(songbooks);
+        return ok(table.render(Song.getNumberOfSongsInDatabase(), Song.getSongModifiedList(), Song.getSongCreatedList(), user, new ArrayList<>(songbooksWithoutDuplicates)));
     }
 
     @Security.Authenticated(Secured.class)
@@ -313,8 +318,8 @@ public class Application extends Controller {
         List<Service> services = Service.all();
         return ok(Json.toJson(SongToJsonConverter.convert(services)));
     }
-    
-    public Result getsongbooksdata(){
+
+    public Result getsongbooksdata() {
         return ok(Json.toJson(SongBook.all()));
     }
 
@@ -365,7 +370,8 @@ public class Application extends Controller {
             UserAccount user = getUserFromCookie();
             String userName = UserAccount.getNameFromEmail(user.getEmail());
             Song updatedSong = filledForm.get();
-            updatedSong.setSongLastModifiedBy(userName);;
+            updatedSong.setSongLastModifiedBy(userName);
+            ;
             Logger.debug("Update or create song");
             Song.updateOrCreateSong(updatedSong, user.getEmail());
             return redirect(routes.Application.table());
@@ -457,13 +463,12 @@ public class Application extends Controller {
          * Get needed params
          */
 
-        // TODO: implement public - private songbooks
-
         UserAccount user = getUserFromCookie();
 
-        Long songBookIdFilter = 1L;
-        // check if user is owner of this songbooko
-        if (user.containsSongbook(songBookId)) {
+        Long songBookIdFilter = SongBook.DEFAULT_SONGBOOK_ID;
+        Logger.debug("Looking for songbook by ID: " + songBookId);
+        // check if user is owner of this songbook or songbook is public (not private)
+        if (user.containsSongbook(songBookId) || !SongBook.get(songBookId).getPrivateSongbook()) {
             songBookIdFilter = songBookId;
         }
 
@@ -507,16 +512,32 @@ public class Application extends Controller {
              * u2.song_book_id as r_id from song t0 join song_lyrics u1 on u1.song_id = t0.id join song_book_song u2 on u2.song_id = t0.id where u2.song_book_id = 2 order by song_name asc;
              */
             //@formatter:off
-            queryResult = Ebean.createSqlQuery(
-                    "select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.date_created, t0.date_modified, u1.id as l_id, u2.song_book_id as r_id "
-                            + "from song t0 " 
-                            + "join song_lyrics u1 on u1.song_id = t0.id " 
-                            + "join song_book_song u2 on u2.song_id = t0.id " 
-                            + "where u2.song_book_id = " + songBookIdFilter.toString() + " "
-                            + "order by " + sortBy + " " + order)
-                    .findList();
-
+            
+            // default songbook - query default songbook and all public songs (private false)
+            String queryDefaultSongbook = "select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.date_created, t0.date_modified, t0.private_song, u1.id as l_id, u2.song_book_id as r_id "
+                    + "from song t0 " 
+                    + "join song_lyrics u1 on u1.song_id = t0.id " 
+                    + "join song_book_song u2 on u2.song_id = t0.id " 
+                    + "where u2.song_book_id = " + songBookIdFilter.toString() + " OR t0.private_song = false " 
+                    + "order by " + sortBy + " " + order;
+            
+            String querySpecificSongbook = "select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.date_created, t0.date_modified, t0.private_song, u1.id as l_id, u2.song_book_id as r_id "
+                    + "from song t0 " 
+                    + "join song_lyrics u1 on u1.song_id = t0.id " 
+                    + "join song_book_song u2 on u2.song_id = t0.id " 
+                    + "where u2.song_book_id = " + songBookIdFilter.toString() + " " 
+                    + "order by " + sortBy + " " + order;
+            
+            if (songBookIdFilter == SongBook.DEFAULT_SONGBOOK_ID){
+                queryResult = Ebean.createSqlQuery(queryDefaultSongbook)
+                        .findList();
+            }
+            else {
+                queryResult = Ebean.createSqlQuery(querySpecificSongbook)
+                        .findList();
+            }
         } else {
+            // this is scenario with string filter
             // TODO : fix this so support songbook 
             queryResult = Ebean
                     .createSqlQuery(

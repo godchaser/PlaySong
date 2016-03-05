@@ -123,6 +123,10 @@ public class SongBook extends Model {
     private static List<SongBook> getSongbooksOwnedByUser(String email, String songBookName) {
         return UserAccount.getByEmail(email).getSongbooks();
     }
+    
+    public static List<SongBook> getAllPublicSongbooks(){
+        return find.where().eq("private_songbook", false).findList();
+    }
 
     // INTERESTING: I have to fetch users first and then query it's members
     private static List<SongBook> getSongbooksOwnedByUserExample(String email, String songBookName) {

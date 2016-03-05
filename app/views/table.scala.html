@@ -12,7 +12,7 @@
 	<h2>Song Database 
 	
 	<select id="select-songbooks" class="selectpicker">
-		  <option value="0">All Songs</option>
+		  <option value="1">All Songs</option>
 		   @if(songBooks.size>0){
 			  @songBooks.map { songBookItem =>
 			  	    @if(songBookItem.getId()!=1){
@@ -312,7 +312,7 @@
 				"bJQueryUI" : true,
 				"paginationType" : "full",
 				"stateSave": true,
-				"sAjaxSource" : "@routes.Application.getsongsdatatable(0)",
+				"sAjaxSource" : "@routes.Application.getsongsdatatable(1)",
 				//"dom": 'T<"clear">lfrtip',
 				"dom": '<f<t>lip>',
 				"drawCallback": function( settings ) {
@@ -372,7 +372,7 @@
 		$("#select-songbooks").change(function(){
 		   var selectedSongbookId = this.value;
 		   //var selectedSongbookName = $("#songbook-select option:selected").text();
-		   var songBookDefaultUrl = "@routes.Application.getsongsdatatable(0)";
+		   var songBookDefaultUrl = "@routes.Application.getsongsdatatable(1)";
 		   var songBookUrl = songBookDefaultUrl.substring(0,songBookDefaultUrl.length-1) + selectedSongbookId;
 		   oTable.DataTable().ajax.url(songBookUrl).load();
 		});

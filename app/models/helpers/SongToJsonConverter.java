@@ -35,7 +35,7 @@ public class SongToJsonConverter {
             songLyricsIDsArray.add(lyrics.getsongLyricsId());
         }
 
-        ObjectNode songObject = convert(s.songName, s.songLink, s.songOriginalTitle, s.songAuthor, s.id, s.songImporter, s.dateCreated.getTime(), s.dateModified.getTime(),
+        ObjectNode songObject = convert(s.songName, s.songLink, s.songOriginalTitle, s.songAuthor, s.id, s.songImporter, s.dateCreated.getTime(), s.dateModified.getTime(), s.getPrivateSong(),
                 songLyricsIDsArray, s.getSongbooks());
 
         return songObject;
@@ -65,7 +65,7 @@ public class SongToJsonConverter {
     }
 
     public static ObjectNode convert(String songName, String songLink, String songOriginalTitle, String songAuthor, Long id, String songImporter, Long dateCreated, Long dateModified,
-            ArrayNode songLyricsIDsArray, List<SongBook> songbooks) {
+            boolean privateSong, ArrayNode songLyricsIDsArray, List<SongBook> songbooks) {
 
         ObjectNode songObject = Json.newObject();
 
@@ -78,6 +78,7 @@ public class SongToJsonConverter {
         songObject.put("songImporter", songImporter);
         songObject.put("dateCreated", dateCreated);
         songObject.put("dateModified", dateModified);
+        songObject.put("privateSong", privateSong);
 
         //ObjectNode songbooksObject = Json.newObject();
         ArrayNode songbookArray = Json.newArray();

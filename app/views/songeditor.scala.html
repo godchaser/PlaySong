@@ -67,6 +67,15 @@
                         $('#songOriginalTitle').attr("value", data.songOriginalTitle);
                         $('#songAuthor').attr("value", data.songAuthor);
                         $('#songLink').attr("value", data.songLink);
+                        
+                        if (data.privateSong){
+                        	$('#privateSong').attr('checked', 'checked');
+                        }
+                        
+                        if (data.songBooks[0].songBookPrivate){
+                        	$('#isPrivateSongBook').attr('checked', 'checked');
+                        }
+      
                         $('#songBookName').attr("value", data.songBooks[0].songBookName);
                         $('#songBookId').attr("value", data.songBooks[0].songBookId);
                         songLyricsIDs = data.songLyricsIDs;
