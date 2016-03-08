@@ -1,4 +1,4 @@
-@(songs: List[Song],  songBooks : List [SongBook], user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
+@(songs: List[Song],  songBooks : List [SongBook], songBookId: Long, user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
 
 @admintheme("", user, songsModified, songsCreated) {
 	<!-- 
@@ -36,7 +36,11 @@
 		   @if(songBooks.size>0){
 			  @songBooks.map { songBookItem =>
 			  	    @if(songBookItem.getId()!=1){
-				    	<option value="@songBookItem.getId()">@songBookItem.getSongBookName()</option>
+			  	    	@if(songBookItem.getId().equals(songBookId)){
+					    	<option value="@songBookItem.getId()" selected>@songBookItem.getSongBookName()</option>
+					    }else {
+				    		<option value="@songBookItem.getId()">@songBookItem.getSongBookName()</option>
+				    	}
 				    }
 			  	}
 			 </select>
@@ -135,6 +139,7 @@
 		
 		// change songbook event handling	
 		$("#select-songbooks").change(function(){
+		   console.log("value changed" + this.value);
 		   var selectedSongbookId = this.value;
 		   var songBookDefaultUrl = "@routes.Application.songbook(1)";
 		   var songBookUrl = songBookDefaultUrl.substring(0,songBookDefaultUrl.length-1) + selectedSongbookId;

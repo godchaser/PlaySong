@@ -149,7 +149,7 @@ public class Application extends Controller {
             }
         });
 
-        return ok(songbook.render(sortedSongs, new ArrayList<SongBook>(songbooksWithoutDuplicates), user, Song.getSongModifiedList(), Song.getSongCreatedList()));
+        return ok(songbook.render(sortedSongs, new ArrayList<SongBook>(songbooksWithoutDuplicates), id, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
     }
 
     public Result services() {
@@ -877,7 +877,7 @@ public class Application extends Controller {
 
         PlaySongRestService psrs = new PlaySongRestService();
         psrs.downloadSongsData(user.getEmail());
-        // psrs.downloadFavoritesSongsData();
+        psrs.downloadFavoritesSongsData();
         return redirect(routes.Application.table());
     }
 
