@@ -67,7 +67,7 @@ import songimporters.SongImporter;
 import views.html.admin;
 import views.html.login;
 import views.html.playlists;
-import views.html.songbook;
+import views.html.playlistmaker;
 import views.html.songeditor;
 import views.html.songs;
 import views.html.songviewer;
@@ -122,7 +122,7 @@ public class Application extends Controller {
         return ok(songviewer.render(id, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
     }
 
-    public Result songbook(Long id) {
+    public Result playlistmaker(Long id) {
         UserAccount user = getUserFromCookie();
 
         // switch songbooks according to id - but should also check credentials first to account the owner
@@ -149,7 +149,7 @@ public class Application extends Controller {
             }
         });
 
-        return ok(songbook.render(sortedSongs, new ArrayList<SongBook>(songbooksWithoutDuplicates), id, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
+        return ok(playlistmaker.render(sortedSongs, new ArrayList<SongBook>(songbooksWithoutDuplicates), id, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
     }
 
     public Result services() {
@@ -330,11 +330,11 @@ public class Application extends Controller {
         isDefaultSongBookId = (songBookId.equals(SongBook.DEFAULT_SONGBOOK_ID)) ? true : false;
 
         // check if user is owner of this songbook or songbook is public (not private)
-        boolean isPublicSong = true;
+        boolean isPublicSongBook = true;
         if (SongBook.get(songBookId) != null) {
-            isPublicSong = SongBook.get(songBookId).getPrivateSongbook();
+            isPublicSongBook = !SongBook.get(songBookId).getPrivateSongbook();
         }
-        if (user.containsSongbook(songBookId) || isPublicSong) {
+        if (user.containsSongbook(songBookId) || isPublicSongBook) {
             songBookIdFilter = songBookId;
         }
 
@@ -574,7 +574,7 @@ public class Application extends Controller {
                 .findList();
         //@formatter:on
         ArrayList<Long> ids = new ArrayList<>();
-        //TODO: Get song name through this sql query
+        // TODO: Get song name through this sql query
         for (SqlRow res : result) {
             ids.add(res.getLong("id"));
         }
@@ -923,16 +923,29 @@ public class Application extends Controller {
         return user;
     }
 
+    //@formatter:off
     public Result javascriptRoutes() {
         response().setContentType("text/javascript");
-        return ok(Routes.javascriptRouter("jsRoutes", controllers.routes.javascript.Application.songview(), controllers.routes.javascript.Application.login(),
-                controllers.routes.javascript.Application.deletesong(), controllers.routes.javascript.Application.getsongjson(), controllers.routes.javascript.Application.songeditor(),
-                controllers.routes.javascript.Application.songsuggestions(), controllers.routes.javascript.Application.getsonglyricsjson(),
-                controllers.routes.javascript.Application.updatesonglyricsjson(), controllers.routes.javascript.Application.services(),
-                controllers.routes.javascript.Application.generateService(), controllers.routes.javascript.Application.deleteservice(), controllers.routes.javascript.Application.upload(),
-                controllers.routes.javascript.Application.addUser(), controllers.routes.javascript.Application.getUser(), controllers.routes.javascript.Application.deleteUser(),
+        return ok(Routes.javascriptRouter("jsRoutes", 
+                controllers.routes.javascript.Application.songview(), 
+                controllers.routes.javascript.Application.login(),
+                controllers.routes.javascript.Application.deletesong(), 
+                controllers.routes.javascript.Application.getsongjson(), 
+                controllers.routes.javascript.Application.songeditor(),
+                controllers.routes.javascript.Application.playlistmaker(),
+                controllers.routes.javascript.Application.songsuggestions(), 
+                controllers.routes.javascript.Application.getsonglyricsjson(),
+                controllers.routes.javascript.Application.updatesonglyricsjson(), 
+                controllers.routes.javascript.Application.services(),
+                controllers.routes.javascript.Application.generateService(), 
+                controllers.routes.javascript.Application.deleteservice(), 
+                controllers.routes.javascript.Application.upload(),
+                controllers.routes.javascript.Application.addUser(), 
+                controllers.routes.javascript.Application.getUser(), 
+                controllers.routes.javascript.Application.deleteUser(),
                 controllers.routes.javascript.Application.updateUser()));
     }
+    //@formatter:on
 
     //
     // USER ACTIONS
@@ -1095,7 +1108,7 @@ public class Application extends Controller {
         XlsHelper.importAndUpdateSongs();
         return ok();
     }
-    
+
     @Security.Authenticated(Secured.class)
     public Result init() {
         try {
