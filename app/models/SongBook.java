@@ -80,9 +80,9 @@ public class SongBook extends Model {
         return foundSongbook;
     }
 
-    public static void staleSongbookCleanup(String email, SongBook songbook) {
+    public static void staleSongbookCleanup(String email) {
         Logger.debug("Starting Songbook cleanup action");
-        for (SongBook songbookEntry : getSongbooksOwnedByUser(email, songbook.getSongBookName())) {
+        for (SongBook songbookEntry : getSongbooksOwnedByUser(email)) {
             Logger.debug("Found user songbook: " + email + "->" + songbookEntry.getSongBookName());
             Logger.debug("Checking if she songbook is empty");
             // I should ignore default songbooks
@@ -97,7 +97,7 @@ public class SongBook extends Model {
         }
         Logger.debug("Finished Songbook cleanup action");
     }
-
+    
     private static void setUser(UserAccount user, SongBook songbook) {
         user.addSongbook(songbook);
         // Add user to owners of songbook - skip if user is already owning this songbook
@@ -120,7 +120,7 @@ public class SongBook extends Model {
         return find.byId(id);
     }
 
-    private static List<SongBook> getSongbooksOwnedByUser(String email, String songBookName) {
+    private static List<SongBook> getSongbooksOwnedByUser(String email) {
         return UserAccount.getByEmail(email).getSongbooks();
     }
     
@@ -134,7 +134,7 @@ public class SongBook extends Model {
     }
 
     public static SongBook getByNameAndEmail(String songBookName, String email) {
-        List<SongBook> foundSongBooks = getSongbooksOwnedByUser(email, songBookName);
+        List<SongBook> foundSongBooks = getSongbooksOwnedByUser(email);
         // if did not fint songbooks, or I found default one then return null
         if (foundSongBooks == null || foundSongBooks.isEmpty() || (foundSongBooks.get(0).getId()==SongBook.DEFAULT_SONGBOOK_ID)) {
             return null;

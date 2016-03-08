@@ -33,8 +33,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import chord.tools.ChordLineTransposer;
 import chord.tools.LineTypeChecker;
+import database.SqlQueries;
 import document.tools.DocxGenerator;
 import document.tools.PdfGenerator;
 import document.tools.XlsHelper;
@@ -55,6 +55,7 @@ import play.Logger;
 import play.Routes;
 import play.data.DynamicForm;
 import play.data.Form;
+import play.db.ebean.Transactional;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http.MultipartFormData;
@@ -85,6 +86,7 @@ public class Application extends Controller {
         return redirect(routes.Application.table());
     }
 
+    // VIEWS
     @Security.Authenticated(Secured.class)
     public Result admin() {
         UserAccount user = getUserFromCookie();
@@ -93,134 +95,11 @@ public class Application extends Controller {
         return ok(admin.render(user, userForm, UserAccount.find.all(), message, Song.getSongModifiedList(), Song.getSongCreatedList()));
     }
 
-    @Security.Authenticated(Secured.class)
-    public Result upload() {
-        Logger.trace("Upload file form");
-        MultipartFormData body = request().body().asMultipartFormData();
-        FilePart uploadedFile = body.getFile("uploadedfile");
-        if (uploadedFile != null) {
-            String contentType = uploadedFile.getContentType();
-            File file = uploadedFile.getFile();
-            String message = "File successfully uploaded: " + file.getAbsolutePath() + " " + contentType;
-            Logger.trace(message);
-            File target = new File("resources/upload/songs.xlsx");
-
-            try {
-                Files.copy(file.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            Logger.trace("Updating songs");
-            XlsHelper.importAndUpdateSongs3();
-
-            return redirect(routes.Application.admin());
-        } else {
-            String message = "File not uploaded - missing  file";
-            Logger.trace(message);
-            return redirect(routes.Application.admin());
-        }
-    }
-
-    @Security.Authenticated(Secured.class)
-    public Result addUser() {
-        Form<UserAccount> filledForm = userForm.bindFromRequest();
-        UserAccount user = getUserFromCookie();
-
-        if (filledForm.hasErrors()) {
-            String message = "Invalid user form";
-            Logger.trace(message);
-            return badRequest(admin.render(user, userForm, UserAccount.find.all(), message, Song.getSongModifiedList(), Song.getSongCreatedList()));
-        }
-
-        UserAccount newUser = filledForm.get();
-        String message = null;
-        if (UserAccount.find.byId(newUser.email) != null) {
-            message = "User with this email already exists: " + newUser.email;
-        } else {
-            message = "Adding new user: " + newUser.email;
-            newUser.save();
-            newUser.setDefaultSongbook();
-            newUser.update();
-
-        }
-        Logger.trace(message);
-        return redirect(routes.Application.admin());
-    }
-
-    @Security.Authenticated(Secured.class)
-    public Result getUser(String email) {
-        UserAccount foundUser = null;
-        if (email != null) {
-            foundUser = UserAccount.find.byId(email);
-        }
-        if (foundUser == null) {
-            String message = "Cannot find user for get: " + email;
-            Logger.trace(message);
-            return badRequest();
-        }
-        String message = "Getting user: " + email;
-        Logger.trace(message);
-        return ok(Json.toJson(foundUser));
-    }
-
-    @Security.Authenticated(Secured.class)
-    public Result deleteUser(String email) {
-        UserAccount foundUser = null;
-        if (email != null) {
-            foundUser = UserAccount.find.byId(email);
-        }
-        if (foundUser == null) {
-            String message = "Cannot find user for deletion: " + email;
-            Logger.trace(message);
-            return badRequest();
-        }
-        String message = "Deleting user: " + email;
-        foundUser.delete();
-        Logger.trace(message);
-        return ok();
-    }
-
-    @Security.Authenticated(Secured.class)
-    public Result updateUser(String email) {
-        Form<UserAccount> filledForm = userForm.bindFromRequest();
-        if (filledForm.hasErrors()) {
-            String message = "Invalid user update form";
-            Logger.trace(message);
-            return badRequest();
-        }
-        UserAccount updateUser = filledForm.get();
-        String message = "Updating  user: " + updateUser.email;
-        Logger.trace(message);
-        updateUser.update();
-        return ok();
-    }
-
-    @Security.Authenticated(Secured.class)
-    public Result getXLS() {
-        XlsHelper.dumpSongs((Song.find.all()));
-        String message = "Getting xls songs";
-        Logger.trace(message);
-        File tmpFile = new File("resources/xlsx/songs.xlsx");
-        response().setHeader(CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-
-        Logger.debug("File: " + tmpFile.getAbsolutePath());
-        FileInputStream fin = null;
-        try {
-            fin = new FileInputStream(tmpFile);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        response().setHeader("Content-disposition", "attachment;filename=" + tmpFile.getName());
-        return ok(fin);
-    }
-
     public Result table() {
         UserAccount user = getUserFromCookie();
+
         List<SongBook> songbooks = user.getSongbooks();
         songbooks.addAll(SongBook.getAllPublicSongbooks());
-
         // remove duplicates
         Set<SongBook> songbooksWithoutDuplicates = new LinkedHashSet<>(songbooks);
         return ok(table.render(Song.getNumberOfSongsInDatabase(), Song.getSongModifiedList(), Song.getSongCreatedList(), user, new ArrayList<>(songbooksWithoutDuplicates)));
@@ -244,28 +123,22 @@ public class Application extends Controller {
     }
 
     public Result songbook(Long id) {
-        
         UserAccount user = getUserFromCookie();
-        
+
         // switch songbooks according to id - but should also check credentials first to account the owner
         List<SongBook> songbooks = user.getSongbooks();
         songbooks.addAll(SongBook.getAllPublicSongbooks());
         // remove duplicates
         Set<SongBook> songbooksWithoutDuplicates = new LinkedHashSet<>(songbooks);
-
-        
         SongBook filteredSongbook = SongBook.get(SongBook.DEFAULT_SONGBOOK_ID);
-        
-        for (SongBook songbook : songbooksWithoutDuplicates ){
+        for (SongBook songbook : songbooksWithoutDuplicates) {
             Logger.debug("Checking songbook: " + songbook.getId() + " with matched Id: " + id);
-            if (songbook.getId().equals(id)){
+            if (songbook.getId().equals(id)) {
                 Logger.debug("Found songbook match by ID: " + id);
                 filteredSongbook = songbook;
                 break;
             }
         }
-   
-        
 
         HR_COLLATOR.setStrength(Collator.PRIMARY);
         List<Song> sortedSongs = filteredSongbook.getSongs();
@@ -275,15 +148,14 @@ public class Application extends Controller {
                 return HR_COLLATOR.compare(s1.songName, s2.songName);
             }
         });
-        
-        return ok(songbook.render(sortedSongs, new ArrayList(songbooksWithoutDuplicates), user, Song.getSongModifiedList(), Song.getSongCreatedList()));
+
+        return ok(songbook.render(sortedSongs, new ArrayList<SongBook>(songbooksWithoutDuplicates), user, Song.getSongModifiedList(), Song.getSongCreatedList()));
     }
 
     public Result services() {
         UserAccount user = getUserFromCookie();
 
         List<Service> serviceList = Service.find.all();
-
         // sort by date created
         Collections.sort(serviceList, new Comparator<Service>() {
             public int compare(Service o1, Service o2) {
@@ -346,16 +218,8 @@ public class Application extends Controller {
         return ok(Json.toJson(SongBook.all()));
     }
 
-    @Security.Authenticated(Secured.class)
-    public Result updateFromOnlineSpreadsheet() {
-        JsonNode data = request().body().asJson();
-        Logger.debug("Online spreadsheet data: " + data.asText());
-        return ok();
-    }
-
     public Result getsongjson(Long id) {
         Song s = Song.get(id);
-        // TODO: I have to send also songbook private flag
         ObjectNode songJson = SongToJsonConverter.convert(s);
         return ok(Json.toJson(songJson));
     }
@@ -368,6 +232,7 @@ public class Application extends Controller {
         return ok(lyricsResult);
     }
 
+    @Transactional
     @Security.Authenticated(Secured.class)
     public Result updatesonglyricsjson(Long id) {
         SongLyrics lyricsObject = SongLyrics.find.byId(id);
@@ -380,8 +245,17 @@ public class Application extends Controller {
 
     @Security.Authenticated(Secured.class)
     public Result deletesong(Long id) {
-        Song.delete(id);
+        UserAccount user = getUserFromCookie();
+
+        deleteSong(id);
+        SongBook.staleSongbookCleanup(user.getEmail());
         return redirect(routes.Application.table());
+    }
+
+    // Helper method to execute transaction
+    @Transactional
+    private void deleteSong(Long id) {
+        Song.delete(id);
     }
 
     @Security.Authenticated(Secured.class)
@@ -394,13 +268,23 @@ public class Application extends Controller {
             String userName = UserAccount.getNameFromEmail(user.getEmail());
             Song updatedSong = filledForm.get();
             updatedSong.setSongLastModifiedBy(userName);
-            ;
+
             Logger.debug("Update or create song");
-            Song.updateOrCreateSong(updatedSong, user.getEmail());
+            updateOrCreateSong(updatedSong, user);
+
+            Logger.debug("Removing stale songbook references, if they exist");
+            SongBook.staleSongbookCleanup(user.getEmail());
             return redirect(routes.Application.table());
         }
     }
 
+    // Helper method to execute transaction
+    @Transactional
+    private void updateOrCreateSong(Song updatedSong, UserAccount user) {
+        Song.updateOrCreateSong(updatedSong, user.getEmail());
+    }
+
+    @Transactional
     @Security.Authenticated(Secured.class)
     public Result emptyDb() {
         Ebean.createSqlUpdate("delete from song_lyrics").execute();
@@ -415,21 +299,7 @@ public class Application extends Controller {
         return redirect(routes.Application.table());
     }
 
-    @Security.Authenticated(Secured.class)
-    public Result init() {
-        try {
-            // SongImporter.restoreFromSQLDump();
-            SongImporter.importFromDb();
-            XlsHelper.importAndUpdateSongs();
-        } catch (Exception e) {
-            Logger.error("Exception occured during init" + e.getStackTrace());
-            e.printStackTrace();
-            System.out.print(e.getStackTrace());
-            System.out.print(e.getMessage());
-        }
-        return redirect(routes.Application.index());
-    }
-
+    @Transactional
     public Result inituser() {
         try {
             Ebean.createSqlUpdate("delete from user_account").execute();
@@ -450,48 +320,21 @@ public class Application extends Controller {
         return ok(songs.render(Song.all()));
     }
 
-    @Security.Authenticated(Secured.class)
-    public Result yamlbackup() {
-        SongImporter.songToYaml();
-        return redirect(routes.Application.index());
-    }
-
-    @Security.Authenticated(Secured.class)
-    public Result yamlrestore() {
-        SongImporter.yamlToSong();
-        return redirect(routes.Application.index());
-    }
-
-    @Security.Authenticated(Secured.class)
-    public Result sqlinit() {
-        Ebean.delete(Song.all());
-        SongImporter.restoreFromSQLDump();
-        return redirect(routes.Application.table());
-    }
-
-    @Security.Authenticated(Secured.class)
-    public Result xmlupdate() {
-        XmlSongsParser.updateFromXML();
-        return ok();
-    }
-
-    @Security.Authenticated(Secured.class)
-    public Result updateFromXLS() {
-        XlsHelper.importAndUpdateSongs();
-        return ok();
-    }
-
     public Result getsongsdatatable(Long songBookId) {
-        /**
-         * Get needed params
-         */
-
         UserAccount user = getUserFromCookie();
 
         Long songBookIdFilter = SongBook.DEFAULT_SONGBOOK_ID;
         Logger.debug("Looking for songbook by ID: " + songBookId);
+
+        boolean isDefaultSongBookId = true;
+        isDefaultSongBookId = (songBookId.equals(SongBook.DEFAULT_SONGBOOK_ID)) ? true : false;
+
         // check if user is owner of this songbook or songbook is public (not private)
-        if (user.containsSongbook(songBookId) || !SongBook.get(songBookId).getPrivateSongbook()) {
+        boolean isPublicSong = true;
+        if (SongBook.get(songBookId) != null) {
+            isPublicSong = SongBook.get(songBookId).getPrivateSongbook();
+        }
+        if (user.containsSongbook(songBookId) || isPublicSong) {
             songBookIdFilter = songBookId;
         }
 
@@ -523,66 +366,108 @@ public class Application extends Controller {
 
         List<SqlRow> queryResult;
 
+        String sqlQuery = null;
+
         // searching without full text search filter
         if (filter.isEmpty()) {
-            /*
-             * queryResult = Ebean.createSqlQuery(
-             * "select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id from song t0 join song_lyrics u1 on u1.song_id = t0.id "
-             * + "where t0.song_book_id = " + songBookIdFilter.toString() + " " + "order by " + sortBy + " " + order) .findList();
-             */
-            /*
-             * select t0.id, t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.date_created, t0.date_modified, u1.id as l_id,
-             * u2.song_book_id as r_id from song t0 join song_lyrics u1 on u1.song_id = t0.id join song_book_song u2 on u2.song_id = t0.id where u2.song_book_id = 2 order by song_name asc;
-             */
-            //@formatter:off
-            
-            // default songbook - query default songbook and all public songs (private false)
-            String queryDefaultSongbook = "select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.date_created, t0.date_modified, t0.private_song, u1.id as l_id, u2.song_book_id as r_id "
-                    + "from song t0 " 
-                    + "join song_lyrics u1 on u1.song_id = t0.id " 
-                    + "join song_book_song u2 on u2.song_id = t0.id " 
-                    + "where u2.song_book_id = " + songBookIdFilter.toString() + " OR t0.private_song = false " 
-                    + "order by " + sortBy + " " + order;
-            
-            String querySpecificSongbook = "select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.date_created, t0.date_modified, t0.private_song, u1.id as l_id, u2.song_book_id as r_id "
-                    + "from song t0 " 
-                    + "join song_lyrics u1 on u1.song_id = t0.id " 
-                    + "join song_book_song u2 on u2.song_id = t0.id " 
-                    + "where u2.song_book_id = " + songBookIdFilter.toString() + " " 
-                    + "order by " + sortBy + " " + order;
-            
-            if (songBookIdFilter == SongBook.DEFAULT_SONGBOOK_ID){
-                queryResult = Ebean.createSqlQuery(queryDefaultSongbook)
-                        .findList();
+            if (isDefaultSongBookId) {
+                // default songbook - query default songbook and all public songs (private false)
+                //@formatter:off
+                sqlQuery =  SqlQueries.sqlSelectSong
+                            + SqlQueries.sqlFromSong
+                            + SqlQueries.sqlJoin
+                            + "where u2.song_book_id = " + songBookIdFilter.toString() 
+                            + SqlQueries.sqlPrivateSongFalse
+                            + "order by " + sortBy + " " + order;
+                // @formatter:on
+            } else {
+                //@formatter:off
+                sqlQuery =  SqlQueries.sqlSelectSong
+                            + SqlQueries.sqlFromSong
+                            + SqlQueries.sqlJoin
+                            + "where u2.song_book_id = " + songBookIdFilter.toString() + " " 
+                            + "order by " + sortBy + " " + order;
+                // @formatter:on
             }
-            else {
-                queryResult = Ebean.createSqlQuery(querySpecificSongbook)
-                        .findList();
-            }
-        } else {
-            // this is scenario with string filter
-            // TODO : fix this so support songbook 
-            queryResult = Ebean
-                    .createSqlQuery(
-                            "(select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id "
-                            + "from song t0 "
-                            + "join song_lyrics u1 on u1.song_id = t0.id  where lower(t0.song_name) like :songnamefilter AND where t0.song_book_id = " + songBookIdFilter.toString() + ") " + "UNION ALL"
-                            
-                            + " (select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id "
-                            + "from song t0 "                         
-                            + "join song_lyrics u1 on u1.song_id = t0.id  where lower(t0.song_name) like :songnameinlinefilter AND where t0.song_book_id = " + songBookIdFilter.toString() + ") " + "UNION ALL"
-                            
-                            + " (select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id "
-                            + "from song t0 "
-                            + "join song_lyrics u1 on u1.song_id = t0.id where lower(u1.song_lyrics) like :songlyricsfilter AND where t0.song_book_id = " + songBookIdFilter.toString() + ") " + "UNION ALL"
-                            
-                            + " (select t0.id,  t0.song_name, t0.song_original_title, t0.song_author, t0.song_link, t0.song_importer, t0.song_last_modified_by, t0.song_book_id, t0.date_created, t0.date_modified, u1.id as l_id "
-                            + "from song t0 "
-                            + "song_lyrics u1 on u1.song_id = t0.id  where lower(t0.song_author) like :songauthorfilter AND where t0.song_book_id = " + songBookIdFilter.toString() + ") ")
-                    .setParameter("songnamefilter", filter + "%").setParameter("songnameinlinefilter", "%" + filter + "%").setParameter("songlyricsfilter", "%" + filter + "%")
-                    .setParameter("songauthorfilter", "%" + filter + "%").findList();
+            queryResult = Ebean.createSqlQuery(sqlQuery).findList();
         }
-        // @formatter:on
+        // this is scenario with string filter
+        else {
+            if (isDefaultSongBookId) {
+                // @formatter:off
+                sqlQuery = "(" 
+                            + SqlQueries.sqlSelectSong
+                            + SqlQueries.sqlFromSong
+                            + SqlQueries.sqlJoin          
+                            + "where lower(t0.song_name) like :songnamefilter "
+                            + "AND (u2.song_book_id = " + songBookIdFilter.toString() + SqlQueries.sqlPrivateSongFalse + ")) "
+                            + "UNION ALL "
+                            
+                            + "(" 
+                            + SqlQueries.sqlSelectSong
+                            + SqlQueries.sqlFromSong
+                            + SqlQueries.sqlJoin  
+                            + "where lower(t0.song_name) like :songnameinlinefilter "
+                            + "AND (u2.song_book_id = " + songBookIdFilter.toString() + SqlQueries.sqlPrivateSongFalse + ")) "
+                            + "UNION ALL "
+                            
+                            + "(" 
+                            + SqlQueries.sqlSelectSong
+                            + SqlQueries.sqlFromSong
+                            + SqlQueries.sqlJoin     
+                            + "where lower(u1.song_lyrics) like :songlyricsfilter "
+                            + "AND (u2.song_book_id = " + songBookIdFilter.toString() + SqlQueries.sqlPrivateSongFalse + ")) "
+                            + "UNION ALL "
+                            
+                            + "(" 
+                            + SqlQueries.sqlSelectSong
+                            + SqlQueries.sqlFromSong
+                            + SqlQueries.sqlJoin  
+                            + "where lower(t0.song_author) like :songauthorfilter "
+                            + "AND (u2.song_book_id = " + songBookIdFilter.toString() + SqlQueries.sqlPrivateSongFalse +")"
+                            + ")";
+                
+            } else {
+                sqlQuery = "(" 
+                        + SqlQueries.sqlSelectSong
+                        + SqlQueries.sqlFromSong
+                        + SqlQueries.sqlJoin               
+                        + "where lower(t0.song_name) like :songnamefilter "
+                        + "AND (u2.song_book_id = " + songBookIdFilter.toString()+")) "
+                        + "UNION ALL "
+                        
+                        + "(" 
+                        + SqlQueries.sqlSelectSong
+                        + SqlQueries.sqlFromSong
+                        + SqlQueries.sqlJoin   
+                        + "where lower(t0.song_name) like :songnameinlinefilter "
+                        + "AND (u2.song_book_id = " + songBookIdFilter.toString() + ")) "
+                        + "UNION ALL "
+                        
+                        + "(" 
+                        + SqlQueries.sqlSelectSong
+                        + SqlQueries.sqlFromSong
+                        + SqlQueries.sqlJoin  
+                        + "where lower(u1.song_lyrics) like :songlyricsfilter "
+                        + "AND (u2.song_book_id = " + songBookIdFilter.toString() + ")) "
+                        + "UNION ALL "
+                        
+                        + "(" 
+                        + SqlQueries.sqlSelectSong
+                        + SqlQueries.sqlFromSong
+                        + SqlQueries.sqlJoin    
+                        + "where lower(t0.song_author) like :songauthorfilter "
+                        + "AND (u2.song_book_id = " + songBookIdFilter.toString() + "))";
+            }
+            queryResult = Ebean.createSqlQuery(sqlQuery)
+                    .setParameter("songnamefilter", filter + "%")
+                    .setParameter("songnameinlinefilter", "%" + filter + "%")
+                    .setParameter("songlyricsfilter", "%" + filter + "%")
+                    .setParameter("songauthorfilter", "%" + filter + "%")
+                    .findList();
+            // @formatter:on
+        }
+
         Map<Long, SongTableData> songTableDataMap = new LinkedHashMap<Long, SongTableData>();
 
         for (SqlRow res : queryResult) {
@@ -657,20 +542,39 @@ public class Application extends Controller {
     }
 
     public Result songsuggestions() {
-        /**
-         * Get needed params
-         */
-
         Map<String, String[]> params = request().queryString();
         String filter = params.get("q")[0].toLowerCase();
         // Logger.trace("Quick search song suggestion filter: " + filter);
+        //@formatter:off
         List<SqlRow> result = Ebean
-                .createSqlQuery("(SELECT t0.id" + " FROM song t0" + " WHERE lower(t0.song_name) like :songnamefilter) UNION ALL" + "(SELECT t0.id" + " FROM song t0"
-                        + " WHERE lower(t0.song_name) like :songnameinlinefilter) UNION ALL" + " (SELECT t0.id" + " FROM song t0" + " JOIN song_lyrics u1 on u1.song_id = t0.id"
-                        + " WHERE lower(u1.song_lyrics) like :songlyricsfilter) UNION ALL" + "(SELECT t0.id" + " FROM song t0" + " WHERE lower(t0.song_author) like :songauthorfilter)")
-                .setParameter("songnamefilter", filter + "%").setParameter("songnameinlinefilter", "%" + filter + "%").setParameter("songlyricsfilter", "%" + filter + "%")
-                .setParameter("songauthorfilter", "%" + filter + "%").findList();
+                .createSqlQuery(""
+                        + "("
+                        + SqlQueries.sqlSelectSongId
+                        + SqlQueries.sqlFromSong
+                        + " WHERE lower(t0.song_name) like :songnamefilter) UNION ALL" 
+                        + "("
+                        + SqlQueries.sqlSelectSongId
+                        + SqlQueries.sqlFromSong
+                        + " WHERE lower(t0.song_name) like :songnameinlinefilter) "
+                        + "UNION ALL" 
+                        + "("
+                        + SqlQueries.sqlSelectSongId
+                        + SqlQueries.sqlFromSong
+                        + " JOIN song_lyrics u1 on u1.song_id = t0.id"
+                        + " WHERE lower(u1.song_lyrics) like :songlyricsfilter) "
+                        + "UNION ALL" 
+                        + "("
+                        + SqlQueries.sqlSelectSongId
+                        + SqlQueries.sqlFromSong
+                        + " WHERE lower(t0.song_author) like :songauthorfilter)")
+                .setParameter("songnamefilter", filter + "%")
+                .setParameter("songnameinlinefilter", "%" + filter + "%")
+                .setParameter("songlyricsfilter", "%" + filter + "%")
+                .setParameter("songauthorfilter", "%" + filter + "%")
+                .findList();
+        //@formatter:on
         ArrayList<Long> ids = new ArrayList<>();
+        //TODO: Get song name through this sql query
         for (SqlRow res : result) {
             ids.add(res.getLong("id"));
         }
@@ -839,11 +743,9 @@ public class Application extends Controller {
     }
 
     public Result generateService(String id) {
-
-        boolean useColumns = true;
-
         UserAccount user = getUserFromCookie();
 
+        boolean useColumns = true;
         boolean excludeChords = false;
         Long service_id = null;
         boolean defaultServiceOptions = true;
@@ -968,6 +870,7 @@ public class Application extends Controller {
         return redirect(routes.Application.table());
     }
 
+    @Transactional
     @Security.Authenticated(Secured.class)
     public Result syncDb() {
         UserAccount user = getUserFromCookie();
@@ -978,6 +881,7 @@ public class Application extends Controller {
         return redirect(routes.Application.table());
     }
 
+    @Transactional
     @Security.Authenticated(Secured.class)
     public Result sanitizesongs() {
         System.out.println("sanitizesongs!");
@@ -1028,6 +932,183 @@ public class Application extends Controller {
                 controllers.routes.javascript.Application.generateService(), controllers.routes.javascript.Application.deleteservice(), controllers.routes.javascript.Application.upload(),
                 controllers.routes.javascript.Application.addUser(), controllers.routes.javascript.Application.getUser(), controllers.routes.javascript.Application.deleteUser(),
                 controllers.routes.javascript.Application.updateUser()));
+    }
+
+    //
+    // USER ACTIONS
+    @Security.Authenticated(Secured.class)
+    public Result addUser() {
+        Form<UserAccount> filledForm = userForm.bindFromRequest();
+        UserAccount user = getUserFromCookie();
+
+        if (filledForm.hasErrors()) {
+            String message = "Invalid user form";
+            Logger.trace(message);
+            return badRequest(admin.render(user, userForm, UserAccount.find.all(), message, Song.getSongModifiedList(), Song.getSongCreatedList()));
+        }
+
+        UserAccount newUser = filledForm.get();
+        String message = null;
+        if (UserAccount.find.byId(newUser.email) != null) {
+            message = "User with this email already exists: " + newUser.email;
+        } else {
+            message = "Adding new user: " + newUser.email;
+            newUser.save();
+            newUser.setDefaultSongbook();
+            newUser.update();
+        }
+        Logger.trace(message);
+        return redirect(routes.Application.admin());
+    }
+
+    @Security.Authenticated(Secured.class)
+    public Result getUser(String email) {
+        UserAccount foundUser = null;
+        if (email != null) {
+            foundUser = UserAccount.find.byId(email);
+        }
+        if (foundUser == null) {
+            String message = "Cannot find user for get: " + email;
+            Logger.trace(message);
+            return badRequest();
+        }
+        String message = "Getting user: " + email;
+        Logger.trace(message);
+        return ok(Json.toJson(foundUser));
+    }
+
+    @Security.Authenticated(Secured.class)
+    public Result deleteUser(String email) {
+        UserAccount foundUser = null;
+        if (email != null) {
+            foundUser = UserAccount.find.byId(email);
+        }
+        if (foundUser == null) {
+            String message = "Cannot find user for deletion: " + email;
+            Logger.trace(message);
+            return badRequest();
+        }
+        String message = "Deleting user: " + email;
+        foundUser.delete();
+        Logger.trace(message);
+        return ok();
+    }
+
+    @Security.Authenticated(Secured.class)
+    public Result updateUser(String email) {
+        Form<UserAccount> filledForm = userForm.bindFromRequest();
+        if (filledForm.hasErrors()) {
+            String message = "Invalid user update form";
+            Logger.trace(message);
+            return badRequest();
+        }
+        UserAccount updateUser = filledForm.get();
+        String message = "Updating  user: " + updateUser.email;
+        Logger.trace(message);
+        updateUser.update();
+        return ok();
+    }
+
+    // Some not used Actions
+    @Security.Authenticated(Secured.class)
+    public Result upload() {
+        Logger.trace("Upload file form");
+        MultipartFormData body = request().body().asMultipartFormData();
+        FilePart uploadedFile = body.getFile("uploadedfile");
+        if (uploadedFile != null) {
+            String contentType = uploadedFile.getContentType();
+            File file = uploadedFile.getFile();
+            String message = "File successfully uploaded: " + file.getAbsolutePath() + " " + contentType;
+            Logger.trace(message);
+            File target = new File("resources/upload/songs.xlsx");
+
+            try {
+                Files.copy(file.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Logger.trace("Updating songs");
+            XlsHelper.importAndUpdateSongs3();
+
+            return redirect(routes.Application.admin());
+        } else {
+            String message = "File not uploaded - missing  file";
+            Logger.trace(message);
+            return redirect(routes.Application.admin());
+        }
+    }
+
+    @Security.Authenticated(Secured.class)
+    public Result getXLS() {
+        XlsHelper.dumpSongs((Song.find.all()));
+        String message = "Getting xls songs";
+        Logger.trace(message);
+        File tmpFile = new File("resources/xlsx/songs.xlsx");
+        response().setHeader(CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+        Logger.debug("File: " + tmpFile.getAbsolutePath());
+        FileInputStream fin = null;
+        try {
+            fin = new FileInputStream(tmpFile);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        response().setHeader("Content-disposition", "attachment;filename=" + tmpFile.getName());
+        return ok(fin);
+    }
+
+    @Security.Authenticated(Secured.class)
+    public Result updateFromOnlineSpreadsheet() {
+        JsonNode data = request().body().asJson();
+        Logger.debug("Online spreadsheet data: " + data.asText());
+        return ok();
+    }
+
+    @Security.Authenticated(Secured.class)
+    public Result yamlbackup() {
+        SongImporter.songToYaml();
+        return redirect(routes.Application.index());
+    }
+
+    @Security.Authenticated(Secured.class)
+    public Result yamlrestore() {
+        SongImporter.yamlToSong();
+        return redirect(routes.Application.index());
+    }
+
+    @Security.Authenticated(Secured.class)
+    public Result sqlinit() {
+        Ebean.delete(Song.all());
+        SongImporter.restoreFromSQLDump();
+        return redirect(routes.Application.table());
+    }
+
+    @Security.Authenticated(Secured.class)
+    public Result xmlupdate() {
+        XmlSongsParser.updateFromXML();
+        return ok();
+    }
+
+    @Security.Authenticated(Secured.class)
+    public Result updateFromXLS() {
+        XlsHelper.importAndUpdateSongs();
+        return ok();
+    }
+    
+    @Security.Authenticated(Secured.class)
+    public Result init() {
+        try {
+            // SongImporter.restoreFromSQLDump();
+            SongImporter.importFromDb();
+            XlsHelper.importAndUpdateSongs();
+        } catch (Exception e) {
+            Logger.error("Exception occured during init" + e.getStackTrace());
+            e.printStackTrace();
+            System.out.print(e.getStackTrace());
+            System.out.print(e.getMessage());
+        }
+        return redirect(routes.Application.index());
     }
 
 }

@@ -80,6 +80,7 @@ public class Song extends Model implements Comparator<Song> {
         }
         song.songLyrics.removeAll(removedList);
         
+        // preparing songbook
         SongBook activeSongbook = null;
             
         // first handle if songbooks is empty - create default songbook
@@ -87,7 +88,6 @@ public class Song extends Model implements Comparator<Song> {
             Logger.debug("Using default songbook while song does not have any songbooks");
             activeSongbook = SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail));
             song.setSongBook(activeSongbook, userEmail);
-            //savedToDefaultSongbook = true;
         }
         else {
             Logger.debug("Updating or creating new songbook");
@@ -117,8 +117,6 @@ public class Song extends Model implements Comparator<Song> {
             Logger.debug("Song updated on: " + song.getDateModified().toString());
             Logger.debug("Adding song to songbook");
             SongBook.addSong(song, activeSongbook);
-            Logger.debug("Removing stale songbook references, if they exist");
-            SongBook.staleSongbookCleanup(userEmail, activeSongbook);
         } else {
             Logger.debug("Will not save song without lyrics");
         }
@@ -133,10 +131,15 @@ public class Song extends Model implements Comparator<Song> {
 
     public static void delete(Long id) {
         Song thisSong = find.ref(id);
-        // Long songBookId = thisSong.getSongBook().getId();
+
+        // first delete all associatons toward this song
+        for (SongBook songbook : thisSong.getSongbooks()){
+            Logger.debug("Delete song songbook: "+ songbook.getSongBookName());
+            songbook.getSongs().remove(thisSong);
+            songbook.update();
+        }
+
         thisSong.delete();
-        // delete songbooks that are associated, but not needed anymore if no more songs pointing to it
-        // SongBook.deleteIfNoMoreSongs(songBookId);
     }
 
     public static Finder<Long, Song> find = new Finder<>(Song.class);
