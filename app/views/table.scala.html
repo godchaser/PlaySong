@@ -1,4 +1,4 @@
-@(numberOfSongsInDatabase: Int, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion], user: UserAccount)
+@(numberOfSongsInDatabase: Int, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion], user: UserAccount, songBooks : List [SongBook])
 
 @admintheme("", user, songsModified, songsCreated) {
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap/css/bootstrap.min.css")">
@@ -9,15 +9,26 @@
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/font-awesome/css/font-awesome.css")">
  -->
 <div hidden id="song_table_wrapper" class="panel panel-default hover" cellspacing="0" width="100%">
-	<h2>Song Database <span class="pull-right small"> <i class="glyphicon glyphicon-stats"></i> @numberOfSongsInDatabase songs</span></h2>                 	
+	<h2>Song Database 
+	
+	<select id="select-songbooks" class="selectpicker">
+		  <option value="1">All Songs</option>
+		   @if(songBooks.size>0){
+			  @songBooks.map { songBookItem =>
+			  	    @if(songBookItem.getId()!=1){
+				    	<option value="@songBookItem.getId()">@songBookItem.getSongBookName()</option>
+				    }
+			  	}
+			 </select>
+	        }
+	</select><span class="pull-right small"> <i class="glyphicon glyphicon-stats"></i> @numberOfSongsInDatabase Total Songs</span></h2>                 	
 	<div>
-                 <div class="row">
-                	<div id="ytvideoframe" class="col-lg-3 col-md-6">
-                	</div>
-                </div>
-            </div>
+          <div class="row">
+         	<div id="ytvideoframe" class="col-lg-3 col-md-6">
+         	</div>
+         </div>
+        </div>
 		
-
 		<div class="col-lg-6"  id="song_table_div">
 			<div class="panel-body">
 				<div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
@@ -289,6 +300,8 @@
 	  		}		
 		}
 		
+		var songbookID = 0;
+		
 		/* Table initialisation */
 		$('#song_table')
 		    .dataTable({
@@ -299,7 +312,7 @@
 				"bJQueryUI" : true,
 				"paginationType" : "full",
 				"stateSave": true,
-				"sAjaxSource" : " @routes.Application.getsongsdatatable()",
+				"sAjaxSource" : "@routes.Application.getsongsdatatable(1)",
 				//"dom": 'T<"clear">lfrtip',
 				"dom": '<f<t>lip>',
 				"drawCallback": function( settings ) {
@@ -355,6 +368,15 @@
 		
 		oTable = $('#song_table').dataTable();
 
+		// change songbook event handling	
+		$("#select-songbooks").change(function(){
+		   var selectedSongbookId = this.value;
+		   //var selectedSongbookName = $("#songbook-select option:selected").text();
+		   var songBookDefaultUrl = "@routes.Application.getsongsdatatable(1)";
+		   var songBookUrl = songBookDefaultUrl.substring(0,songBookDefaultUrl.length-1) + selectedSongbookId;
+		   oTable.DataTable().ajax.url(songBookUrl).load();
+		});
+		
 		//for static row selection events - marking selected/deselected rows
 		$('#song_table tbody').on('click', 'tr', function(event) {
 			//first check if there are any rows in table

@@ -35,6 +35,20 @@ public class SongsJson {
     @SerializedName("songLyricsIDs")
     @Expose
     private List<Long> songLyricsIDs = new ArrayList<Long>();
+    
+    @SerializedName("songBookName")
+    @Expose
+    private String songBookName;
+    
+
+    @SerializedName("songBookId")
+    @Expose
+    private Long songBookId;
+    
+    @SerializedName("privateSong")
+    @Expose
+    private boolean privateSong;
+
 
     /**
      * 
@@ -197,5 +211,30 @@ public class SongsJson {
     public void setSongLyricsIDs(List<Long> songLyricsIDs) {
         this.songLyricsIDs = songLyricsIDs;
     }
+    
+    public String getSongBookName() {
+        return songBookName;
+    }
+
+    public void setSongBookName(String songBookName) {
+        this.songBookName = songBookName;
+    }
+
+    public Long getSongBookId() {
+        return songBookId;
+    }
+
+    public void setSongBookId(Long songBookId) {
+        this.songBookId = songBookId;
+    }
+    
+    public boolean getPrivateSong() {
+        return privateSong;
+    }
+
+    public void setPrivateSong(boolean privateSong) {
+        this.privateSong = privateSong;
+    }
+
 
 }

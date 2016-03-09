@@ -1,23 +1,22 @@
-@(songs: List[Song],  user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
+@(songs: List[Song],  songBooks : List [SongBook], songBookId: Long, user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
 
 @admintheme("", user, songsModified, songsCreated) {
 	<!-- 
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap/css/bootstrap.min.css")">
  -->
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap-multiselect/dist/css/bootstrap-multiselect.css")">
-<link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap-select/dist/css/bootstrap-select.min.css")">
 
 <div hidden class="panel-group" id="collapse-accordion">
-	<h2>Songbook Creator <i class="glyphicon glyphicon-cog"></i></h2>
+	<h2>Playlist Maker <i class="glyphicon glyphicon-cog"></i></h2>
 	<div class="panel panel-default" style="overflow:visible;">
 		<div class="panel-heading">
 			<div class="panel-title">
 				<ol>
 					<li>
-						Click the <strong>Select songs</strong> button to choose songs
+						Select the <strong>Songbooks</strong> or leave all songs as default
 					</li>
 					<li>
-						Change the <strong>Fonts</strong> or output <strong>Format</strong> if necessary
+						Click the <strong>Select songs</strong> button to choose songs
 					</li>
 					<li>
 						Click the <strong>Prepare Songbook</strong> button
@@ -32,6 +31,22 @@
 			</div>
 		</div>
 	</div>
+	<select id="select-songbooks" class="selectpicker">
+		  <option value="1">All Songs</option>
+		   @if(songBooks.size>0){
+			  @songBooks.map { songBookItem =>
+			  	    @if(songBookItem.getId()!=1){
+			  	    	@if(songBookItem.getId().equals(songBookId)){
+					    	<option value="@songBookItem.getId()" selected>@songBookItem.getSongBookName()</option>
+					    }else {
+				    		<option value="@songBookItem.getId()">@songBookItem.getSongBookName()</option>
+				    	}
+				    }
+			  	}
+			 </select>
+	        }
+	</select>
+	<br><br>
 	<form class="btn-group form-inline" id="songbook-form">
 		<div class="btn-group">
 			<select id="song-selector" class="btn-group btn-info active" multiple="multiple">
@@ -78,9 +93,9 @@
 		@if(user.email != "Guest"){
 		<div class="form-inline">
 			<br>
-			<label for="songbook-name">Songbook name:</label>
+			<label for="playlist-name">Playlist name:</label>
 			<br>
-			<input type="text" class="form-control" id="songbook-name">
+			<input type="text" class="form-control" id="playlist-name">
 			<div class="checkbox">
 				  <label><input type="checkbox" id="publish-playlist-checkbox" value="">Save playlist</label>
 			</div>
@@ -102,7 +117,6 @@
 
 <script src="@routes.Assets.at("lib/jquery/dist/jquery.min.js")" ></script>
 <script src="@routes.Assets.at("lib/bootstrap-multiselect/dist/js/bootstrap-multiselect.js")" ></script>
-<script src="@routes.Assets.at("lib/bootstrap-select/dist/js/bootstrap-select.min.js")" ></script>
 
 <script >
 	$(document).ready(function() {
@@ -121,6 +135,15 @@
 			enableClickableOptGroups : false,
 			nonSelectedText : 'Select songs',
 			maxHeight : 400
+		});
+		
+		// change songbook event handling	
+		$("#select-songbooks").change(function(){
+		   console.log("value changed" + this.value);
+		   var selectedSongbookId = this.value;
+		   var songBookDefaultUrl = "@routes.Application.playlistmaker(1)";
+		   var songBookUrl = songBookDefaultUrl.substring(0,songBookDefaultUrl.length-1) + selectedSongbookId;
+		   window.open(songBookUrl, '_self');
 		});
 
 		function setSelected() {
@@ -283,7 +306,7 @@
 				
 				@if(user.email != "Guest"){
 				songBookData.publishPlaylist = document.getElementById('publish-playlist-checkbox').checked;
-				songBookData.songBookName = $('#songbook-name').val();
+				songBookData.songBookName = $('#playlist-name').val();
 				}
 				if (document.getElementById('exclude-chords-checkbox').checked){
 					songBookData.excludeChords = false;

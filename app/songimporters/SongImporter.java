@@ -121,7 +121,7 @@ public class SongImporter {
 		SongLyrics songLyrics = new SongLyrics();
 		songLyrics.setsongLyrics(cleanlyrics);
 		song.songLyrics.add(songLyrics);
-		Song.updateOrCreateSong(song);
+		Song.updateOrCreateSong(song, "");
 	}
 
 	public static void restoreFromSQLDump() {

@@ -5,7 +5,6 @@ import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 
 import chord.tools.LineTypeChecker;
-import helpers.ArrayHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import play.Logger;
+import models.helpers.ArrayHelper;
 import models.helpers.PdfPrintable;
 
 /**

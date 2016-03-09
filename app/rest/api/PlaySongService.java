@@ -2,6 +2,7 @@ package rest.api;
 
 import rest.json.ServiceJson;
 import rest.json.SongLyricsJson;
+import rest.json.SongbookJson;
 import rest.json.SongsJson;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -16,4 +17,7 @@ public interface PlaySongService {
 
     @GET("/json/favoritesongs")
     Call<ServiceJson[]> getFavoritesSongs();
+    
+    @GET("/json/songbooks")
+    Call<SongbookJson[]> getSongbooks();
 }

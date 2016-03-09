@@ -1,22 +1,43 @@
-@(id: Long, songForm: Form[Song], user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
+@(id: Long, songForm: Form[Song], user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion], songBooks : List [SongBook])
 
 @admintheme("Song Editor", user, songsModified, songsCreated) {
     <div id="songEditor">
         <h2>Edit or create song</h2>
-        @helper.form(action = routes.Application.newsong()) {
+        @helper.form(action = routes.Application.updateorcreatesong()) {
+        	<div class="row">
+			<div class="col-lg-3 col-md-6">		
             @helper.inputText(songForm("songName"), args = '_label -> "Song name: ", 'class -> "form-control")
             @helper.inputText(songForm("songOriginalTitle"), args = '_label -> "Original title: ", 'class -> "form-control")
             @helper.inputText(songForm("songAuthor"), args = '_label -> "Author: ", 'class -> "form-control")
             @helper.inputText(songForm("songLink"), args = '_label -> "Link: ", 'class -> "form-control")
+            @helper.inputText(songForm("songBookName"), args = '_label -> "Songbook Name: ", 'class -> "form-control")
+            
+            @if(songBooks.size>0){
+            	<label for="songbook-select">Add To Songbook:</label>
+	           	<select class="selectpicker form-control" id="songbook-select">
+				  @songBooks.map { songBookItem =>
+					    <option value="@songBookItem.getId()">@songBookItem.getSongBookName()</option>
+				  	}
+				 </select>
+	        }
+	        <br>
+	        <br>
+			@helper.checkbox(songForm("isPrivateSongBook"), args = '_label -> "Private songbook: ", 'class -> "form-inline")
+			@helper.checkbox(songForm("privateSong"), args = '_label -> "Private song: ", 'class -> "form-inline")
+			<button type="button" id="addAdditionalLyricsButton" class="btn btn-default">Add additional lyrics</button>
+			<input type="submit" value="Save" class="btn btn-default">
+			</div>
+			<div class="col-lg-3 col-md-
             @helper.textarea(field = songForm("songLyrics[0].songLyrics"), args = '_label -> "Lyrics: ", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
             @helper.textarea(field = songForm("songLyrics[1].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
             @helper.textarea(field = songForm("songLyrics[2].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
-            @helper.textarea(field = songForm("songLyrics[3].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
-            <input type="submit" value="Save" class="btn btn-default">
-            @helper.inputText(songForm("id"), args = 'style -> "display:none;", 'class -> "form-control monoSpaceTextArea")
+            @helper.textarea(field = songForm("songLyrics[3].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")           
+            @helper.inputText(songForm("id"), args = 'style -> "display:none;", 'hidden -> "hidden")
+            @helper.inputText(songForm("songBookId"), args = 'style -> "display:none;", 'hidden -> "hidden")
+			</div>
+            </div>          
         }
-        <button type="button" id="addAdditionalLyricsButton" class="btn btn-default">Add additional lyrics</button>
-    </div>
+        </div>
 
     <script src="@routes.Assets.at("lib/jquery/dist/jquery.min.js")" ></script>
     <script src="@routes.Application.javascriptRoutes()"  ></script>
@@ -46,6 +67,17 @@
                         $('#songOriginalTitle').attr("value", data.songOriginalTitle);
                         $('#songAuthor').attr("value", data.songAuthor);
                         $('#songLink').attr("value", data.songLink);
+                        
+                        if (data.privateSong){
+                        	$('#privateSong').attr('checked', 'checked');
+                        }
+                        
+                        if (data.songBooks[0].songBookPrivate){
+                        	$('#isPrivateSongBook').attr('checked', 'checked');
+                        }
+      
+                        $('#songBookName').attr("value", data.songBooks[0].songBookName);
+                        $('#songBookId').attr("value", data.songBooks[0].songBookId);
                         songLyricsIDs = data.songLyricsIDs;
 
                         $.each(songLyricsIDs, function(i,s){
@@ -69,14 +101,22 @@
             })
             }
         }
-
-        $( "#addAdditionalLyricsButton" ).click(function() {
+        
+        $("#songbook-select").change(function(){
+		   var selectedSongbookId = this.value;
+		   var selectedSongbookName = $("#songbook-select option:selected" ).text();
+		   $('#songBookId').attr("value", selectedSongbookId);
+		   $('#songBookName').attr("value", selectedSongbookName);
+		});
+        
+        $("#addAdditionalLyricsButton" ).click(function() {
             $('#songLyrics_'+songLyricsCount+'_songLyrics').attr("style", "display:block;");
             songLyricsCount = songLyricsCount + 1;
         });
 
     CreateSongEditor(id);
-
+    // hide label
+	$('label[for="songBookId"]').hide();
     });
     </script>
 }
