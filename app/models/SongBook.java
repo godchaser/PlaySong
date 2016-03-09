@@ -9,6 +9,7 @@ import com.avaje.ebean.Expr;
 import com.avaje.ebean.Model;
 
 import play.Logger;
+import play.db.ebean.Transactional;
 
 @Entity
 public class SongBook extends Model {
@@ -80,6 +81,7 @@ public class SongBook extends Model {
         return foundSongbook;
     }
 
+    @Transactional
     public static void staleSongbookCleanup(String email) {
         Logger.debug("Starting Songbook cleanup action");
         for (SongBook songbookEntry : getSongbooksOwnedByUser(email)) {
