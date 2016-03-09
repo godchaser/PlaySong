@@ -25,6 +25,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 import play.Logger;
+import play.db.ebean.Transactional;
 
 /**
  * Created by samuel on 12/28/15.
@@ -205,18 +206,22 @@ public class PlaySongRestService extends Observable {
         });
     }
 
+    @Transactional
     public void downloadSongsData(String userEmail) {
         getSongsData(userEmail);
     }
-
+    
+    @Transactional
     public void downloadFavoritesSongsData() {
         getFavoritesSongsData();
     }
 
+    // NOT USED CURRENTLY
     public void downloadSongLyricsData(List<Long> updatedSongs) {
         getSongLyrics(updatedSongs);
     }
 
+    // NOT USED CURRENTLY
     public void downloadSongbooks() {
         getSongbooks();
     }

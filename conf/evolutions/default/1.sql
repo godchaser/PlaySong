@@ -26,7 +26,7 @@ create table service_song (
 create sequence service_song_seq;
 
 create table song (
-  id                            bigint not null,
+  id                            bigint auto_increment not null,
   song_name                     varchar(255),
   song_original_title           varchar(255),
   song_author                   varchar(255),
@@ -38,7 +38,6 @@ create table song (
   date_modified                 timestamp,
   constraint pk_song primary key (id)
 );
-create sequence song_seq;
 
 create table song_book (
   id                            bigint not null,
@@ -140,7 +139,6 @@ drop table if exists service_song;
 drop sequence if exists service_song_seq;
 
 drop table if exists song;
-drop sequence if exists song_seq;
 
 drop table if exists song_book;
 drop sequence if exists song_book_seq;

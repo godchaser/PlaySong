@@ -32,23 +32,15 @@ public class SongsJson {
     @SerializedName("dateModified")
     @Expose
     private Long dateModified;
-    @SerializedName("songLyricsIDs")
-    @Expose
-    private List<Long> songLyricsIDs = new ArrayList<Long>();
-    
-    @SerializedName("songBookName")
-    @Expose
-    private String songBookName;
-    
-
-    @SerializedName("songBookId")
-    @Expose
-    private Long songBookId;
-    
     @SerializedName("privateSong")
     @Expose
-    private boolean privateSong;
-
+    private Boolean privateSong;
+    @SerializedName("songBooks")
+    @Expose
+    private List<SongBookJson> songBooks = new ArrayList<SongBookJson>();
+    @SerializedName("songLyricsIDs")
+    @Expose
+    private List<Integer> songLyricsIDs = new ArrayList<Integer>();
 
     /**
      * 
@@ -197,9 +189,45 @@ public class SongsJson {
     /**
      * 
      * @return
+     *     The privateSong
+     */
+    public Boolean getPrivateSong() {
+        return privateSong;
+    }
+
+    /**
+     * 
+     * @param privateSong
+     *     The privateSong
+     */
+    public void setPrivateSong(Boolean privateSong) {
+        this.privateSong = privateSong;
+    }
+
+    /**
+     * 
+     * @return
+     *     The songBooks
+     */
+    public List<SongBookJson> getSongBooks() {
+        return songBooks;
+    }
+
+    /**
+     * 
+     * @param songBooks
+     *     The songBooks
+     */
+    public void setSongBooks(List<SongBookJson> songBooks) {
+        this.songBooks = songBooks;
+    }
+
+    /**
+     * 
+     * @return
      *     The songLyricsIDs
      */
-    public List<Long> getSongLyricsIDs() {
+    public List<Integer> getSongLyricsIDs() {
         return songLyricsIDs;
     }
 
@@ -208,33 +236,8 @@ public class SongsJson {
      * @param songLyricsIDs
      *     The songLyricsIDs
      */
-    public void setSongLyricsIDs(List<Long> songLyricsIDs) {
+    public void setSongLyricsIDs(List<Integer> songLyricsIDs) {
         this.songLyricsIDs = songLyricsIDs;
     }
-    
-    public String getSongBookName() {
-        return songBookName;
-    }
-
-    public void setSongBookName(String songBookName) {
-        this.songBookName = songBookName;
-    }
-
-    public Long getSongBookId() {
-        return songBookId;
-    }
-
-    public void setSongBookId(Long songBookId) {
-        this.songBookId = songBookId;
-    }
-    
-    public boolean getPrivateSong() {
-        return privateSong;
-    }
-
-    public void setPrivateSong(boolean privateSong) {
-        this.privateSong = privateSong;
-    }
-
 
 }

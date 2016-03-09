@@ -17,6 +17,7 @@ import models.SongBook;
 import models.SongLyrics;
 import models.UserAccount;
 import play.Logger;
+import play.db.ebean.Transactional;
 
 public class DatabaseHelper {
 
@@ -96,19 +97,24 @@ public class DatabaseHelper {
             songdb.setDateModified(new Date(song.getDateModified()));
             songdb.setPrivateSong(song.getPrivateSong());
 
-            boolean songBookExists = false;
-            if (song.getSongBookId() != null) {
-                SongBook foundSongBook = SongBook.get(song.getSongBookId());
-                if (foundSongBook != null) {
-                    Logger.trace("PlaySongDatabase : found songbook = " + foundSongBook.getSongBookName()); // found existing songbook // TODO: Think about reusing updateOrCreate Song method
-                    songdb.setSongBook(foundSongBook, userEmail);
-                }
-            }
-
-            if (!songBookExists) {
-                Logger.trace("PlaySongDatabase : songbook does not exist"); // setting default songbook Logger.trace("PlaySongDatabase : using default songbook");
-                songdb.setSongBook(SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail)), userEmail);
-            }
+            /*
+             * boolean songBookExists = false; if (song.getSongBookId() != null) { SongBook foundSongBook = SongBook.get(song.getSongBookId()); if (foundSongBook != null) { Logger.trace(
+             * "PlaySongDatabase : found songbook = " + foundSongBook.getSongBookName()); // found existing songbook // TODO: Think about reusing updateOrCreate Song method
+             * songdb.setSongBook(foundSongBook, userEmail); } }
+             * 
+             * if (!songBookExists) { Logger.trace("PlaySongDatabase : songbook does not exist"); // setting default songbook Logger.trace("PlaySongDatabase : using default songbook");
+             * songdb.setSongBook(SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail)), userEmail); }
+             */
+            /*
+             * // preparing songbook SongBook activeSongbook = null;
+             * 
+             * // first handle if songbooks is empty - create default songbook if (song.getSongBookName().isEmpty()) { Logger.debug(
+             * "Using default songbook while song does not have any songbooks"); activeSongbook = SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail));
+             * song.setSongBook(activeSongbook, userEmail); } else { Logger.debug("Updating or creating new songbook"); activeSongbook = SongBook.updateOrCreate(song.getSongBookId(),
+             * song.getSongBookName(), userEmail, song.getPrivateSongBook()); song.setSongBook(activeSongbook, userEmail); }
+             * 
+             * SongBook.addSong(song, activeSongbook);
+             */
 
             // song
             if (shouldUpdateSong) {
@@ -116,6 +122,21 @@ public class DatabaseHelper {
             } else {
                 songdb.save();
             }
+
+            // now updating songbook
+            if (!song.getSongBooks().isEmpty()) {
+                Logger.trace("PlaySongDatabase : updating songbook");
+                //TODO: later implement multiple songbooks
+                songdb.setSongBookName(song.getSongBooks().get(0).getSongBookName());
+                songdb.setSongBookId(song.getSongBooks().get(0).getSongBookId());
+                songdb.setPrivateSongBook(song.getSongBooks().get(0).getSongBookPrivate());
+            }
+            
+            // I have to create dummy song lyrics
+            //songdb.setSongLyrics(new ArrayList <SongLyrics>());
+
+            Song.updateOrCreateSong(songdb, userEmail);
+
             updatedSongs.add(song.getSongId());
         }
         return updatedSongs;

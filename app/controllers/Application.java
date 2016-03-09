@@ -869,20 +869,19 @@ public class Application extends Controller {
         Logger.debug("TEST!");
         return redirect(routes.Application.table());
     }
-
-    @Transactional
+   
     @Security.Authenticated(Secured.class)
     public Result syncDb() {
         UserAccount user = getUserFromCookie();
 
         PlaySongRestService psrs = new PlaySongRestService();
         psrs.downloadSongsData(user.getEmail());
-        psrs.downloadFavoritesSongsData();
+        //psrs.downloadFavoritesSongsData();
         return redirect(routes.Application.table());
     }
-
-    @Transactional
+   
     @Security.Authenticated(Secured.class)
+    @Transactional
     public Result sanitizesongs() {
         System.out.println("sanitizesongs!");
 

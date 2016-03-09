@@ -49,7 +49,7 @@ public class SongBook extends Model {
             Logger.debug("Received songbook by ID: " + id);
             foundSongbook = get(id);
             // check if id and songbook name match - then only update existing song
-            if (foundSongbook.getSongBookName().equals(songbookName)) {
+            if (foundSongbook != null && foundSongbook.getSongBookName().equals(songbookName)) {
                 // do nothing
                 Logger.debug("Found song by same ID and Name");
             } else {

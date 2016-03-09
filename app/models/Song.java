@@ -18,7 +18,7 @@ import com.avaje.ebean.Model;
 public class Song extends Model implements Comparator<Song> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
     @Required
@@ -71,55 +71,59 @@ public class Song extends Model implements Comparator<Song> {
 
     public static void updateOrCreateSong(Song song, String userEmail) {
 
+        boolean songHasSongLyrics = (song.getSongLyrics() != null) ? true : false;
         // delete empty lyrics
-        List<SongLyrics> removedList = new ArrayList<SongLyrics>();
-        for (int i = 0; i < song.songLyrics.size(); i++) {
-            if (song.songLyrics.get(i).getsongLyrics().length() < 2) {
-                removedList.add(song.songLyrics.get(i));
+        if (songHasSongLyrics) {
+            List<SongLyrics> removedList = new ArrayList<SongLyrics>();
+            for (int i = 0; i < song.songLyrics.size(); i++) {
+                if (song.songLyrics.get(i).getsongLyrics().length() < 2) {
+                    removedList.add(song.songLyrics.get(i));
+                }
             }
+            song.songLyrics.removeAll(removedList);
         }
-        song.songLyrics.removeAll(removedList);
-        
         // preparing songbook
         SongBook activeSongbook = null;
-            
+
         // first handle if songbooks is empty - create default songbook
-        if (song.getSongBookName().isEmpty()) {
+        if (song.getSongBookName().isEmpty() || "default".equals(song.getSongBookName())) {
             Logger.debug("Using default songbook while song does not have any songbooks");
             activeSongbook = SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail));
             song.setSongBook(activeSongbook, userEmail);
-        }
-        else {
+        } else {
             Logger.debug("Updating or creating new songbook");
             activeSongbook = SongBook.updateOrCreate(song.getSongBookId(), song.getSongBookName(), userEmail, song.getPrivateSongBook());
             song.setSongBook(activeSongbook, userEmail);
         }
-        
-        // song must have lyrics
-        if (song.songLyrics.size() > 0) {
+
+        // song should have lyrics
+        if (songHasSongLyrics && song.songLyrics.size() > 0) {
             for (SongLyrics songLyrics : song.songLyrics) {
                 songLyrics.updateSongKeys();
                 songLyrics.sanitizeLyrics();
             }
-            if (song.id != null && song.id > 0) {
-                // DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
-                Date date = new Date();
-                song.setDateModified(date);
-                song.update();
-            } else {
-                song.id = null;
-                // DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
-                Date date = new Date();
-                song.setDateCreated(date);
-                song.save();
-            }
-            Logger.debug("Song updated by user: " + song.songLastModifiedBy);
-            Logger.debug("Song updated on: " + song.getDateModified().toString());
-            Logger.debug("Adding song to songbook");
-            SongBook.addSong(song, activeSongbook);
         } else {
-            Logger.debug("Will not save song without lyrics");
+            Logger.debug("Song does not have lyrics");
         }
+
+        if (song.id != null && song.id > 0) {
+            Logger.debug("Updating song - song ID not null");
+            // DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+            Date date = new Date();
+            song.setDateModified(date);
+            song.update();
+        } else {
+            song.id = null;
+            Logger.debug("Creating new song - song ID is null: " + song.id);
+            // DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+            Date date = new Date();
+            song.setDateCreated(date);
+            song.save();
+        }
+        Logger.debug("Song updated by user: " + song.songLastModifiedBy);
+        Logger.debug("Song updated on: " + song.getDateModified().toString());
+        Logger.debug("Adding song to songbook");
+        SongBook.addSong(song, activeSongbook);
     }
 
     public void setSongBook(SongBook activeSongbook, String userEmail) {
@@ -133,8 +137,8 @@ public class Song extends Model implements Comparator<Song> {
         Song thisSong = find.ref(id);
 
         // first delete all associatons toward this song
-        for (SongBook songbook : thisSong.getSongbooks()){
-            Logger.debug("Delete song songbook: "+ songbook.getSongBookName());
+        for (SongBook songbook : thisSong.getSongbooks()) {
+            Logger.debug("Delete song songbook: " + songbook.getSongBookName());
             songbook.getSongs().remove(thisSong);
             songbook.update();
         }
@@ -308,7 +312,7 @@ public class Song extends Model implements Comparator<Song> {
     public void setPrivateSongBook(boolean isPrivateSongBook) {
         this.isPrivateSongBook = isPrivateSongBook;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if ((o instanceof Song) && (((Song) o).getId().equals(getId()))) {
