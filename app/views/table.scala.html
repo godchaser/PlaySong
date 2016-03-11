@@ -51,18 +51,18 @@
 			<div class="panel-body">
 				<div class="row">
 					<p class="inline-buttons">
-					<button id="editsongbutton" class="songbuttons btn btn-warning" onClick="songManipulationButtonClick(this)" href="#">
+					<button id="editsongbutton" class="songbuttons btn btn-warning songbutton-edit-actions" onClick="songManipulationButtonClick(this)" href="#">
 						<i class="glyphicon glyphicon-edit"></i> Edit
 					</button>
 					</p>
 					@if(user.email != "Guest"){
 						<p class="inline-buttons">
-					<button id="editlyricsbutton" class="songbuttons btn btn-info" onClick="songManipulationButtonClick(this)" href="#">
+					<button id="editlyricsbutton" class="songbuttons btn btn-info songbutton-edit-actions" onClick="songManipulationButtonClick(this)" href="#">
 						<i class="glyphicon glyphicon-music"></i> Quick Edit
 					</button>
 					</p>
 					<p class="inline-buttons">
-					<button id="deletesongbutton" class="songbuttons btn btn-danger" onClick="songManipulationButtonClick(this)">
+					<button id="deletesongbutton" class="songbuttons btn btn-danger songbutton-edit-actions" onClick="songManipulationButtonClick(this)">
 						<i class="glyphicon glyphicon-trash"></i> Delete
 					</button>
 					</p>
@@ -165,14 +165,14 @@
 		        openSongEditor(-1);
 		        break;
 		    case "deletesongbutton":
-		        if( ! confirm("Do you really want to delete song?") ){
-	            	//event.preventDefault(); // ! => don't want to do this
-		        } 
-		        else {
-		            if (selectedSongID != null) {
+		    	if (selectedSongID != null) {
+					if( ! confirm("Do you really want to delete song?") ){
+		            	//event.preventDefault(); // ! => don't want to do this
+			        } 
+			        else {
 						deleteSong(selectedSongID);
-					}
-		        }
+			        }
+				}
 		        break;
 		    default:
 		        var text = "Unknown button action!";
@@ -246,11 +246,11 @@
 		var match = url.match(regExp);
 		
 		if (match && match[2].length == 11) {
-		   		return match[2];
-		    } 
-		    else {
-		    	return 'error';
-			}
+		   	return match[2];
+		} 
+	    else {
+	    	return 'error';
+		}
 	}
 		
 	function openYtLink(ytLink){
@@ -260,18 +260,22 @@
 	}
 	
 	$(document).ready(function() {
-		// copy song table div to dynamic content div
-		//$('#song_table_wrapper').insertAfter(('#dynamiccontent'));
 		$('#dynamiccontent').html($('#song_table_wrapper').html());
 		
-		// delete initial table div
-		//$('#song_table_wrapper').remove();
 		function isUrl(s) {
 			var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
 			return regexp.test(s);
 		}
 		
-		function selectRow(rowNumber){
+		function selectRow(rowNumber){	
+			// disable songbutton-edit-actions buttons if no songs available	
+			if (!oTable.DataTable().data().count()){
+			    $(".songbutton-edit-actions").hide();
+			    $("#songLyrics").hide();
+			    $("#song_section_div").show();				
+				return;
+			}
+		
 			//console.log("page event fired");
 			var selectRow = true;
 			rowNumber = typeof rowNumber !== 'undefined' ? rowNumber : 1;
@@ -367,7 +371,7 @@
 		});
 		
 		oTable = $('#song_table').dataTable();
-
+		
 		// change songbook event handling	
 		$("#select-songbooks").change(function(){
 		   var selectedSongbookId = this.value;
@@ -407,47 +411,8 @@
 				}
 			}
 		});
-		
-		/*	
-		$('#song_table tbody').on('mouseover', 'tr', function (event) {
-		var lockedMode = checkLock();
-		if (!lockedMode){
-			if (!isSmallScreen()){
-					// ignore responsive expand button trigger
-					if (!$(event.target).hasClass("sorting_1")) {
-						// this is lyrics link event selection
-						if ($(event.target).hasClass("lyrics-link")) {
-							var lyricsID = $(event.target).attr("id");
-							if (lyricsID != null) {
-								if (lyricsID != selectedSongLyricsID) {
-									selectedSongLyricsID = lyricsID;
-								}
-							}
-						}
-						// this is default row lyrics selection
-						else {
-							selectedSongLyricsID = $(this).find('.lyrics-link' )[0].id;
-						}
-						selectedSongID = $(this).attr('id');
-						$('#song_table').DataTable().$('tr.selected-row').removeClass('selected-row');
-						$(this).addClass('selected-row');
-						updateLyricsPanel(selectedSongLyricsID);
-					}
-				}
-			}
-		});
-		*/
-		
 	});
 
-	function showAlert() {
-		$(".alert").addClass("in");
-		$("#cert-error").show();
-	}
-
-	function closeAlert() {
-		$("#cert-error").hide();
-	}
 	$(document).keydown(function (event) {
 		var lockedMode = checkLock();
 				

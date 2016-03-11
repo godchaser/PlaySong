@@ -127,9 +127,17 @@ public class Application extends Controller {
 
         // switch songbooks according to id - but should also check credentials first to account the owner
         List<SongBook> songbooks = user.getSongbooks();
+
+        // if db empty imediately return answer
+        boolean databaseIsEmpty = (songbooks.isEmpty()) ? true : false;
+        if (databaseIsEmpty) {
+            return ok(playlistmaker.render(new ArrayList<Song>(), new ArrayList<SongBook>(), id, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
+        }
+
         songbooks.addAll(SongBook.getAllPublicSongbooks());
         // remove duplicates
         Set<SongBook> songbooksWithoutDuplicates = new LinkedHashSet<>(songbooks);
+
         SongBook filteredSongbook = SongBook.get(SongBook.DEFAULT_SONGBOOK_ID);
         for (SongBook songbook : songbooksWithoutDuplicates) {
             Logger.debug("Checking songbook: " + songbook.getId() + " with matched Id: " + id);
@@ -869,17 +877,17 @@ public class Application extends Controller {
         Logger.debug("TEST!");
         return redirect(routes.Application.table());
     }
-   
+
     @Security.Authenticated(Secured.class)
     public Result syncDb() {
         UserAccount user = getUserFromCookie();
 
         PlaySongRestService psrs = new PlaySongRestService();
         psrs.downloadSongsData(user.getEmail());
-        //psrs.downloadFavoritesSongsData();
+        psrs.downloadFavoritesSongsData();
         return redirect(routes.Application.table());
     }
-   
+
     @Security.Authenticated(Secured.class)
     @Transactional
     public Result sanitizesongs() {

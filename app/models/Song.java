@@ -107,11 +107,19 @@ public class Song extends Model implements Comparator<Song> {
         }
 
         if (song.id != null && song.id > 0) {
-            Logger.debug("Updating song - song ID not null");
             // DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
             Date date = new Date();
             song.setDateModified(date);
-            song.update();
+            // search to see if song already exist so we can update it
+            Song foundSong = Song.get(song.id);
+            if (foundSong == null) {
+                //song.id = null;
+                Logger.debug("Saving new song - song ID not in db");
+                song.save();
+            } else {
+                Logger.debug("Updating song - song ID found in db");
+                song.update();
+            }
         } else {
             song.id = null;
             Logger.debug("Creating new song - song ID is null: " + song.id);
