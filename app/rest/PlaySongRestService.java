@@ -33,6 +33,7 @@ import play.db.ebean.Transactional;
 public class PlaySongRestService extends Observable {
 
     private final String PLAY_SONG_REST_ADDR = "http://playsong.herokuapp.com";
+    //private final String PLAY_SONG_REST_ADDR = "http://localhost:9000";
     // private final String PLAY_SONG_REST_ADDR = "http://10.0.2.2:9000";
     //private final String PLAY_SONG_REST_ADDR = "http://playsong.duckdns.org:9000";
     public static final String KEY_SONGS_FETCHED = "Songs Fetched";
@@ -206,12 +207,10 @@ public class PlaySongRestService extends Observable {
         });
     }
 
-    @Transactional
     public void downloadSongsData(String userEmail) {
         getSongsData(userEmail);
     }
     
-    @Transactional
     public void downloadFavoritesSongsData() {
         getFavoritesSongsData();
     }

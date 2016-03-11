@@ -72,6 +72,13 @@ public class SongBook extends Model {
         if (foundSongbook == null) {
             Logger.debug("Not found songbook, creating new");
             foundSongbook = new SongBook();
+            // try reusing songbook id
+            if (id != null) {
+                Logger.debug("Trying to reuse songbook id: " + id);
+                foundSongbook.setId(id);
+            } else {
+                Logger.debug("New songbook id will be created");
+            }
             foundSongbook.setSongBookName(songbookName);
             foundSongbook.setPrivateSongbook(isPrivateSongBook);
             foundSongbook.save();
@@ -88,7 +95,7 @@ public class SongBook extends Model {
             Logger.debug("Found user songbook: " + email + "->" + songbookEntry.getSongBookName());
             Logger.debug("Checking if she songbook is empty");
             // I should ignore default songbooks
-            if (songbookEntry.getSongs().isEmpty() && songbookEntry.getId()!=SongBook.DEFAULT_SONGBOOK_ID) {
+            if (songbookEntry.getSongs().isEmpty() && songbookEntry.getId() != SongBook.DEFAULT_SONGBOOK_ID) {
                 Logger.debug("Deleting stale Songbook: " + songbookEntry.getSongBookName());
                 UserAccount ua = UserAccount.getByEmail(email);
                 // I have to remove all many to many relationship first, before deleting the sb object
@@ -99,7 +106,7 @@ public class SongBook extends Model {
         }
         Logger.debug("Finished Songbook cleanup action");
     }
-    
+
     private static void setUser(UserAccount user, SongBook songbook) {
         user.addSongbook(songbook);
         // Add user to owners of songbook - skip if user is already owning this songbook
@@ -109,13 +116,13 @@ public class SongBook extends Model {
             songbook.update();
         }
     }
-    
+
     private void removeUser(UserAccount user) {
         Logger.debug("Removing user from songbook");
         getUsers().remove(user);
         update();
     }
-    
+
     public static Finder<Long, SongBook> find = new Finder<>(SongBook.class);
 
     public static SongBook get(Long id) {
@@ -125,8 +132,8 @@ public class SongBook extends Model {
     private static List<SongBook> getSongbooksOwnedByUser(String email) {
         return UserAccount.getByEmail(email).getSongbooks();
     }
-    
-    public static List<SongBook> getAllPublicSongbooks(){
+
+    public static List<SongBook> getAllPublicSongbooks() {
         return find.where().eq("private_songbook", false).findList();
     }
 
@@ -138,7 +145,7 @@ public class SongBook extends Model {
     public static SongBook getByNameAndEmail(String songBookName, String email) {
         List<SongBook> foundSongBooks = getSongbooksOwnedByUser(email);
         // if did not fint songbooks, or I found default one then return null
-        if (foundSongBooks == null || foundSongBooks.isEmpty() || (foundSongBooks.get(0).getId()==SongBook.DEFAULT_SONGBOOK_ID)) {
+        if (foundSongBooks == null || foundSongBooks.isEmpty() || (foundSongBooks.get(0).getId() == SongBook.DEFAULT_SONGBOOK_ID)) {
             return null;
         } else {
             return foundSongBooks.get(0);

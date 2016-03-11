@@ -879,6 +879,7 @@ public class Application extends Controller {
     }
 
     @Security.Authenticated(Secured.class)
+    @Transactional
     public Result syncDb() {
         UserAccount user = getUserFromCookie();
 
