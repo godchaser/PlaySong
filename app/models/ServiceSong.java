@@ -13,7 +13,7 @@ public class ServiceSong extends Model implements PdfPrintable, Comparable<Servi
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE)
-	public int id;
+	public Long id;
 
 	@Required
 	public String songName;
@@ -94,7 +94,7 @@ public class ServiceSong extends Model implements PdfPrintable, Comparable<Servi
 
 	@Override
 	public int compareTo(ServiceSong otherSong) {
-		return Integer.compare(this.id, otherSong.id);
+		return Long.compare(this.id, otherSong.id);
 	}
 
 }
