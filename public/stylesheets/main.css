@@ -36,3 +36,10 @@
 .inline-buttons {
 	display: inline-block!important;
 }
+
+.img-responsive-logo {
+    max-height: 30px !important;
+    overflow: visible !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}

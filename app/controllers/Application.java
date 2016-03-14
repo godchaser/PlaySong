@@ -1,7 +1,5 @@
 package controllers;
 
-import static play.data.Form.form;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -52,7 +50,6 @@ import models.helpers.SongTableData;
 import models.helpers.SongToJsonConverter;
 import models.json.JsonSongbook;
 import play.Logger;
-import play.Routes;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.db.ebean.Transactional;
@@ -62,6 +59,10 @@ import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
 import play.mvc.Security;
+import play.routing.JavaScriptReverseRouter;
+import play.data.FormFactory;
+
+import javax.inject.*;
 import rest.PlaySongRestService;
 import songimporters.SongImporter;
 import views.html.admin;
@@ -73,17 +74,28 @@ import views.html.songs;
 import views.html.songviewer;
 import views.html.table;
 
+
 public class Application extends Controller {
+	private Form<Song> songForm;
+	private Form<UserAccount> userForm;
+	private Form<Login> loginForm;
+	private DynamicForm dynamicForm;
+	private Locale HR_LOCALE;
+	private Collator HR_COLLATOR;
 
-    static Form<Song> songForm = form(Song.class);
-    static Form<UserAccount> userForm = form(UserAccount.class);
-    static Form<Login> loginForm = Form.form(Login.class);
-
-    public final static Locale HR_LOCALE = new Locale("HR");
-    public final static Collator HR_COLLATOR = Collator.getInstance(HR_LOCALE);
+    @Inject
+    public Application(FormFactory formFactory) {
+        this.songForm = formFactory.form(Song.class);
+        this.userForm = formFactory.form(UserAccount.class);
+        this.loginForm = formFactory.form(Login.class);
+        this.dynamicForm = formFactory.form();
+        HR_LOCALE = new Locale("HR");
+        HR_COLLATOR = Collator.getInstance(HR_LOCALE);
+        HR_COLLATOR.setStrength(Collator.PRIMARY);
+    }
 
     public Result index() {
-        return redirect(routes.Application.table());
+        return redirect(controllers.routes.Application.table());
     }
 
     // VIEWS
@@ -114,7 +126,7 @@ public class Application extends Controller {
     @Security.Authenticated(Secured.class)
     public Result newsongeditor() {
         Long id = -1L;
-        return redirect(routes.Application.songeditor(id));
+        return redirect(controllers.routes.Application.songeditor(id));
     }
 
     public Result songview(Long id) {
@@ -148,7 +160,7 @@ public class Application extends Controller {
             }
         }
 
-        HR_COLLATOR.setStrength(Collator.PRIMARY);
+
         List<Song> sortedSongs = filteredSongbook.getSongs();
         Collections.sort(sortedSongs, new Comparator<Song>() {
             @Override
@@ -244,7 +256,7 @@ public class Application extends Controller {
     @Security.Authenticated(Secured.class)
     public Result updatesonglyricsjson(Long id) {
         SongLyrics lyricsObject = SongLyrics.find.byId(id);
-        DynamicForm df = play.data.Form.form().bindFromRequest();
+        DynamicForm df = dynamicForm.bindFromRequest();
         String songLyrics = df.get("songLyrics");
         lyricsObject.setsongLyrics(songLyrics);
         lyricsObject.updateSongLyrics();
@@ -257,7 +269,7 @@ public class Application extends Controller {
 
         deleteSong(id);
         SongBook.staleSongbookCleanup(user.getEmail());
-        return redirect(routes.Application.table());
+        return redirect(controllers.routes.Application.table());
     }
 
     // Helper method to execute transaction
@@ -282,7 +294,7 @@ public class Application extends Controller {
 
             Logger.debug("Removing stale songbook references, if they exist");
             SongBook.staleSongbookCleanup(user.getEmail());
-            return redirect(routes.Application.table());
+            return redirect(controllers.routes.Application.table());
         }
     }
 
@@ -304,7 +316,7 @@ public class Application extends Controller {
         Ebean.createSqlUpdate("delete from service_song").execute();
         Ebean.createSqlUpdate("delete from service").execute();
         Ebean.createSqlUpdate("delete from song_book").execute();
-        return redirect(routes.Application.table());
+        return redirect(controllers.routes.Application.table());
     }
 
     @Transactional
@@ -321,7 +333,7 @@ public class Application extends Controller {
             System.out.print(e.getStackTrace());
             System.out.print(e.getMessage());
         }
-        return redirect(routes.Application.index());
+        return redirect(controllers.routes.Application.index());
     }
 
     public Result songs() {
@@ -837,22 +849,22 @@ public class Application extends Controller {
     }
 
     public Result authenticate() {
-        Form<Login> loginForm = form(Login.class).bindFromRequest();
+        Form<Login> filledLoginForm =  loginForm.bindFromRequest();
         String redirecturl = request().body().asFormUrlEncoded().get("redirecturl")[0];
         String email = request().body().asFormUrlEncoded().get("email")[0];
         if (!redirecturl.isEmpty() || "null".equals(redirecturl)) {
             Logger.debug("Authenticate forwarded redirect url: " + redirecturl);
         }
-        if (loginForm.hasErrors()) {
+        if (filledLoginForm.hasErrors()) {
             Logger.debug("Failed login for: " + email);
             if (redirecturl != null) {
                 flash().put("url", redirecturl);
             }
-            return badRequest(login.render(loginForm));
+            return badRequest(login.render(filledLoginForm));
         } else {
             session().clear();
-            session("email", loginForm.get().email);
-            redirecturl = loginForm.get().redirecturl;
+            session("email", filledLoginForm.get().email);
+            redirecturl = filledLoginForm.get().redirecturl;
             if (redirecturl.isEmpty()) {
                 redirecturl = "/";
             }
@@ -870,12 +882,12 @@ public class Application extends Controller {
         }
         session().clear();
         flash("success", "You've been logged out");
-        return redirect(routes.Application.index());
+        return redirect(controllers.routes.Application.index());
     }
 
     public Result test() {
         Logger.debug("TEST!");
-        return redirect(routes.Application.table());
+        return redirect(controllers.routes.Application.table());
     }
 
     @Security.Authenticated(Secured.class)
@@ -886,7 +898,7 @@ public class Application extends Controller {
         PlaySongRestService psrs = new PlaySongRestService();
         psrs.downloadSongsData(user.getEmail());
         psrs.downloadFavoritesSongsData();
-        return redirect(routes.Application.table());
+        return redirect(controllers.routes.Application.table());
     }
 
     @Security.Authenticated(Secured.class)
@@ -902,7 +914,7 @@ public class Application extends Controller {
             Song.updateOrCreateSong(s, ua.getEmail());
         }
 
-        return redirect(routes.Application.index());
+        return redirect(controllers.routes.Application.index());
     }
 
     public UserAccount getUserFromCookie() {
@@ -931,10 +943,8 @@ public class Application extends Controller {
         return user;
     }
 
-    //@formatter:off
     public Result javascriptRoutes() {
-        response().setContentType("text/javascript");
-        return ok(Routes.javascriptRouter("jsRoutes", 
+        return ok(JavaScriptReverseRouter.create("jsRoutes", 
                 controllers.routes.javascript.Application.songview(), 
                 controllers.routes.javascript.Application.login(),
                 controllers.routes.javascript.Application.deletesong(), 
@@ -953,8 +963,7 @@ public class Application extends Controller {
                 controllers.routes.javascript.Application.deleteUser(),
                 controllers.routes.javascript.Application.updateUser()));
     }
-    //@formatter:on
-
+    
     //
     // USER ACTIONS
     @Security.Authenticated(Secured.class)
@@ -979,7 +988,7 @@ public class Application extends Controller {
             newUser.update();
         }
         Logger.trace(message);
-        return redirect(routes.Application.admin());
+        return redirect(controllers.routes.Application.admin());
     }
 
     @Security.Authenticated(Secured.class)
@@ -1034,8 +1043,9 @@ public class Application extends Controller {
     @Security.Authenticated(Secured.class)
     public Result upload() {
         Logger.trace("Upload file form");
-        MultipartFormData body = request().body().asMultipartFormData();
-        FilePart uploadedFile = body.getFile("uploadedfile");
+        
+        MultipartFormData<File> body = request().body().asMultipartFormData();
+        FilePart<File> uploadedFile = body.getFile("uploadedfile");
         if (uploadedFile != null) {
             String contentType = uploadedFile.getContentType();
             File file = uploadedFile.getFile();
@@ -1051,11 +1061,11 @@ public class Application extends Controller {
             Logger.trace("Updating songs");
             XlsHelper.importAndUpdateSongs3();
 
-            return redirect(routes.Application.admin());
+            return redirect(controllers.routes.Application.admin());
         } else {
             String message = "File not uploaded - missing  file";
             Logger.trace(message);
-            return redirect(routes.Application.admin());
+            return redirect(controllers.routes.Application.admin());
         }
     }
 
@@ -1089,20 +1099,20 @@ public class Application extends Controller {
     @Security.Authenticated(Secured.class)
     public Result yamlbackup() {
         SongImporter.songToYaml();
-        return redirect(routes.Application.index());
+        return redirect(controllers.routes.Application.index());
     }
 
     @Security.Authenticated(Secured.class)
     public Result yamlrestore() {
         SongImporter.yamlToSong();
-        return redirect(routes.Application.index());
+        return redirect(controllers.routes.Application.index());
     }
 
     @Security.Authenticated(Secured.class)
     public Result sqlinit() {
         Ebean.delete(Song.all());
         SongImporter.restoreFromSQLDump();
-        return redirect(routes.Application.table());
+        return redirect(controllers.routes.Application.table());
     }
 
     @Security.Authenticated(Secured.class)
@@ -1129,7 +1139,7 @@ public class Application extends Controller {
             System.out.print(e.getStackTrace());
             System.out.print(e.getMessage());
         }
-        return redirect(routes.Application.index());
+        return redirect(controllers.routes.Application.index());
     }
 
 }
