@@ -139,18 +139,21 @@ public class Application extends Controller {
 
         // switch songbooks according to id - but should also check credentials first to account the owner
         List<SongBook> songbooks = user.getSongbooks();
+        
+        // get default songbook
+        SongBook filteredSongbook = SongBook.get(SongBook.DEFAULT_SONGBOOK_ID);
 
         // if db empty imediately return answer
-        boolean databaseIsEmpty = (songbooks.isEmpty()) ? true : false;
+        boolean databaseIsEmpty = (songbooks.isEmpty() && (filteredSongbook == null)) ? true : false;
         if (databaseIsEmpty) {
+            Logger.debug("PlayListMaker: Database is empty");
             return ok(playlistmaker.render(new ArrayList<Song>(), new ArrayList<SongBook>(), id, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
         }
 
         songbooks.addAll(SongBook.getAllPublicSongbooks());
         // remove duplicates
         Set<SongBook> songbooksWithoutDuplicates = new LinkedHashSet<>(songbooks);
-
-        SongBook filteredSongbook = SongBook.get(SongBook.DEFAULT_SONGBOOK_ID);
+       
         for (SongBook songbook : songbooksWithoutDuplicates) {
             Logger.debug("Checking songbook: " + songbook.getId() + " with matched Id: " + id);
             if (songbook.getId().equals(id)) {
