@@ -22,6 +22,11 @@ span.lyrics {
     font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
 }
 
+span.lyrics-bold {
+    font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+    font-weight: bold;
+}
+
 span.verseType {
 	font-style: normal;
 	font-weight: bold;

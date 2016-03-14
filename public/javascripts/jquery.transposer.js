@@ -219,6 +219,7 @@
             var lines = $(this).text().split("\n");
             var line = "";
             var initialChordSet = false;
+            var thisIsChorusText = false;
             var verseTypes = ["Verse", "Chorus", "Bridge", "Intro", "Ending"];
 
             for (var i = 0; i < lines.length; i++) {
@@ -235,11 +236,22 @@
                 // check if this is verse type
 	            else if (line.charAt(line.length-1) == "]") {
 	            	 switch(line.charAt(1)) {
-		                 case "C": line = line.replace("C", "Chorus "); break;
-		                 case "V": line = line.replace("V", "Verse "); break;
-		                 case "B": line = line.replace("B", "Bridge "); break;
-		                 case "I": line = line.replace("I", "Intro "); break;
-		                 case "E": line = line.replace("E", "Ending "); break;
+		                 case "C": line = line.replace("C", "Chorus "); 
+		                 			//starting chorus
+		                 			thisIsChorusText=true; 
+		                 			break;
+		                 case "V": line = line.replace("V", "Verse ");
+			              			thisIsChorusText=false; 
+			              			break;
+		                 case "B": line = line.replace("B", "Bridge "); 
+				                   thisIsChorusText=false; 
+			              		   break;
+		                 case "I": line = line.replace("I", "Intro ");
+				                   thisIsChorusText=false; 
+			              		   break;
+		                 case "E": line = line.replace("E", "Ending "); 
+				                   thisIsChorusText=false; 
+			              		   break;
 		                 default:  break;
 	            	 }
 	            	output.push("<span class='verseType'>" + line.substring(1,line.length-1).trim() + "</span>");
@@ -254,7 +266,12 @@
 		            	  }
 		            }
 		            if (!lineRecognized){
-		                output.push("<span class='lyrics'>" + line + "</span>");
+		            	if (thisIsChorusText){
+		            		output.push("<span class='lyrics-bold'>" + line + "</span>");
+		            	}
+		            	else {
+		            		output.push("<span class='lyrics'>" + line + "</span>");
+		            	}	                
 		                lineRecognized = true;
 		            }
 	            }
