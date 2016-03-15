@@ -49,7 +49,7 @@ public class ApplicationTimer {
         Logger.info("ApplicationTimer: Starting application at " + start);
         Logger.info("Starting cleanup actor");
         
-        ActorRef cleanupActor = this.system.actorOf(CleanupActor.props(42), "demo");
+        ActorRef cleanupActor = this.system.actorOf(CleanupActor.props(42));
         this.system.scheduler().schedule(Duration.create(0, TimeUnit.MILLISECONDS), // Initial
                 Duration.create(30, TimeUnit.SECONDS), // Frequency 15 seconds
                 cleanupActor, "cleaning resource files", system.dispatcher(), null);
