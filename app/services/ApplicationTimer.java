@@ -60,7 +60,7 @@ public class ApplicationTimer {
         appLifecycle.addStopHook(() -> {
             Instant stop = clock.instant();
             Long runningTime = stop.getEpochSecond() - start.getEpochSecond();
-            Logger.info("ApplicationTimer demo: Stopping application at " + clock.instant() + " after " + runningTime + "s.");
+            Logger.info("ApplicationTimer: Stopping application at " + clock.instant() + " after " + runningTime + "s.");
             return CompletableFuture.completedFuture(null);
         });
     }

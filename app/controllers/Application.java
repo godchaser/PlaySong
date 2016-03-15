@@ -310,6 +310,7 @@ public class Application extends Controller {
     @Transactional
     @Security.Authenticated(Secured.class)
     public Result emptyDb() {
+        // TODO: move this to SqlQueries
         Ebean.createSqlUpdate("delete from song_lyrics").execute();
         Ebean.createSqlUpdate("delete from song_book_song").execute();
         Ebean.createSqlUpdate("delete from song_book_user_account").execute();
@@ -347,7 +348,7 @@ public class Application extends Controller {
         UserAccount user = getUserFromCookie();
 
         Long songBookIdFilter = SongBook.DEFAULT_SONGBOOK_ID;
-        Logger.debug("Looking for songbook by ID: " + songBookId);
+        //Logger.debug("Looking for songbook by ID: " + songBookId);
 
         boolean isDefaultSongBookId = true;
         isDefaultSongBookId = (songBookId.equals(SongBook.DEFAULT_SONGBOOK_ID)) ? true : false;
@@ -940,7 +941,7 @@ public class Application extends Controller {
             }
         }
         if (user == null) {
-            Logger.debug("Using guest session");
+            //Logger.debug("Using guest session");
             user = new UserAccount("Guest", "", "");
         }
         return user;
