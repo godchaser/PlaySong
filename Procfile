@@ -1,1 +1,1 @@
-web: target/universal/stage/bin/playsong -Dhttp.port=disabled -Dhttps.port=${PORT} -Dplay.evolutions.db.default.autoApply=false -Dplay.evolutions.db.default.autoApplyDowns=false -Ddb.default.driver=org.postgresql.Driver -Ddb.default.url=${DATABASE_URL}
+web: target/universal/stage/bin/playsong -Dhttp.port=${PORT} -Dplay.evolutions.db.default.autoApply=false -Dplay.evolutions.db.default.autoApplyDowns=false -Ddb.default.driver=org.postgresql.Driver -Ddb.default.url=${DATABASE_URL}
