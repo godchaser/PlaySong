@@ -38,6 +38,8 @@ public class SqlQueries {
     + "ALTER SEQUENCE song_seq RESTART WITH (SELECT max(id) FROM song);"
     + "ALTER SEQUENCE song_book_seq RESTART WITH (SELECT max(id) FROM song_book);";
     
+    public static final String sqlH2SongBookSeqFix ="ALTER SEQUENCE song_book_seq RESTART WITH (SELECT (max(id)+1) FROM song_book);";
+    
     //@formatter:on
 
 

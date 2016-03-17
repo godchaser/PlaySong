@@ -124,7 +124,7 @@ public class IntegrationTest {
         driver.get(baseUrl);
         // Fix sequences
         Logger.info("Fixing db sequences");
-        Ebean.createSqlUpdate(SqlQueries.sqlH2SeqFix).execute();
+        Ebean.createSqlUpdate(SqlQueries.sqlH2SongBookSeqFix).execute();
     }
 
     @Test
