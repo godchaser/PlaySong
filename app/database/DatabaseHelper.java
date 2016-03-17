@@ -3,7 +3,7 @@ package database;
 import rest.json.ServiceJson;
 import rest.json.ServiceSongJson;
 import rest.json.SongLyricsJson;
-import rest.json.SongbookJson;
+import rest.json.SongBookJson;
 import rest.json.SongsJson;
 
 import java.util.ArrayList;
@@ -66,6 +66,7 @@ public class DatabaseHelper {
         }
     }
 
+    @Transactional
     public List<Long> writeJsonSongsToDb(List<SongsJson> songsJson, String userEmail) {
         List<Long> updatedSongs = new ArrayList<>();
         for (SongsJson song : songsJson) {
@@ -128,8 +129,8 @@ public class DatabaseHelper {
                 Logger.trace("PlaySongDatabase : updating songbook");
                 //TODO: later implement multiple songbooks
                 songdb.setSongBookName(song.getSongBooks().get(0).getSongBookName());
-                songdb.setSongBookId(song.getSongBooks().get(0).getSongBookId());
-                songdb.setPrivateSongBook(song.getSongBooks().get(0).getSongBookPrivate());
+                songdb.setSongBookId(song.getSongBooks().get(0).getId());
+                songdb.setPrivateSongBook(song.getSongBooks().get(0).getPrivateSongbook());
             }
             
             // I have to create dummy song lyrics
@@ -142,8 +143,8 @@ public class DatabaseHelper {
         return updatedSongs;
     }
 
-    public void writeJsonSongbooksToDb(List<SongbookJson> SongbookJson) {
-        for (SongbookJson songbook : SongbookJson) {
+    public void writeJsonSongbooksToDb(List<SongBookJson> SongbookJson) {
+        for (SongBookJson songbook : SongbookJson) {
             Logger.trace("PlaySongDatabase : Trying to writes json songbook to db: " + songbook.getSongBookName());
             SongBook.updateOrCreate(songbook.getId(), songbook.getSongBookName(), songbook.getSongbookOwner(), songbook.getPrivateSongbook());
         }

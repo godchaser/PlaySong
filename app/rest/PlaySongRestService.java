@@ -5,7 +5,7 @@ package rest;
 import rest.api.PlaySongService;
 import rest.json.ServiceJson;
 import rest.json.SongLyricsJson;
-import rest.json.SongbookJson;
+import rest.json.SongBookJson;
 import rest.json.SongsJson;
 
 import java.io.IOException;
@@ -173,11 +173,11 @@ public class PlaySongRestService extends Observable {
 
     private void getSongbooks() {
         // Fetching song json data
-        Call<SongbookJson[]> getsongbookscall = playsong.getSongbooks();
-        getsongbookscall.enqueue(new Callback<SongbookJson[]>() {
+        Call<SongBookJson[]> getsongbookscall = playsong.getSongbooks();
+        getsongbookscall.enqueue(new Callback<SongBookJson[]>() {
             @Override
-            public void onResponse(Response<SongbookJson[]> response) {
-                SongbookJson[] model = response.body();
+            public void onResponse(Response<SongBookJson[]> response) {
+                SongBookJson[] model = response.body();
 
                 if (model == null) {
                     // 404 or the response cannot be converted to Model.
@@ -195,7 +195,7 @@ public class PlaySongRestService extends Observable {
                     // 200
                     Logger.trace("PlaySongRestService", "Songbooks Data successfully fetched");
                     Logger.trace("PlaySongRestService", "Writing songbooks data to db");
-                    db.writeJsonSongbooksToDb(Arrays.asList((SongbookJson[]) model));
+                    db.writeJsonSongbooksToDb(Arrays.asList((SongBookJson[]) model));
                     Logger.trace("PlaySongRestService", "Notifying observer that songs are fetched");
                 }
             }

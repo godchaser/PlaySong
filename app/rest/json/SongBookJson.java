@@ -1,73 +1,58 @@
-
 package rest.json;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class SongBookJson {
 
+    @SerializedName("id")
+    @Expose
+    private Long id;
     @SerializedName("songBookName")
     @Expose
     private String songBookName;
-    @SerializedName("songBookId")
+    @SerializedName("privateSongbook")
     @Expose
-    private Long songBookId;
-    @SerializedName("songBookPrivate")
+    private boolean privateSongbook;
+    @SerializedName("songbookOwner")
     @Expose
-    private Boolean songBookPrivate;
-
-    /**
-     * 
-     * @return
-     *     The songBookName
-     */
+    private String songbookOwner;
+    @SerializedName("songIDs")
+    @Expose
+    private List<Long> songIDs = new ArrayList<Long>();
+    
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
     public String getSongBookName() {
         return songBookName;
     }
-
-    /**
-     * 
-     * @param songBookName
-     *     The songBookName
-     */
     public void setSongBookName(String songBookName) {
         this.songBookName = songBookName;
     }
-
-    /**
-     * 
-     * @return
-     *     The songBookId
-     */
-    public Long getSongBookId() {
-        return songBookId;
+    public boolean getPrivateSongbook() {
+        return privateSongbook;
     }
-
-    /**
-     * 
-     * @param songBookId
-     *     The songBookId
-     */
-    public void setSongBookId(Long songBookId) {
-        this.songBookId = songBookId;
+    public void setPrivateSongbook(boolean privateSongbook) {
+        this.privateSongbook = privateSongbook;
     }
-
-    /**
-     * 
-     * @return
-     *     The songBookPrivate
-     */
-    public Boolean getSongBookPrivate() {
-        return songBookPrivate;
+    public String getSongbookOwner() {
+        return songbookOwner;
     }
-
-    /**
-     * 
-     * @param songBookPrivate
-     *     The songBookPrivate
-     */
-    public void setSongBookPrivate(Boolean songBookPrivate) {
-        this.songBookPrivate = songBookPrivate;
+    public void setSongbookOwner(String songbookOwner) {
+        this.songbookOwner = songbookOwner;
+    }
+    public List<Long> getSongIDs() {
+        return songIDs;
+    }
+    public void setSongIDs(List<Long> songIDs) {
+        this.songIDs = songIDs;
     }
 
 }
