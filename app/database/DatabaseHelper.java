@@ -26,17 +26,10 @@ public class DatabaseHelper {
         for (SongLyricsJson songlyrics : songLyricsJson) {
             SongLyrics songlyricsdb = new SongLyrics();
             SongLyrics foundSongLyrics = null;
-            // don't set local ids, but only master ids
-            // songlyricsdb.setId((songlyrics.getSongLyricsId()));
-            if (songlyrics.getMasterId() != null) {
-                songlyricsdb.setMasterId(songlyrics.getMasterId());
-                foundSongLyrics = SongLyrics.getByMasterId(songlyrics.getMasterId());
-            } else {
-                // TODO: remove this temp workaround - because I currently don't have master id in db
-                songlyricsdb.setMasterId(songlyrics.getSongLyricsId());
-                foundSongLyrics = SongLyrics.getByMasterId(songlyrics.getSongLyricsId());
-            }
 
+            songlyricsdb.setMasterId(songlyrics.getSongLyricsId());
+            foundSongLyrics = SongLyrics.getByMasterId(songlyrics.getSongLyricsId());
+            
             Logger.trace("PlaySongDatabase : Checking if song lyrics is already in db: " + songlyrics.getSongLyricsId() + " : " + songlyrics.getSongId());
 
             boolean shouldUpdateSong = false;
@@ -63,8 +56,7 @@ public class DatabaseHelper {
             // fill up data
             songlyricsdb.setSongKey(songlyrics.getSongKey());
             songlyricsdb.setsongLyrics(songlyrics.getSongLyrics());
-            // songlyricsdb.setSongLyricsHtml(LyricsHtmlBuilder.buildHtmlFromSongLyrics(songlyrics.getSongLyrics()));
-            // .setSongLyricsWithoutChordsHtml(LyricsHtmlBuilder.buildHtmlFromSongLyrics(LineTypeChecker.removeChordLines(songlyrics.getSongLyrics())));
+
             if (song != null) {
                 songlyricsdb.setSong(song);
             } else {
@@ -88,26 +80,22 @@ public class DatabaseHelper {
             // songdb.setId(song.getSongId());
             if (song.getMasterId() != null) {
                 songdb.setMasterId(song.getMasterId());
-                foundSong = Song.getByMasterId(song.getSongId());
-            } else {
-                // TODO: remove this temp workaround - because I currently don't have master id in db
-                songdb.setMasterId(song.getSongId());
+                foundSong = Song.getByMasterId(song.getMasterId());
             }
-
             boolean shouldUpdateSong = false;
-            Logger.trace("PlaySongDatabase : Checking if songs is already in db: " + song.getSongId() + " : " + song.getSongName());
+            Logger.trace("PlaySongDatabase : Checking if songs is already in db: " + song.getMasterId() + " : " + song.getSongName());
 
             if (foundSong != null) {
                 if (foundSong.getDateModified().getTime() < song.getDateModified()) {
                     // UPDATE SONG
                     shouldUpdateSong = true;
                 } else {
-                    Logger.trace("PlaySongDatabase : Song in db already up to date: " + song.getSongId() + " : " + song.getSongName());
+                    Logger.trace("PlaySongDatabase : Song in db already up to date: " + song.getMasterId() + " : " + song.getSongName());
                     continue;
                 }
             } else {
                 // THIS IS NEW SONG SCENARIO
-                Logger.trace("PlaySongDatabase : Adding new song to db = " + song.getSongId() + " : " + song.getSongName());
+                Logger.trace("PlaySongDatabase : Adding new song to db = " + song.getMasterId() + " : " + song.getSongName());
             }
 
             // songdb.setId(song.getSongId());
@@ -121,25 +109,6 @@ public class DatabaseHelper {
             songdb.setDateModified(new Date(song.getDateModified()));
             songdb.setPrivateSong(song.getPrivateSong());
 
-            /*
-             * boolean songBookExists = false; if (song.getSongBookId() != null) { SongBook foundSongBook = SongBook.get(song.getSongBookId()); if (foundSongBook != null) { Logger.trace(
-             * "PlaySongDatabase : found songbook = " + foundSongBook.getSongBookName()); // found existing songbook // TODO: Think about reusing updateOrCreate Song method
-             * songdb.setSongBook(foundSongBook, userEmail); } }
-             * 
-             * if (!songBookExists) { Logger.trace( "PlaySongDatabase : songbook does not exist"); // setting default songbook Logger.trace("PlaySongDatabase : using default songbook" );
-             * songdb.setSongBook(SongBook.getDefaultSongbook(UserAccount. getByEmail(userEmail)), userEmail); }
-             */
-            /*
-             * // preparing songbook SongBook activeSongbook = null;
-             * 
-             * // first handle if songbooks is empty - create default songbook if (song.getSongBookName().isEmpty()) { Logger.debug(
-             * "Using default songbook while song does not have any songbooks"); activeSongbook = SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail));
-             * song.setSongBook(activeSongbook, userEmail); } else { Logger.debug("Updating or creating new songbook"); activeSongbook = SongBook.updateOrCreate(song.getSongBookId(),
-             * song.getSongBookName(), userEmail, song.getPrivateSongBook()); song.setSongBook(activeSongbook, userEmail); }
-             * 
-             * SongBook.addSong(song, activeSongbook);
-             */
-
             // song
             if (shouldUpdateSong) {
                 songdb.update();
@@ -152,11 +121,7 @@ public class DatabaseHelper {
                 Logger.trace("PlaySongDatabase : updating songbook");
                 // TODO: later implement multiple songbooks
                 songdb.setSongBookName(song.getSongBooks().get(0).getSongBookName());
-                
-                // TODO: Remove this workaroung
-                //songdb.setSongBookId(song.getSongBooks().get(0).getId());
-                songdb.setSongBookmasterId(song.getSongBooks().get(0).getId());
-                
+                songdb.setSongBookmasterId(song.getSongBooks().get(0).getMasterId());
                 songdb.setPrivateSongBook(song.getSongBooks().get(0).getPrivateSongbook());
             }
 
@@ -165,7 +130,7 @@ public class DatabaseHelper {
 
             Song.updateOrCreateSong(songdb, userEmail);
 
-            updatedSongs.add(song.getSongId());
+            updatedSongs.add(song.getMasterId());
         }
         return updatedSongs;
     }
@@ -244,7 +209,7 @@ public class DatabaseHelper {
                 favoriteSong.save();
                 Logger.trace("PlaySongDatabase : Saving service song");
             }
-            updatedFavorites.add(favorite.getId());
+            updatedFavorites.add(favorite.getMasterId());
         }
         return updatedFavorites;
     }

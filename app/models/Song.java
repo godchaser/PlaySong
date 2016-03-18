@@ -20,8 +20,8 @@ public class Song extends Model implements Comparator<Song> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     public Long id;
-    
-	public Long masterId;
+
+    public Long masterId;
 
     @Required
     public String songName;
@@ -72,14 +72,14 @@ public class Song extends Model implements Comparator<Song> {
     public static Song get(Long id) {
         return find.byId(id);
     }
-    
-	public static Song getByMasterId(Long masterId) {
-		return find.where().eq("master_id", masterId).findUnique();
+
+    public static Song getByMasterId(Long masterId) {
+        return find.where().eq("master_id", masterId).findUnique();
     }
-	
+
     public static void updateOrCreateSong(Song song, String userEmail) {
 
-        boolean songHasSongLyrics = (song.getSongLyrics() != null) ? true : false;
+        boolean songHasSongLyrics = (song.getSongLyrics() != null && (song.getSongLyrics().size() > 0)) ? true : false;
         // delete empty lyrics
         if (songHasSongLyrics) {
             List<SongLyrics> removedList = new ArrayList<SongLyrics>();
@@ -121,7 +121,7 @@ public class Song extends Model implements Comparator<Song> {
             // search to see if song already exist so we can update it
             Song foundSong = Song.get(song.id);
             if (foundSong == null) {
-                //song.id = null;
+                // song.id = null;
                 Logger.debug("Saving new song - song ID not in db");
                 song.save();
             } else {
@@ -144,8 +144,21 @@ public class Song extends Model implements Comparator<Song> {
 
     public void setSongBook(SongBook activeSongbook, String userEmail) {
         // Add songbook to song - skip if song already contains songbook
-        if (!getSongbooks().contains(SongBook.getByNameAndEmail(activeSongbook.getSongBookName(), userEmail))) {
-            getSongbooks().add(activeSongbook);
+        // Logger.debug("############# " + SongBook.getByNameAndEmail(activeSongbook.getSongBookName(), userEmail).getSongBookName());
+        // 1. check if song has any songbooks
+        if (getSongbooks() != null && !getSongbooks().isEmpty()) {
+            // 2. check if song contains has any songbooks
+            if (!getSongbooks().contains(SongBook.getByNameAndEmail(activeSongbook.getSongBookName(), userEmail))) {
+                getSongbooks().add(activeSongbook);
+            } else {
+                //songbook is already added
+            }
+        }
+        else {
+            // add new songbook to song
+            List<SongBook> songbooks = new ArrayList<SongBook>();
+            songbooks.add(activeSongbook);
+            setSongbooks(songbooks);
         }
     }
 
@@ -343,20 +356,20 @@ public class Song extends Model implements Comparator<Song> {
         return getId().hashCode();
     }
 
-	public Long getMasterId() {
-		return masterId;
-	}
+    public Long getMasterId() {
+        return masterId;
+    }
 
-	public void setMasterId(Long masterId) {
-		this.masterId = masterId;
-	}
+    public void setMasterId(Long masterId) {
+        this.masterId = masterId;
+    }
 
-	public Long getSongBookmasterId() {
-		return songBookmasterId;
-	}
+    public Long getSongBookmasterId() {
+        return songBookmasterId;
+    }
 
-	public void setSongBookmasterId(Long songBookmasterId) {
-		this.songBookmasterId = songBookmasterId;
-	}
+    public void setSongBookmasterId(Long songBookmasterId) {
+        this.songBookmasterId = songBookmasterId;
+    }
 
 }

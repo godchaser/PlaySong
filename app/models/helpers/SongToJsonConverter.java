@@ -106,7 +106,7 @@ public class SongToJsonConverter {
         songLyricsObject.put("songLyricsId", s.getId());
         songLyricsObject.put("songLyrics", s.getsongLyrics());
         songLyricsObject.put("songKey", s.getSongKey());
-        songLyricsObject.put("songId", s.getSong().getId());
+        songLyricsObject.put("songId", s.getSong().getMasterId());
 
         return songLyricsObject;
     }
@@ -117,7 +117,7 @@ public class SongToJsonConverter {
         for (ServiceSong ss : s.getSongs()) {
             ObjectNode serviceObject = Json.newObject();
             serviceObject.put("songName", ss.getSongName());
-            serviceObject.put("songId", ss.getSongId());
+            serviceObject.put("songId", ss.getMasterId());
             serviceObject.put("lyricsId", ss.getLyricsId());
             serviceObject.put("songKey", ss.getSongKey());
             serviceObject.put("songLyrics", ss.getSongLyrics());

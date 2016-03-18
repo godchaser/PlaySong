@@ -8,8 +8,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class SongBookJson {
 
-    //@SerializedName("id")
-    @SerializedName("songBookId")
+    @SerializedName("id")
     @Expose
     private Long id;
     @SerializedName("masterId")
