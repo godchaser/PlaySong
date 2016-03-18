@@ -141,7 +141,7 @@ public class Application extends Controller {
         List<SongBook> songbooks = user.getSongbooks();
         
         // get default songbook
-        SongBook filteredSongbook = SongBook.get(SongBook.DEFAULT_SONGBOOK_ID);
+        SongBook filteredSongbook = SongBook.getByMasterId(SongBook.DEFAULT_SONGBOOK_ID);
 
         // if db empty imediately return answer
         boolean databaseIsEmpty = (songbooks.isEmpty() && (filteredSongbook == null)) ? true : false;
@@ -242,7 +242,7 @@ public class Application extends Controller {
     }
 
     public Result getsongjson(Long id) {
-        Song s = Song.get(id);
+        Song s = Song.getByMasterId(id);
         ObjectNode songJson = SongToJsonConverter.convert(s);
         return ok(Json.toJson(songJson));
     }
@@ -600,7 +600,7 @@ public class Application extends Controller {
         ArrayList<Long> ids = new ArrayList<>();
         // TODO: Get song name through this sql query
         for (SqlRow res : result) {
-            ids.add(res.getLong("id"));
+            ids.add(res.getLong("master_id"));
         }
         ids = ArrayHelper.removeDuplicates(ids);
         List<ObjectNode> songSuggestions = new ArrayList<ObjectNode>();
@@ -608,7 +608,7 @@ public class Application extends Controller {
         for (Long id : ids) {
             ObjectNode songSuggestion = Json.newObject();
             songSuggestion.put("key", id);
-            songSuggestion.put("value", Song.get(id).getSongName());
+            songSuggestion.put("value", Song.getByMasterId(id).getSongName());
             songSuggestions.add(songSuggestion);
         }
 

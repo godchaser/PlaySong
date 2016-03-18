@@ -33,10 +33,10 @@ public class SongBook extends Model {
 	public List<UserAccount> users = new ArrayList<>();
 
 	public static SongBook getDefaultSongbook(UserAccount user) {
-		SongBook defaultSongbook = SongBook.get(1l);
+		SongBook defaultSongbook = SongBook.getByMasterId(DEFAULT_SONGBOOK_ID);
 		if (defaultSongbook == null) {
 			defaultSongbook = new SongBook();
-			defaultSongbook.setId(DEFAULT_SONGBOOK_ID);
+			defaultSongbook.setMasterId(DEFAULT_SONGBOOK_ID);
 			defaultSongbook.setSongBookName("default");
 			defaultSongbook.setPrivateSongbook(false);
 			defaultSongbook.save();
@@ -55,6 +55,10 @@ public class SongBook extends Model {
 		if (masterId != null) {
 			Logger.debug("Received songbook by master ID: " + id);
 			foundSongbook = getByMasterId(masterId);
+		} else {
+		 // TODO: remove this temp workaround - because I currently don't have master id in db
+		    masterId = id;
+		    foundSongbook = getByMasterId(masterId);
 		}
 
 		if (id != null && masterId == null) {
@@ -84,18 +88,21 @@ public class SongBook extends Model {
 			}
 		}
 		if (foundSongbook == null)
-
 		{
 			Logger.debug("Not found songbook, creating new");
 			foundSongbook = new SongBook();
 			// try reusing songbook id
 			if (id != null) {
 				Logger.debug("Trying to reuse songbook id: " + id);
-				foundSongbook.setId(id);
+				//foundSongbook.setId(id);
+			     
 			} else {
 				Logger.debug("New songbook id will be created");
-				id = null;
+				//id = null;
+				foundSongbook.setId(null);
 			}
+			// TODO: remove this temp workaround - because I currently don't have master id in db
+            foundSongbook.setMasterId(masterId);
 			foundSongbook.setSongBookName(songbookName);
 			foundSongbook.setPrivateSongbook(isPrivateSongBook);
 			foundSongbook.save();
@@ -171,7 +178,7 @@ public class SongBook extends Model {
 		List<SongBook> foundSongBooks = getSongbooksOwnedByUser(email);
 		// if did not fint songbooks, or I found default one then return null
 		if (foundSongBooks == null || foundSongBooks.isEmpty()
-				|| (foundSongBooks.get(0).getId() == SongBook.DEFAULT_SONGBOOK_ID)) {
+				|| (foundSongBooks.get(0).getMasterId().equals(SongBook.DEFAULT_SONGBOOK_ID))) {
 			return null;
 		} else {
 			return foundSongBooks.get(0);
@@ -191,6 +198,7 @@ public class SongBook extends Model {
 		}
 	}
 
+	/*
 	public static void deleteIfNoMoreSongs(Long id) {
 		if (id != DEFAULT_SONGBOOK_ID) {
 			List<Song> songsUsingSongbook = Song.find.where().eq("song_book_id", id).findList();
@@ -199,7 +207,8 @@ public class SongBook extends Model {
 			}
 		}
 	}
-
+    */
+	
 	@Override
 	public boolean equals(Object o) {
 		if ((o instanceof SongBook) && (((SongBook) o).getId().equals(getId()))) {

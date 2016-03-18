@@ -86,9 +86,9 @@ public class SongToJsonConverter {
         for (SongBook songbook : songbooks) {
             ObjectNode songbookObject = Json.newObject();
             songbookObject.put("songBookName", songbook.getSongBookName());
-            songbookObject.put("songBookId", songbook.getId());
+            songbookObject.put("id", songbook.getId());
             songbookObject.put("masterId", songbook.getMasterId());
-            songbookObject.put("songBookPrivate", songbook.getPrivateSongbook());
+            songbookObject.put("privateSongbook", songbook.getPrivateSongbook());
             songbookArray.add(songbookObject);
         }
         songObject.putArray("songBooks").addAll(songbookArray);
