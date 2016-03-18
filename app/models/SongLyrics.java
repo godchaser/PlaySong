@@ -20,89 +20,103 @@ import com.avaje.ebean.Model;
 @Entity
 public class SongLyrics extends Model {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    public Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	public Long id;
 
-    @ManyToOne
-    public Song song;
+	public Long masterId;
 
-    @Column(columnDefinition = "TEXT")
-    public String songLyrics;
+	@ManyToOne
+	public Song song;
 
-    public String songKey;
+	@Column(columnDefinition = "TEXT")
+	public String songLyrics;
 
-    public static SongLyrics get(Long id) {
-        return find.byId(id);
-    }
+	public String songKey;
 
-    public static Finder<Long, SongLyrics> find = new Finder<>(SongLyrics.class);
+	public static SongLyrics get(Long id) {
+		return find.byId(id);
+	}
 
-    public static List<SongLyrics> all() {
-        return find.all();
-    }
+	public static Finder<Long, SongLyrics> find = new Finder<>(SongLyrics.class);
 
-    public void updateSongLyrics() {
-        updateSongKeys();
-        sanitizeLyrics();
-        update();
-        // Automatically update song modification journal
-        Date date = new Date();
-        getSong().setDateModified(date);
-        getSong().update();
-    }
+	public static List<SongLyrics> all() {
+		return find.all();
+	}
 
-    public static void deleteSongLyricsForSong(Song song) {
-        List<SongLyrics> songLyrics = song.getSongLyrics();
-        for (SongLyrics songLyric : songLyrics) {
-            songLyric.delete();
-        }
-    }
+	public static SongLyrics getByMasterId(Long masterId) {
+		return find.where().eq("master_id", masterId).findUnique();
+	}
 
-    public void updateSongKeys() {
-        String songKey = LineTypeChecker.getSongKey(songLyrics);
-        setSongKey(songKey);
-    }
+	public void updateSongLyrics() {
+		updateSongKeys();
+		sanitizeLyrics();
+		update();
+		// Automatically update song modification journal
+		Date date = new Date();
+		getSong().setDateModified(date);
+		getSong().update();
+	}
 
-    public void sanitizeLyrics() {
-        String newSongLyrics = SongSanitizer.sanitizeSong(songLyrics);
-        setsongLyrics(newSongLyrics);
-    }
+	public static void deleteSongLyricsForSong(Song song) {
+		List<SongLyrics> songLyrics = song.getSongLyrics();
+		for (SongLyrics songLyric : songLyrics) {
+			songLyric.delete();
+		}
+	}
 
-    public String getsongLyrics() {
-        return songLyrics;
-    }
+	public void updateSongKeys() {
+		String songKey = LineTypeChecker.getSongKey(songLyrics);
+		setSongKey(songKey);
+	}
 
-    public void setsongLyrics(String lyrics) {
-        songLyrics = lyrics;
-    }
+	public void sanitizeLyrics() {
+		String newSongLyrics = SongSanitizer.sanitizeSong(songLyrics);
+		setsongLyrics(newSongLyrics);
+	}
 
-    public Long getsongLyricsId() {
-        return id;
-    }
+	public String getsongLyrics() {
+		return songLyrics;
+	}
 
-    public String getSongKey() {
-        return songKey;
-    }
+	public void setsongLyrics(String lyrics) {
+		songLyrics = lyrics;
+	}
 
-    public void setSongKey(String songKey) {
-        this.songKey = songKey;
-    }
+	public Long getsongLyricsId() {
+		return id;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public String getSongKey() {
+		return songKey;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setSongKey(String songKey) {
+		this.songKey = songKey;
+	}
 
-    public Song getSong() {
-        return song;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setSong(Song song) {
-        this.song = song;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Song getSong() {
+		return song;
+	}
+
+	public void setSong(Song song) {
+		this.song = song;
+	}
+
+	public Long getMasterId() {
+		return masterId;
+	}
+
+	public void setMasterId(Long masterId) {
+		this.masterId = masterId;
+	}
 
 }

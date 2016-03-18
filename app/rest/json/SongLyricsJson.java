@@ -9,6 +9,9 @@ public class SongLyricsJson {
     @SerializedName("songLyricsId")
     @Expose
     private Long songLyricsId;
+    @SerializedName("masterId")
+    @Expose
+    private Long masterId;
     @SerializedName("songLyrics")
     @Expose
     private String songLyrics;
@@ -90,5 +93,13 @@ public class SongLyricsJson {
     public void setSongId(Long songId) {
         this.songId = songId;
     }
+
+	public Long getMasterId() {
+		return masterId;
+	}
+
+	public void setMasterId(Long masterId) {
+		this.masterId = masterId;
+	}
 
 }

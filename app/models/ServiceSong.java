@@ -14,6 +14,8 @@ public class ServiceSong extends Model implements PdfPrintable, Comparable<Servi
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE)
 	public Long id;
+	
+	public Long masterId;
 
 	@Required
 	public String songName;
@@ -37,6 +39,7 @@ public class ServiceSong extends Model implements PdfPrintable, Comparable<Servi
 	public String getSongName() {
 		return songName;
 	}
+	
 
 	public void setSongName(String songName) {
 		this.songName = songName;
@@ -81,6 +84,8 @@ public class ServiceSong extends Model implements PdfPrintable, Comparable<Servi
 	public void setService(Service service) {
 		this.service = service;
 	}
+	
+	
 
 	public String getTitle() {
 		String songName = getSongName();
@@ -95,6 +100,14 @@ public class ServiceSong extends Model implements PdfPrintable, Comparable<Servi
 	@Override
 	public int compareTo(ServiceSong otherSong) {
 		return Long.compare(this.id, otherSong.id);
+	}
+
+	public Long getMasterId() {
+		return masterId;
+	}
+
+	public void setMasterId(Long masterId) {
+		this.masterId = masterId;
 	}
 
 }

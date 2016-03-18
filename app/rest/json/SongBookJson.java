@@ -11,6 +11,9 @@ public class SongBookJson {
     @SerializedName("id")
     @Expose
     private Long id;
+    @SerializedName("masterId")
+    @Expose
+    private Long masterId;
     @SerializedName("songBookName")
     @Expose
     private String songBookName;
@@ -54,5 +57,11 @@ public class SongBookJson {
     public void setSongIDs(List<Long> songIDs) {
         this.songIDs = songIDs;
     }
+	public Long getMasterId() {
+		return masterId;
+	}
+	public void setMasterId(Long masterId) {
+		this.masterId = masterId;
+	}
 
 }

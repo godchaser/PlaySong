@@ -35,7 +35,7 @@ public class SongToJsonConverter {
             songLyricsIDsArray.add(lyrics.getsongLyricsId());
         }
 
-        ObjectNode songObject = convert(s.songName, s.songLink, s.songOriginalTitle, s.songAuthor, s.id, s.songImporter, s.dateCreated.getTime(), s.dateModified.getTime(), s.getPrivateSong(),
+        ObjectNode songObject = convert(s.songName, s.songLink, s.songOriginalTitle, s.songAuthor, s.id, s.masterId, s.songImporter, s.dateCreated.getTime(), s.dateModified.getTime(), s.getPrivateSong(),
                 songLyricsIDsArray, s.getSongbooks());
 
         return songObject;
@@ -64,7 +64,7 @@ public class SongToJsonConverter {
         return songObject;
     }
 
-    public static ObjectNode convert(String songName, String songLink, String songOriginalTitle, String songAuthor, Long id, String songImporter, Long dateCreated, Long dateModified,
+    public static ObjectNode convert(String songName, String songLink, String songOriginalTitle, String songAuthor, Long id, Long songMasterId, String songImporter, Long dateCreated, Long dateModified,
             boolean privateSong, ArrayNode songLyricsIDsArray, List<SongBook> songbooks) {
 
         ObjectNode songObject = Json.newObject();
@@ -74,6 +74,7 @@ public class SongToJsonConverter {
         songObject.put("songOriginalTitle", songOriginalTitle);
         songObject.put("songAuthor", songAuthor);
         songObject.put("songId", id);
+        songObject.put("masterId", songMasterId);
         songObject.put("songImporter", songImporter);
         songObject.put("songImporter", songImporter);
         songObject.put("dateCreated", dateCreated);
@@ -86,6 +87,7 @@ public class SongToJsonConverter {
             ObjectNode songbookObject = Json.newObject();
             songbookObject.put("songBookName", songbook.getSongBookName());
             songbookObject.put("songBookId", songbook.getId());
+            songbookObject.put("masterId", songbook.getMasterId());
             songbookObject.put("songBookPrivate", songbook.getPrivateSongbook());
             songbookArray.add(songbookObject);
         }

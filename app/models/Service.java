@@ -16,6 +16,8 @@ public class Service extends Model {
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE)
 	public Long id;
+	
+	public Long masterId;
 
 	@Required
 	public String userEmail;
@@ -29,6 +31,10 @@ public class Service extends Model {
 
 	public static Service get(Long id) {
         return find.byId(id);
+    }
+	
+	public static Service getByMasterId(Long masterId) {
+		return find.where().eq("master_id", masterId).findUnique();
     }
 	
 	public Long getId() {
@@ -89,5 +95,13 @@ public class Service extends Model {
 	}
 	public static void delete(Long id) {
 		find.byId(id).delete();
+	}
+
+	public Long getMasterId() {
+		return masterId;
+	}
+
+	public void setMasterId(Long masterId) {
+		this.masterId = masterId;
 	}
 }

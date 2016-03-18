@@ -13,6 +13,9 @@ public class ServiceSongJson {
     @SerializedName("songId")
     @Expose
     private Long songId;
+    @SerializedName("masterId")
+    @Expose
+    private Long masterId;
     @SerializedName("lyricsId")
     @Expose
     private Long lyricsId;
@@ -112,4 +115,12 @@ public class ServiceSongJson {
     public void setSongLyrics(String songLyrics) {
         this.songLyrics = songLyrics;
     }
+
+	public Long getMasterId() {
+		return masterId;
+	}
+
+	public void setMasterId(Long masterId) {
+		this.masterId = masterId;
+	}
 }

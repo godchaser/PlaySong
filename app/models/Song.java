@@ -20,6 +20,8 @@ public class Song extends Model implements Comparator<Song> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     public Long id;
+    
+	public Long masterId;
 
     @Required
     public String songName;
@@ -55,6 +57,8 @@ public class Song extends Model implements Comparator<Song> {
     @Transient
     public Long songBookId;
     @Transient
+    public Long songBookmasterId;
+    @Transient
     public boolean isPrivateSongBook;
 
     public static List<Song> all() {
@@ -68,7 +72,11 @@ public class Song extends Model implements Comparator<Song> {
     public static Song get(Long id) {
         return find.byId(id);
     }
-
+    
+	public static Song getByMasterId(Long masterId) {
+		return find.where().eq("master_id", masterId).findUnique();
+    }
+	
     public static void updateOrCreateSong(Song song, String userEmail) {
 
         boolean songHasSongLyrics = (song.getSongLyrics() != null) ? true : false;
@@ -92,7 +100,7 @@ public class Song extends Model implements Comparator<Song> {
             song.setSongBook(activeSongbook, userEmail);
         } else {
             Logger.debug("Updating or creating new songbook");
-            activeSongbook = SongBook.updateOrCreate(song.getSongBookId(), song.getSongBookName(), userEmail, song.getPrivateSongBook());
+            activeSongbook = SongBook.updateOrCreate(song.getSongBookId(), song.getSongBookmasterId(), song.getSongBookName(), userEmail, song.getPrivateSongBook());
             song.setSongBook(activeSongbook, userEmail);
         }
 
@@ -334,5 +342,21 @@ public class Song extends Model implements Comparator<Song> {
     public int hashCode() {
         return getId().hashCode();
     }
+
+	public Long getMasterId() {
+		return masterId;
+	}
+
+	public void setMasterId(Long masterId) {
+		this.masterId = masterId;
+	}
+
+	public Long getSongBookmasterId() {
+		return songBookmasterId;
+	}
+
+	public void setSongBookmasterId(Long songBookmasterId) {
+		this.songBookmasterId = songBookmasterId;
+	}
 
 }

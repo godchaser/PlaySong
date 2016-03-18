@@ -25,7 +25,7 @@ public class DatabaseHelper {
         // TODO: IMPLEMENT OPTIONAL DELETION OF MISSING REMOTE SONGS
         for (SongLyricsJson songlyrics : songLyricsJson) {
             Logger.trace("PlaySongDatabase : Checking if song lyrics is already in db: " + songlyrics.getSongLyricsId() + " : " + songlyrics.getSongId());
-            SongLyrics foundSongLyrics = SongLyrics.get(songlyrics.getSongLyricsId());
+            SongLyrics foundSongLyrics = SongLyrics.getByMasterId(songlyrics.getMasterId());
             boolean shouldUpdateSong = false;
             boolean songUpdated = updatedSongs.contains(songlyrics.getSongId());
             // UPDATE SONG LYRICS IF IT IS PRESENT AND SONG WAS UPDATED ALREADY
@@ -39,8 +39,9 @@ public class DatabaseHelper {
             // SONG IS MODIFIED BUT DID NOT FIND ASSOCIATED LYRICS
             Logger.trace("PlaySongDatabase : Adding new songlyrics (id) to db = " + songlyrics.getSongLyricsId());
 
-            Song song = Song.get(songlyrics.getSongId());
-            // DELETE PREVIOUS LOCAL SONG LYRICS IF REMOTE SONG HAS ONLY 1 SONG LYRICS - THIS I SFOR SAVE
+            Song song = Song.getByMasterId(songlyrics.getSongId());
+            // DELETE PREVIOUS LOCAL SONG LYRICS IF REMOTE SONG HAS ONLY 1 SONG
+            // LYRICS - THIS I SFOR SAVE
             if (!shouldUpdateSong && song != null && song.getSongLyrics().size() < 2) {
                 Logger.trace("PlaySongDatabase : Deleting stale songlyrics!");
                 SongLyrics.deleteSongLyricsForSong(song);
@@ -48,7 +49,13 @@ public class DatabaseHelper {
 
             // TODO: CHECK FOR NULLS FIRST
             SongLyrics songlyricsdb = new SongLyrics();
-            songlyricsdb.setId((songlyrics.getSongLyricsId()));
+
+            // don't set local ids, but only master ids
+            // songlyricsdb.setId((songlyrics.getSongLyricsId()));
+            if (songlyrics.getMasterId() != null) {
+                songlyricsdb.setMasterId(songlyrics.getMasterId());
+            }
+
             songlyricsdb.setSongKey(songlyrics.getSongKey());
             songlyricsdb.setsongLyrics(songlyrics.getSongLyrics());
             // songlyricsdb.setSongLyricsHtml(LyricsHtmlBuilder.buildHtmlFromSongLyrics(songlyrics.getSongLyrics()));
@@ -72,7 +79,7 @@ public class DatabaseHelper {
         for (SongsJson song : songsJson) {
             boolean shouldUpdateSong = false;
             Logger.trace("PlaySongDatabase : Checking if songs is already in db: " + song.getSongId() + " : " + song.getSongName());
-            Song foundSong = Song.get(song.getSongId());
+            Song foundSong = Song.getByMasterId(song.getSongId());
             if (foundSong != null) {
                 if (foundSong.getDateModified().getTime() < song.getDateModified()) {
                     // UPDATE SONG
@@ -87,7 +94,12 @@ public class DatabaseHelper {
             }
             // TODO: CHECK FOR NULLS FIRST
             Song songdb = new Song();
-            songdb.setId(song.getSongId());
+            // don't set local ids, but only master ids
+            // songdb.setId(song.getSongId());
+            if (song.getMasterId() != null) {
+                songdb.setMasterId(song.getMasterId());
+            }
+            // songdb.setId(song.getSongId());
             songdb.setSongName(song.getSongName());
             songdb.setSongOriginalTitle(song.getSongOriginalTitle());
             songdb.setSongLink(song.getSongLink());
@@ -103,8 +115,8 @@ public class DatabaseHelper {
              * "PlaySongDatabase : found songbook = " + foundSongBook.getSongBookName()); // found existing songbook // TODO: Think about reusing updateOrCreate Song method
              * songdb.setSongBook(foundSongBook, userEmail); } }
              * 
-             * if (!songBookExists) { Logger.trace("PlaySongDatabase : songbook does not exist"); // setting default songbook Logger.trace("PlaySongDatabase : using default songbook");
-             * songdb.setSongBook(SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail)), userEmail); }
+             * if (!songBookExists) { Logger.trace( "PlaySongDatabase : songbook does not exist"); // setting default songbook Logger.trace("PlaySongDatabase : using default songbook" );
+             * songdb.setSongBook(SongBook.getDefaultSongbook(UserAccount. getByEmail(userEmail)), userEmail); }
              */
             /*
              * // preparing songbook SongBook activeSongbook = null;
@@ -127,14 +139,15 @@ public class DatabaseHelper {
             // now updating songbook
             if (!song.getSongBooks().isEmpty()) {
                 Logger.trace("PlaySongDatabase : updating songbook");
-                //TODO: later implement multiple songbooks
+                // TODO: later implement multiple songbooks
                 songdb.setSongBookName(song.getSongBooks().get(0).getSongBookName());
-                songdb.setSongBookId(song.getSongBooks().get(0).getId());
+                // songdb.setSongBookId(song.getSongBooks().get(0).getId());
+                songdb.setSongBookmasterId(song.getSongBooks().get(0).getMasterId());
                 songdb.setPrivateSongBook(song.getSongBooks().get(0).getPrivateSongbook());
             }
-            
+
             // I have to create dummy song lyrics
-            //songdb.setSongLyrics(new ArrayList <SongLyrics>());
+            // songdb.setSongLyrics(new ArrayList <SongLyrics>());
 
             Song.updateOrCreateSong(songdb, userEmail);
 
@@ -146,7 +159,7 @@ public class DatabaseHelper {
     public void writeJsonSongbooksToDb(List<SongBookJson> SongbookJson) {
         for (SongBookJson songbook : SongbookJson) {
             Logger.trace("PlaySongDatabase : Trying to writes json songbook to db: " + songbook.getSongBookName());
-            SongBook.updateOrCreate(songbook.getId(), songbook.getSongBookName(), songbook.getSongbookOwner(), songbook.getPrivateSongbook());
+            SongBook.updateOrCreate(songbook.getId(), songbook.getMasterId(), songbook.getSongBookName(), songbook.getSongbookOwner(), songbook.getPrivateSongbook());
         }
     }
 
@@ -154,8 +167,8 @@ public class DatabaseHelper {
         List<Long> updatedFavorites = new ArrayList<>();
         Logger.trace("PlaySongDatabase : Trying to writes json favorites to db");
         for (ServiceJson favorite : servicesJson) {
-            // first Checkinggg if service already imported
-            Service foundService = Service.get(favorite.getId());
+            // first Checking if service already imported
+            Service foundService = Service.getByMasterId(favorite.getMasterId());
             Logger.trace("PlaySongDatabase : Checking if service is already in db: " + favorite.getSongBookName());
             if (foundService != null) {
                 if (foundService.getDateCreated().getTime() < favorite.getDateCreated().longValue()) {
@@ -171,7 +184,12 @@ public class DatabaseHelper {
 
             Logger.trace("PlaySongDatabase : Processing json service");
             Service favoriteDb = new Service();
-            favoriteDb.setId(favorite.getId());
+
+            // don't set local ids, but only master ids
+            // favoriteDb.setId(favorite.getId());
+            if (favorite.getMasterId() != null) {
+                favoriteDb.setMasterId(favorite.getMasterId());
+            }
             favoriteDb.setDateCreated(new Date(favorite.getDateCreated()));
             favoriteDb.setServiceName(favorite.getSongBookName());
             favoriteDb.setUserEmail(favorite.getUserEmail());
@@ -179,14 +197,22 @@ public class DatabaseHelper {
             favoriteDb.save();
             Logger.trace("PlaySongDatabase : Saving service");
             for (ServiceSongJson serviceSongJson : favorite.getServiceSongJsons()) {
-                Logger.trace("PlaySongDatabase : Processing json service song");
+                Logger.trace("PlaySongDatabase : Processing " + "");
                 ServiceSong favoriteSong = new ServiceSong();
+                Service favoriteMatch = null;
+
+                // don't set local ids, but only master ids
+                // favoriteDb.setId(favorite.getId());
+                if (favoriteSong.getMasterId() != null) {
+                    favoriteDb.setMasterId(favoriteSong.getMasterId());
+                    favoriteMatch = Service.getByMasterId(favorite.getMasterId());
+                }
                 favoriteSong.setLyricsId(serviceSongJson.getLyricsId());
                 favoriteSong.setSongId(serviceSongJson.getSongId());
                 favoriteSong.setSongName(serviceSongJson.getSongName());
                 favoriteSong.setSongKey(serviceSongJson.getSongKey());
                 favoriteSong.setSongLyrics(serviceSongJson.getSongLyrics());
-                Service favoriteMatch = Service.get(favorite.getId());
+                // TODO: fix this search by master id
                 if (favoriteMatch != null) {
                     favoriteSong.setService(favoriteMatch);
                 }

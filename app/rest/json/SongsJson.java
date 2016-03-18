@@ -23,6 +23,9 @@ public class SongsJson {
     @SerializedName("songId")
     @Expose
     private Long songId;
+    @SerializedName("masterId")
+    @Expose
+    private Long masterId;
     @SerializedName("songImporter")
     @Expose
     private String songImporter;
@@ -239,5 +242,13 @@ public class SongsJson {
     public void setSongLyricsIDs(List<Integer> songLyricsIDs) {
         this.songLyricsIDs = songLyricsIDs;
     }
+
+	public Long getMasterId() {
+		return masterId;
+	}
+
+	public void setMasterId(Long masterId) {
+		this.masterId = masterId;
+	}
 
 }

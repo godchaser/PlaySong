@@ -11,6 +11,9 @@ public class ServiceJson {
     @SerializedName("id")
     @Expose
     private Long id;
+    @SerializedName("masterId")
+    @Expose
+    private Long masterId;
     @SerializedName("dateCreated")
     @Expose
     private Long dateCreated;
@@ -135,5 +138,13 @@ public class ServiceJson {
     public void setServiceSongJsons(List<ServiceSongJson> serviceSongJsons) {
         this.serviceSongJsons = serviceSongJsons;
     }
+
+	public Long getMasterId() {
+		return masterId;
+	}
+
+	public void setMasterId(Long masterId) {
+		this.masterId = masterId;
+	}
 
 }

@@ -5,6 +5,7 @@
 
 create table service (
   id                            bigint not null,
+  master_id                     bigint,
   user_email                    varchar(255),
   user_name                     varchar(255),
   service_name                  varchar(255),
@@ -15,6 +16,7 @@ create sequence service_seq;
 
 create table service_song (
   id                            bigint not null,
+  master_id                     bigint,
   song_name                     varchar(255),
   song_id                       bigint,
   lyrics_id                     bigint,
@@ -27,6 +29,7 @@ create sequence service_song_seq;
 
 create table song (
   id                            bigint not null,
+  master_id                     bigint,
   song_name                     varchar(255),
   song_original_title           varchar(255),
   song_author                   varchar(255),
@@ -42,6 +45,7 @@ create sequence song_seq;
 
 create table song_book (
   id                            bigint not null,
+  master_id                     bigint,
   song_book_name                varchar(255),
   private_songbook              boolean,
   constraint pk_song_book primary key (id)
@@ -62,6 +66,7 @@ create table song_book_user_account (
 
 create table song_lyrics (
   id                            bigint not null,
+  master_id                     bigint,
   song_id                       bigint,
   song_lyrics                   TEXT,
   song_key                      varchar(255),
@@ -109,50 +114,50 @@ create index ix_user_account_song_book_song_book on user_account_song_book (song
 
 # --- !Downs
 
-alter table if exists service_song drop constraint if exists fk_service_song_service_id;
+alter table service_song drop constraint if exists fk_service_song_service_id;
 drop index if exists ix_service_song_service_id;
 
-alter table if exists song_book_song drop constraint if exists fk_song_book_song_song_book;
+alter table song_book_song drop constraint if exists fk_song_book_song_song_book;
 drop index if exists ix_song_book_song_song_book;
 
-alter table if exists song_book_song drop constraint if exists fk_song_book_song_song;
+alter table song_book_song drop constraint if exists fk_song_book_song_song;
 drop index if exists ix_song_book_song_song;
 
-alter table if exists song_book_user_account drop constraint if exists fk_song_book_user_account_song_book;
+alter table song_book_user_account drop constraint if exists fk_song_book_user_account_song_book;
 drop index if exists ix_song_book_user_account_song_book;
 
-alter table if exists song_book_user_account drop constraint if exists fk_song_book_user_account_user_account;
+alter table song_book_user_account drop constraint if exists fk_song_book_user_account_user_account;
 drop index if exists ix_song_book_user_account_user_account;
 
-alter table if exists song_lyrics drop constraint if exists fk_song_lyrics_song_id;
+alter table song_lyrics drop constraint if exists fk_song_lyrics_song_id;
 drop index if exists ix_song_lyrics_song_id;
 
-alter table if exists user_account_song_book drop constraint if exists fk_user_account_song_book_user_account;
+alter table user_account_song_book drop constraint if exists fk_user_account_song_book_user_account;
 drop index if exists ix_user_account_song_book_user_account;
 
-alter table if exists user_account_song_book drop constraint if exists fk_user_account_song_book_song_book;
+alter table user_account_song_book drop constraint if exists fk_user_account_song_book_song_book;
 drop index if exists ix_user_account_song_book_song_book;
 
-drop table if exists service cascade;
+drop table if exists service;
 drop sequence if exists service_seq;
 
-drop table if exists service_song cascade;
+drop table if exists service_song;
 drop sequence if exists service_song_seq;
 
-drop table if exists song cascade;
+drop table if exists song;
 drop sequence if exists song_seq;
 
-drop table if exists song_book cascade;
+drop table if exists song_book;
 drop sequence if exists song_book_seq;
 
-drop table if exists song_book_song cascade;
+drop table if exists song_book_song;
 
-drop table if exists song_book_user_account cascade;
+drop table if exists song_book_user_account;
 
-drop table if exists song_lyrics cascade;
+drop table if exists song_lyrics;
 drop sequence if exists song_lyrics_seq;
 
-drop table if exists user_account cascade;
+drop table if exists user_account;
 
-drop table if exists user_account_song_book cascade;
+drop table if exists user_account_song_book;
 
