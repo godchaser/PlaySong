@@ -22,6 +22,8 @@ public class SqlQueries {
                    + "JOIN song_book_song u2 on u2.song_id = t0.id ";
     public static final String sqlPrivateSongFalse = " OR t0.private_song = false ";
     
+    public static final String sqlSelectSongMaxMasterId = "SELECT MAX(master_id) FROM song";
+    
     // Seq fixes
     // Postgresql
     public static final String sqlPGSeqFix = 

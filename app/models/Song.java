@@ -9,7 +9,12 @@ import models.helpers.SongSuggestion;
 import play.Logger;
 import play.data.format.Formats;
 import play.data.validation.Constraints.Required;
+
+import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Model;
+import com.avaje.ebean.SqlRow;
+
+import database.SqlQueries;
 
 /**
  * Created by samuel on 19.02.15..
@@ -130,7 +135,16 @@ public class Song extends Model implements Comparator<Song> {
             }
         } else {
             song.id = null;
-            Logger.debug("Creating new song - song ID is null: " + song.id);
+            SqlRow maxMasterId = Ebean.createSqlQuery(SqlQueries.sqlSelectSongMaxMasterId).findUnique();
+            Logger.debug("Max master id query result: " + maxMasterId);
+            // this is h2 output
+            Long masterId = maxMasterId.getLong("max(master_id)");
+            if (masterId == null) {
+                // this is posgtres output
+                masterId = maxMasterId.getLong("max");
+            }
+            song.masterId = masterId + 1L;
+            Logger.debug("Creating new song - song ID is null, but master id: " + song.masterId);
             // DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
             Date date = new Date();
             song.setDateCreated(date);
@@ -151,10 +165,9 @@ public class Song extends Model implements Comparator<Song> {
             if (!getSongbooks().contains(SongBook.getByNameAndEmail(activeSongbook.getSongBookName(), userEmail))) {
                 getSongbooks().add(activeSongbook);
             } else {
-                //songbook is already added
+                // songbook is already added
             }
-        }
-        else {
+        } else {
             // add new songbook to song
             List<SongBook> songbooks = new ArrayList<SongBook>();
             songbooks.add(activeSongbook);
