@@ -143,7 +143,9 @@ public class Song extends Model implements Comparator<Song> {
                 // this is posgtres output
                 masterId = maxMasterId.getLong("max");
             }
-            song.masterId = masterId + 1L;
+            if (masterId != null) {
+                song.masterId = masterId + 1L;
+            }
             Logger.debug("Creating new song - song ID is null, but master id: " + song.masterId);
             // DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
             Date date = new Date();
@@ -206,7 +208,7 @@ public class Song extends Model implements Comparator<Song> {
 
         Date dateNow = Calendar.getInstance().getTime();
 
-        List<Song> songsModifiedInLastMonth = Song.find.where().between("date_modified", dateBeforeAMonth, dateNow).orderBy("date_modified desc").findList();
+        List<Song> songsModifiedInLastMonth = Song.find.where().between("date_modified", dateBeforeAMonth, dateNow).orderBy("date_modified desc").setMaxRows(10).findList();
 
         List<SongSuggestion> songModifiedList = new ArrayList<>();
         for (Song song : songsModifiedInLastMonth) {
@@ -226,7 +228,7 @@ public class Song extends Model implements Comparator<Song> {
 
         Date dateNow = Calendar.getInstance().getTime();
 
-        List<Song> songsCreatedInLastMonth = Song.find.where().between("date_created", dateBeforeAMonth, dateNow).orderBy("date_created desc").findList();
+        List<Song> songsCreatedInLastMonth = Song.find.where().between("date_created", dateBeforeAMonth, dateNow).orderBy("date_created desc").setMaxRows(10).findList();
 
         List<SongSuggestion> songCreatedList = new ArrayList<>();
         for (Song song : songsCreatedInLastMonth) {
