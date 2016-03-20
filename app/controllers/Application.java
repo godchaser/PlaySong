@@ -59,6 +59,7 @@ import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
 import play.mvc.Security;
+import play.mvc.With;
 import play.routing.JavaScriptReverseRouter;
 import play.data.FormFactory;
 
@@ -282,7 +283,9 @@ public class Application extends Controller {
     }
 
     @Security.Authenticated(Secured.class)
+    @With(VerboseAction.class)
     public Result updateorcreatesong() {
+        
         Form<Song> filledForm = songForm.bindFromRequest();
         if (filledForm.hasErrors()) {
             return badRequest(views.html.error.render());
