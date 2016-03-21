@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.SqlRow;
+import com.google.inject.Singleton;
+
 import models.Service;
 import models.ServiceSong;
 import models.Song;
@@ -21,6 +25,19 @@ import play.db.ebean.Transactional;
 
 public class DatabaseHelper {
 
+    // Singleton
+    private static DatabaseHelper instance = null;
+
+    protected DatabaseHelper() {
+    }
+
+    public static DatabaseHelper getInstance() {
+        if (instance == null) {
+            instance = new DatabaseHelper();
+        }
+        return instance;
+    }
+
     public void writeJsonSongLyricsToDb(List<SongLyricsJson> songLyricsJson, List<Long> updatedSongs) {
         // TODO: IMPLEMENT OPTIONAL DELETION OF MISSING REMOTE SONGS
         for (SongLyricsJson songlyrics : songLyricsJson) {
@@ -29,7 +46,7 @@ public class DatabaseHelper {
 
             songlyricsdb.setMasterId(songlyrics.getSongLyricsId());
             foundSongLyrics = SongLyrics.getByMasterId(songlyrics.getSongLyricsId());
-            
+
             Logger.trace("PlaySongDatabase : Checking if song lyrics is already in db: " + songlyrics.getSongLyricsId() + " : " + songlyrics.getSongId());
 
             boolean shouldUpdateSong = false;
@@ -212,5 +229,26 @@ public class DatabaseHelper {
             updatedFavorites.add(favorite.getMasterId());
         }
         return updatedFavorites;
+    }
+
+    public Long getNextSongMasterId() {
+        return getNextMasterId(SqlQueries.sqlSelectSongMaxMasterId);
+    }
+    
+    public Long getNextSongBookMasterId() {
+        return getNextMasterId(SqlQueries.sqlSelectSongBookMaxMasterId);
+    }
+    
+    private Long getNextMasterId(String sqlQuery){
+        SqlRow maxMasterId = Ebean.createSqlQuery(sqlQuery).findUnique();
+        Logger.debug("Max master id query result: " + maxMasterId);
+        // this is h2 output
+        Long masterId = maxMasterId.getLong("max(master_id)");
+        if (masterId == null) {
+            // this is posgtres output
+            masterId = maxMasterId.getLong("max");
+        }
+        // increase master id or send default 1
+        return (masterId!=null)? masterId + 1L: 1L;
     }
 }

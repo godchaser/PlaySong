@@ -10,7 +10,6 @@ public class VerboseAction extends play.mvc.Action.Simple {
 
     @Override
     public CompletionStage<Result> call(Context ctx) {
-        Logger.info("######################################### Calling action for " + ctx);
         return delegate.call(ctx);
     }
 }

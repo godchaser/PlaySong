@@ -36,7 +36,7 @@
 
 	var id =   @id;
 	function songView(id) {
-	jsRoutes.controllers.Application.getsongjson ( id ).ajax ( {
+	jsRoutes.controllers.Application.getsongbymasteridjson ( id ).ajax ( {
 	datatype : 'json',
 	success : function ( data ) {
 	var songLyricsIDs = [];

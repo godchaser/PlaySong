@@ -60,6 +60,7 @@ import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
 import play.mvc.Security;
 import play.mvc.With;
+import play.mvc.BodyParser;
 import play.routing.JavaScriptReverseRouter;
 import play.data.FormFactory;
 
@@ -243,6 +244,12 @@ public class Application extends Controller {
     }
 
     public Result getsongjson(Long id) {
+        Song s = Song.get(id);
+        ObjectNode songJson = SongToJsonConverter.convert(s);
+        return ok(Json.toJson(songJson));
+    }
+    
+    public Result getsongbymasteridjson(Long id) {
         Song s = Song.getByMasterId(id);
         ObjectNode songJson = SongToJsonConverter.convert(s);
         return ok(Json.toJson(songJson));
@@ -282,11 +289,13 @@ public class Application extends Controller {
         Song.delete(id);
     }
 
+    //TODO: remove this body parser workaround when Bug gets fixed https://github.com/playframework/playframework/issues/5919
     @Security.Authenticated(Secured.class)
     @With(VerboseAction.class)
+    @BodyParser.Of(FormBodyParser.class)
     public Result updateorcreatesong() {
-        
         Form<Song> filledForm = songForm.bindFromRequest();
+        //filledForm.
         if (filledForm.hasErrors()) {
             return badRequest(views.html.error.render());
         } else {
@@ -515,6 +524,7 @@ public class Application extends Controller {
                 ts.setSong_original_title(res.getString("song_original_title"));
                 ts.setSong_author(res.getString("song_author"));
                 ts.setSong_link(res.getString("song_link"));
+                ts.setMaster_id(res.getLong("master_id"));
                 ts.setSong_importer(res.getString("song_importer"));
                 ts.getLyrics_id().add(lyricsId);
                 songTableDataMap.put(songId, ts);
@@ -551,7 +561,7 @@ public class Application extends Controller {
                 for (Entry<Long, SongTableData> inneritem : smallMap.entrySet()) {
                     Long songId = inneritem.getKey();
                     SongTableData ts = inneritem.getValue();
-                    ObjectNode songJson = SongToJsonConverter.convert(ts.getSong_name(), ts.getSong_link(), ts.getSong_original_title(), ts.getSong_author(), songId, ts.getSong_importer(),
+                    ObjectNode songJson = SongToJsonConverter.convert(ts.getSong_name(), ts.getSong_link(), ts.getSong_original_title(), ts.getSong_author(), songId, ts.getMaster_id(), ts.getSong_importer(),
                             ts.getLyrics_id());
                     an.add(songJson);
                 }
@@ -956,9 +966,11 @@ public class Application extends Controller {
                 controllers.routes.javascript.Application.login(),
                 controllers.routes.javascript.Application.deletesong(), 
                 controllers.routes.javascript.Application.getsongjson(), 
+                controllers.routes.javascript.Application.getsongbymasteridjson(), 
                 controllers.routes.javascript.Application.songeditor(),
                 controllers.routes.javascript.Application.playlistmaker(),
                 controllers.routes.javascript.Application.songsuggestions(), 
+                controllers.routes.javascript.Application.getsonglyricsjson(),
                 controllers.routes.javascript.Application.getsonglyricsjson(),
                 controllers.routes.javascript.Application.updatesonglyricsjson(), 
                 controllers.routes.javascript.Application.services(),

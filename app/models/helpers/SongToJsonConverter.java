@@ -41,7 +41,7 @@ public class SongToJsonConverter {
         return songObject;
     }
 
-    public static ObjectNode convert(String songName, String songLink, String songOriginalTitle, String songAuthor, Long id, String songImporter, ArrayList<String> songLyricsIDsArrayList) {
+    public static ObjectNode convert(String songName, String songLink, String songOriginalTitle, String songAuthor, Long id, Long masterId, String songImporter, ArrayList<String> songLyricsIDsArrayList) {
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode songLyricsIDs = mapper.createObjectNode();
@@ -58,6 +58,7 @@ public class SongToJsonConverter {
         songObject.put("songOriginalTitle", songOriginalTitle);
         songObject.put("songAuthor", songAuthor);
         songObject.put("songId", id);
+        songObject.put("masterId", masterId);
         songObject.put("songImporter", songImporter);
         songObject.putArray("songLyricsIDs").addAll(songLyricsIDsArray);
 

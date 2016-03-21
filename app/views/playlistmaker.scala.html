@@ -31,11 +31,14 @@
 			</div>
 		</div>
 	</div>
+	<br>
+	<label for="select-songbooks">Songbook:</label>
+	<br>
 	<select id="select-songbooks" class="selectpicker">
 		  <option value="1">All Songs</option>
 		   @if(songBooks.size>0){
 			  @songBooks.map { songBookItem =>
-			  	    @if(songBookItem.getId()!=1){
+			  	   @if(songBookItem.getMasterId()!=1){
 			  	    	@if(songBookItem.getId().equals(songBookId)){
 					    	<option value="@songBookItem.getId()" selected>@songBookItem.getSongBookName()</option>
 					    }else {

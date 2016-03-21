@@ -9,13 +9,13 @@
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/font-awesome/css/font-awesome.css")">
  -->
 <div hidden id="song_table_wrapper" class="panel panel-default hover" cellspacing="0" width="100%">
-	<h2>Song Database 
+	<h2>Songs 
 	
 	<select id="select-songbooks" class="selectpicker">
 		  <option value="1">All Songs</option>
 		   @if(songBooks.size>0){
 			  @songBooks.map { songBookItem =>
-			  	    @if(songBookItem.getId()!=1){
+			  	    @if(songBookItem.getMasterId()!=1){
 				    	<option value="@songBookItem.getId()">@songBookItem.getSongBookName()</option>
 				    }
 			  	}
@@ -40,6 +40,7 @@
 								<th>Title</th>
 								<th>Author</th>
 								<th class="datatable-nosort">Id</th>
+								<th class="datatable-nosort"></th>
 							</tr>
 						</thead>
 					</table>
@@ -331,14 +332,17 @@
 				}, {
 					"data" : "songAuthor"
 				}, {
+					"data" : "masterId"
+				}, {
 					"data" : "songId"
 				}],
 				"columnDefs" : [{
 					targets : "datatable-nosort",
-					orderable : false
+					orderable : false,
+					visible: false
 				}, {
 					targets : [0],
-					"type" : "balkan_sort"
+					type : "balkan_sort"
 				}],
 				"tableTools" : {
 					"sRowSelect" : "single"
@@ -427,7 +431,7 @@
 				        	var row = $(currentRow).closest('tr');
 				        	if (row.next().length){
 					        	var next = row.next();
-					        	selectedSongID = $(next).attr('id');
+					        	selectedSongID = $(next).attr('songId');
 								selectedSongLyricsID = $(next).find('.lyrics-link' )[0].id;
 								updateLyricsPanel(selectedSongLyricsID);
 						        $(next).addClass("selected-row");
@@ -442,7 +446,7 @@
 				        	var row = $(currentRow).closest('tr');
 				        	if (row.prev().length){
 				        		var prev = row.prev();
-					        	selectedSongID = $(prev).attr('id');
+					        	selectedSongID = $(prev).attr('songId');
 					        	selectedSongLyricsID = $(prev).find('.lyrics-link' )[0].id;
 					        	updateLyricsPanel(selectedSongLyricsID);
 					            $(prev).addClass("selected-row");

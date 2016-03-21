@@ -3,11 +3,13 @@ package models;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.crypto.spec.DHGenParameterSpec;
 import javax.persistence.*;
 
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.Model;
 
+import database.DatabaseHelper;
 import play.Logger;
 import play.db.ebean.Transactional;
 
@@ -25,6 +27,8 @@ public class SongBook extends Model {
     public String songBookName;
 
     public boolean privateSongbook = false;
+
+    private static DatabaseHelper dh = DatabaseHelper.getInstance();
 
     @ManyToMany
     public List<Song> songs = new ArrayList<>();
@@ -48,15 +52,9 @@ public class SongBook extends Model {
     public static SongBook updateOrCreate(Long id, Long masterId, String songbookName, String userEmail, boolean isPrivateSongBook) {
         SongBook foundSongbook = null;
 
-        // TODO: handle masterId
-
         // first search by master id
         if (masterId != null) {
             Logger.debug("Received songbook by master ID: " + id);
-            foundSongbook = getByMasterId(masterId);
-        } else {
-            // TODO: remove this temp workaround - because I currently don't have master id in db
-            masterId = id;
             foundSongbook = getByMasterId(masterId);
         }
 
@@ -97,9 +95,13 @@ public class SongBook extends Model {
             } else {
                 Logger.debug("New songbook id will be created");
                 // id = null;
-                foundSongbook.setId(null);
+                foundSongbook.id = null;
             }
-            // TODO: remove this temp workaround - because I currently don't have master id in db
+
+            // get next available id if it is null
+            if (masterId == null) {
+                masterId = dh.getNextSongBookMasterId();
+            }
             foundSongbook.setMasterId(masterId);
             foundSongbook.setSongBookName(songbookName);
             foundSongbook.setPrivateSongbook(isPrivateSongBook);
@@ -172,13 +174,26 @@ public class SongBook extends Model {
     }
 
     public static SongBook getByNameAndEmail(String songBookName, String email) {
+        Logger.debug("Looking if user owns songbook:" + email + "->" + songBookName);
         List<SongBook> foundSongBooks = getSongbooksOwnedByUser(email);
-        // if did not fint songbooks, or I found default one then return null
-        if (foundSongBooks == null || foundSongBooks.isEmpty() || (foundSongBooks.get(0).getMasterId().equals(SongBook.DEFAULT_SONGBOOK_ID))) {
+        SongBook matchedSongbook = null;
+        // return null if no songbooks
+        if (foundSongBooks == null || foundSongBooks.isEmpty()) {
             return null;
         } else {
-            return foundSongBooks.get(0);
+            // iterate through all owned songbooks, ignore default one and return the matching one
+            for (SongBook sb : foundSongBooks) {
+                if (sb.getMasterId().equals(SongBook.DEFAULT_SONGBOOK_ID)) {
+                    continue;
+                } else {
+                    if (sb.getSongBookName().equals(songBookName)) {
+                        matchedSongbook = sb;
+                        break;
+                    }
+                }
+            }
         }
+        return matchedSongbook;
     }
 
     public static List<SongBook> all() {

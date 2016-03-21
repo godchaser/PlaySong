@@ -16,6 +16,8 @@ import java.util.Observer;
 
 import org.h2.engine.Database;
 
+import com.google.inject.Inject;
+
 import database.DatabaseHelper;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -41,12 +43,13 @@ public class PlaySongRestService extends Observable {
     public static final String KEY_FAVORITES_FETCHED = "Song Favorites Fetched";
 
     private PlaySongService playsong;
-    private DatabaseHelper db;
+    private DatabaseHelper db = DatabaseHelper.getInstance();
 
+    
     public PlaySongRestService() {
         // addObserver(observer);
         setUpRestConnection();
-        db = new DatabaseHelper();
+        DatabaseHelper db = DatabaseHelper.getInstance();
     }
 
     private void setUpRestConnection() {

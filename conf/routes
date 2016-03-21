@@ -34,6 +34,7 @@ GET      /playlist/:id                   controllers.Application.generateService
 
 # used for retrieving specific song info in json format
 GET      /songs/:id                      controllers.Application.getsongjson(id: Long)
+GET      /songs/public/:id               controllers.Application.getsongbymasteridjson(id: Long)
 
 
 # used for retrieving specific song lyrics info in json format

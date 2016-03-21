@@ -23,6 +23,7 @@ public class SqlQueries {
     public static final String sqlPrivateSongFalse = " OR t0.private_song = false ";
     
     public static final String sqlSelectSongMaxMasterId = "SELECT MAX(master_id) FROM song";
+    public static final String sqlSelectSongBookMaxMasterId = "SELECT MAX(master_id) FROM song_book";
     
     // Seq fixes
     // Postgresql

@@ -33,6 +33,7 @@
             @helper.textarea(field = songForm("songLyrics[2].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
             @helper.textarea(field = songForm("songLyrics[3].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")           
             @helper.inputText(songForm("id"), args = 'style -> "display:none;", 'hidden -> "hidden")
+            @helper.inputText(songForm("masterId"), args = 'style -> "display:none;", 'hidden -> "hidden")
             @helper.inputText(songForm("songBookId"), args = 'style -> "display:none;", 'hidden -> "hidden")
 			</div>
             </div>          
@@ -51,7 +52,9 @@
         var id = @id;
 
         $('#id').attr("value", id);
+        //$('#masterId').attr("value", masterId);
         $('label[for="id"]').hide();
+        $('label[for="masterId"]').hide();
 
         function CreateSongEditor(id){
             $('label[for="songLyrics_1_songLyrics"]').hide();
@@ -67,6 +70,8 @@
                         $('#songOriginalTitle').attr("value", data.songOriginalTitle);
                         $('#songAuthor').attr("value", data.songAuthor);
                         $('#songLink').attr("value", data.songLink);
+                        
+                        $('#masterId').attr("value", data.masterId);
                         
                         if (data.privateSong){
                         	$('#privateSong').attr('checked', 'checked');

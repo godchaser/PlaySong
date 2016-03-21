@@ -11,7 +11,10 @@ public class SongTableData {
 	private String song_author;
 	private String song_link;
 	private String song_importer;
-	private ArrayList<String> lyrics_id;
+	private Long master_id;
+
+
+    private ArrayList<String> lyrics_id;
 
 	public SongTableData() {
 		lyrics_id = new ArrayList<String>();
@@ -64,5 +67,13 @@ public class SongTableData {
 	public void setLyrics_id(ArrayList<String> lyrics_id) {
 		this.lyrics_id = lyrics_id;
 	}
+	
+	   public Long getMaster_id() {
+	        return master_id;
+	    }
+
+	    public void setMaster_id(Long master_id) {
+	        this.master_id = master_id;
+	    }
 
 }
