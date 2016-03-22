@@ -10,10 +10,7 @@ public class ServiceJson {
 
     @SerializedName("id")
     @Expose
-    private Long id;
-    @SerializedName("masterId")
-    @Expose
-    private Long masterId;
+    private String id;
     @SerializedName("dateCreated")
     @Expose
     private Long dateCreated;
@@ -30,29 +27,26 @@ public class ServiceJson {
     @Expose
     private List<ServiceSongJson> serviceSongJsons = new ArrayList<ServiceSongJson>();
 
-
     /**
      * 
-     * @return
-     *     The id
+     * @return The id
      */
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
     /**
      * 
      * @param id
-     *     The id
+     *            The id
      */
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
     /**
      * 
-     * @return
-     *     The dateCreated
+     * @return The dateCreated
      */
     public Long getDateCreated() {
         return dateCreated;
@@ -61,7 +55,7 @@ public class ServiceJson {
     /**
      * 
      * @param dateCreated
-     *     The dateCreated
+     *            The dateCreated
      */
     public void setDateCreated(Long dateCreated) {
         this.dateCreated = dateCreated;
@@ -69,8 +63,7 @@ public class ServiceJson {
 
     /**
      * 
-     * @return
-     *     The userEmail
+     * @return The userEmail
      */
     public String getUserEmail() {
         return userEmail;
@@ -79,7 +72,7 @@ public class ServiceJson {
     /**
      * 
      * @param userEmail
-     *     The userEmail
+     *            The userEmail
      */
     public void setUserEmail(String userEmail) {
         this.userEmail = userEmail;
@@ -87,8 +80,7 @@ public class ServiceJson {
 
     /**
      * 
-     * @return
-     *     The userName
+     * @return The userName
      */
     public String getUserName() {
         return userName;
@@ -97,7 +89,7 @@ public class ServiceJson {
     /**
      * 
      * @param userName
-     *     The userName
+     *            The userName
      */
     public void setUserName(String userName) {
         this.userName = userName;
@@ -105,8 +97,7 @@ public class ServiceJson {
 
     /**
      * 
-     * @return
-     *     The songBookName
+     * @return The songBookName
      */
     public String getSongBookName() {
         return songBookName;
@@ -115,7 +106,7 @@ public class ServiceJson {
     /**
      * 
      * @param songBookName
-     *     The songBookName
+     *            The songBookName
      */
     public void setSongBookName(String songBookName) {
         this.songBookName = songBookName;
@@ -123,8 +114,7 @@ public class ServiceJson {
 
     /**
      * 
-     * @return
-     *     The serviceSongJsons
+     * @return The serviceSongJsons
      */
     public List<ServiceSongJson> getServiceSongJsons() {
         return serviceSongJsons;
@@ -133,18 +123,10 @@ public class ServiceJson {
     /**
      * 
      * @param serviceSongJsons
-     *     The serviceSongJsons
+     *            The serviceSongJsons
      */
     public void setServiceSongJsons(List<ServiceSongJson> serviceSongJsons) {
         this.serviceSongJsons = serviceSongJsons;
     }
-
-	public Long getMasterId() {
-		return masterId;
-	}
-
-	public void setMasterId(Long masterId) {
-		this.masterId = masterId;
-	}
 
 }

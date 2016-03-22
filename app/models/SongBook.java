@@ -10,25 +10,21 @@ import com.avaje.ebean.Expr;
 import com.avaje.ebean.Model;
 
 import database.DatabaseHelper;
+import models.helpers.IdHelper;
 import play.Logger;
 import play.db.ebean.Transactional;
 
 @Entity
 public class SongBook extends Model {
 
-    public static final Long DEFAULT_SONGBOOK_ID = 1l;
+    public static final String DEFAULT_SONGBOOK_ID = "00000000";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    public Long id;
-
-    public Long masterId;
+    public String id;
 
     public String songBookName;
 
     public boolean privateSongbook = false;
-
-    private static DatabaseHelper dh = DatabaseHelper.getInstance();
 
     @ManyToMany
     public List<Song> songs = new ArrayList<>();
@@ -37,10 +33,10 @@ public class SongBook extends Model {
     public List<UserAccount> users = new ArrayList<>();
 
     public static SongBook getDefaultSongbook(UserAccount user) {
-        SongBook defaultSongbook = SongBook.getByMasterId(DEFAULT_SONGBOOK_ID);
+        SongBook defaultSongbook = SongBook.get(DEFAULT_SONGBOOK_ID);
         if (defaultSongbook == null) {
             defaultSongbook = new SongBook();
-            defaultSongbook.setMasterId(DEFAULT_SONGBOOK_ID);
+            defaultSongbook.setId(DEFAULT_SONGBOOK_ID);
             defaultSongbook.setSongBookName("default");
             defaultSongbook.setPrivateSongbook(false);
             defaultSongbook.save();
@@ -49,27 +45,21 @@ public class SongBook extends Model {
         return defaultSongbook;
     }
 
-    public static SongBook updateOrCreate(Long id, Long masterId, String songbookName, String userEmail, boolean isPrivateSongBook) {
+    public static SongBook updateOrCreate(String id, String songbookName, String userEmail, boolean isPrivateSongBook) {
         SongBook foundSongbook = null;
 
         // first search by master id
-        if (masterId != null) {
-            Logger.debug("Received songbook by master ID: " + id);
-            foundSongbook = getByMasterId(masterId);
-        }
-
-        if (id != null && masterId == null) {
+        if (id != null) {
+            Logger.debug("Received Songbook by ID: " + id);
             foundSongbook = get(id);
         } else {
             Logger.debug("Songbook ID is null");
         }
-        Logger.debug("Received songbook by ID: " + id);
 
-        // check if id and songbook name match - then only update existing
-        // song
+        // check if id and songbook name match - then only update existing songbook
         if (foundSongbook != null && foundSongbook.getSongBookName().equals(songbookName)) {
             // do nothing
-            Logger.debug("Found song by same ID and Name");
+            Logger.debug("Found song by same ID and Name : " + songbookName);
         } else {
             // try finding if I have songbook already by that name
             Logger.debug("Sent songbook ID does not match songbook Name: " + id + "->" + songbookName);
@@ -78,31 +68,23 @@ public class SongBook extends Model {
         }
         // now update private flag if needed
         if (foundSongbook != null) {
-            Logger.debug("Now updating songbook by ID: " + foundSongbook.getId());
+            Logger.debug("Now updating songbook with ID: " + foundSongbook.getId());
             if (foundSongbook.getPrivateSongbook() != isPrivateSongBook) {
                 foundSongbook.setPrivateSongbook(isPrivateSongBook);
                 foundSongbook.update();
             }
         }
+
         if (foundSongbook == null) {
-            Logger.debug("Not found songbook, creating new");
+            Logger.debug("Not found songbook, creating new.");
             foundSongbook = new SongBook();
             // try reusing songbook id
             if (id != null) {
                 Logger.debug("Trying to reuse songbook id: " + id);
-                // foundSongbook.setId(id);
-
             } else {
                 Logger.debug("New songbook id will be created");
-                // id = null;
-                foundSongbook.id = null;
+                foundSongbook.id = IdHelper.getRandomId();
             }
-
-            // get next available id if it is null
-            if (masterId == null) {
-                masterId = dh.getNextSongBookMasterId();
-            }
-            foundSongbook.setMasterId(masterId);
             foundSongbook.setSongBookName(songbookName);
             foundSongbook.setPrivateSongbook(isPrivateSongBook);
             foundSongbook.save();
@@ -152,12 +134,10 @@ public class SongBook extends Model {
 
     public static Finder<Long, SongBook> find = new Finder<>(SongBook.class);
 
-    public static SongBook get(Long id) {
-        return find.byId(id);
-    }
-
-    public static SongBook getByMasterId(Long masterId) {
-        return find.where().eq("master_id", masterId).findUnique();
+    public static SongBook get(String id) {
+        return find.where().eq("id", id).findUnique();
+        // TODO: try this after compilation
+        // return find.byId(id);
     }
 
     private static List<SongBook> getSongbooksOwnedByUser(String email) {
@@ -183,7 +163,7 @@ public class SongBook extends Model {
         } else {
             // iterate through all owned songbooks, ignore default one and return the matching one
             for (SongBook sb : foundSongBooks) {
-                if (sb.getMasterId().equals(SongBook.DEFAULT_SONGBOOK_ID)) {
+                if (sb.getId().equals(SongBook.DEFAULT_SONGBOOK_ID)) {
                     continue;
                 } else {
                     if (sb.getSongBookName().equals(songBookName)) {
@@ -220,7 +200,7 @@ public class SongBook extends Model {
         if (o instanceof SongBook) {
             if (((SongBook) o).getId() != null && ((SongBook) o).getId().equals(getId())) {
                 return true;
-            } else if (((SongBook) o).getMasterId() != null && ((SongBook) o).getMasterId().equals(getMasterId())) {
+            } else if (((SongBook) o).getId() != null && ((SongBook) o).getId().equals(getId())) {
                 return true;
             } else {
                 return false;
@@ -235,11 +215,11 @@ public class SongBook extends Model {
         return getId().hashCode();
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -273,14 +253,6 @@ public class SongBook extends Model {
 
     public void setUsers(List<UserAccount> users) {
         this.users = users;
-    }
-
-    public Long getMasterId() {
-        return masterId;
-    }
-
-    public void setMasterId(Long masterId) {
-        this.masterId = masterId;
     }
 
 }

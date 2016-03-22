@@ -161,8 +161,8 @@ public class SongImporter {
 		ObjectMapper mapper = new ObjectMapper();
 		//mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		try {
-			System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(SongLyrics.get(106L).getsongLyrics()));			
-			mapper.writeValue(new File("conf/songs.json"), SongLyrics.get(106L).getsongLyrics());
+			System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(SongLyrics.get("106L").getsongLyrics()));			
+			mapper.writeValue(new File("conf/songs.json"), SongLyrics.get("106L").getsongLyrics());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -213,10 +213,10 @@ public class SongImporter {
         System.out.println("########11");
         try {
             PrintWriter out = new PrintWriter("1324.txt");
-            out.println(SongLyrics.get(1324L).getsongLyrics());
+            out.println(SongLyrics.get("1324L").getsongLyrics());
             out.close();
             PrintWriter out2 = new PrintWriter("1323.txt");
-            out2.println(SongLyrics.get(1323L).getsongLyrics());
+            out2.println(SongLyrics.get("1323L").getsongLyrics());
             out2.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -228,7 +228,4 @@ public class SongImporter {
         //System.out.println("values: " + data.toString());
     }
 
-	public static void ttt() {
-		//Map data = (Map) Yaml.load("data/testing-data.yml");
-	}
 }

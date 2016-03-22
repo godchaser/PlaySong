@@ -1,7 +1,6 @@
 
 package rest.json;
 
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -12,13 +11,10 @@ public class ServiceSongJson {
     private String songName;
     @SerializedName("songId")
     @Expose
-    private Long songId;
-    @SerializedName("masterId")
-    @Expose
-    private Long masterId;
+    private String songId;
     @SerializedName("lyricsId")
     @Expose
-    private Long lyricsId;
+    private String lyricsId;
     @SerializedName("songKey")
     @Expose
     private String songKey;
@@ -28,8 +24,7 @@ public class ServiceSongJson {
 
     /**
      * 
-     * @return
-     *     The songName
+     * @return The songName
      */
     public String getSongName() {
         return songName;
@@ -38,7 +33,7 @@ public class ServiceSongJson {
     /**
      * 
      * @param songName
-     *     The songName
+     *            The songName
      */
     public void setSongName(String songName) {
         this.songName = songName;
@@ -46,44 +41,41 @@ public class ServiceSongJson {
 
     /**
      * 
-     * @return
-     *     The songId
+     * @return The songId
      */
-    public Long getSongId() {
+    public String getSongId() {
         return songId;
     }
 
     /**
      * 
      * @param songId
-     *     The songId
+     *            The songId
      */
-    public void setSongId(Long songId) {
+    public void setSongId(String songId) {
         this.songId = songId;
     }
 
     /**
      * 
-     * @return
-     *     The lyricsId
+     * @return The lyricsId
      */
-    public Long getLyricsId() {
+    public String getLyricsId() {
         return lyricsId;
     }
 
     /**
      * 
      * @param lyricsId
-     *     The lyricsId
+     *            The lyricsId
      */
-    public void setLyricsId(Long lyricsId) {
+    public void setLyricsId(String lyricsId) {
         this.lyricsId = lyricsId;
     }
 
     /**
      * 
-     * @return
-     *     The songKey
+     * @return The songKey
      */
     public String getSongKey() {
         return songKey;
@@ -92,7 +84,7 @@ public class ServiceSongJson {
     /**
      * 
      * @param songKey
-     *     The songKey
+     *            The songKey
      */
     public void setSongKey(String songKey) {
         this.songKey = songKey;
@@ -100,8 +92,7 @@ public class ServiceSongJson {
 
     /**
      * 
-     * @return
-     *     The songLyrics
+     * @return The songLyrics
      */
     public String getSongLyrics() {
         return songLyrics;
@@ -110,17 +101,10 @@ public class ServiceSongJson {
     /**
      * 
      * @param songLyrics
-     *     The songLyrics
+     *            The songLyrics
      */
     public void setSongLyrics(String songLyrics) {
         this.songLyrics = songLyrics;
     }
 
-	public Long getMasterId() {
-		return masterId;
-	}
-
-	public void setMasterId(Long masterId) {
-		this.masterId = masterId;
-	}
 }

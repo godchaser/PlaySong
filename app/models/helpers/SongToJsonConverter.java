@@ -35,13 +35,14 @@ public class SongToJsonConverter {
             songLyricsIDsArray.add(lyrics.getsongLyricsId());
         }
 
-        ObjectNode songObject = convert(s.songName, s.songLink, s.songOriginalTitle, s.songAuthor, s.id, s.masterId, s.songImporter, s.dateCreated.getTime(), s.dateModified.getTime(), s.getPrivateSong(),
-                songLyricsIDsArray, s.getSongbooks());
+        ObjectNode songObject = convert(s.songName, s.songLink, s.songOriginalTitle, s.songAuthor, s.id, s.songImporter, s.dateCreated.getTime(), s.dateModified.getTime(),
+                s.getPrivateSong(), songLyricsIDsArray, s.getSongbooks());
 
         return songObject;
     }
 
-    public static ObjectNode convert(String songName, String songLink, String songOriginalTitle, String songAuthor, Long id, Long masterId, String songImporter, ArrayList<String> songLyricsIDsArrayList) {
+    public static ObjectNode convert(String songName, String songLink, String songOriginalTitle, String songAuthor, String id, String songImporter,
+            ArrayList<String> songLyricsIDsArrayList) {
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode songLyricsIDs = mapper.createObjectNode();
@@ -58,14 +59,13 @@ public class SongToJsonConverter {
         songObject.put("songOriginalTitle", songOriginalTitle);
         songObject.put("songAuthor", songAuthor);
         songObject.put("songId", id);
-        songObject.put("masterId", masterId);
         songObject.put("songImporter", songImporter);
         songObject.putArray("songLyricsIDs").addAll(songLyricsIDsArray);
 
         return songObject;
     }
 
-    public static ObjectNode convert(String songName, String songLink, String songOriginalTitle, String songAuthor, Long id, Long songMasterId, String songImporter, Long dateCreated, Long dateModified,
+    public static ObjectNode convert(String songName, String songLink, String songOriginalTitle, String songAuthor, String id, String songImporter, Long dateCreated, Long dateModified,
             boolean privateSong, ArrayNode songLyricsIDsArray, List<SongBook> songbooks) {
 
         ObjectNode songObject = Json.newObject();
@@ -75,26 +75,24 @@ public class SongToJsonConverter {
         songObject.put("songOriginalTitle", songOriginalTitle);
         songObject.put("songAuthor", songAuthor);
         songObject.put("songId", id);
-        songObject.put("masterId", songMasterId);
         songObject.put("songImporter", songImporter);
         songObject.put("songImporter", songImporter);
         songObject.put("dateCreated", dateCreated);
         songObject.put("dateModified", dateModified);
         songObject.put("privateSong", privateSong);
 
-        //ObjectNode songbooksObject = Json.newObject();
+        // ObjectNode songbooksObject = Json.newObject();
         ArrayNode songbookArray = Json.newArray();
         for (SongBook songbook : songbooks) {
             ObjectNode songbookObject = Json.newObject();
             songbookObject.put("songBookName", songbook.getSongBookName());
             songbookObject.put("id", songbook.getId());
-            songbookObject.put("masterId", songbook.getMasterId());
             songbookObject.put("privateSongbook", songbook.getPrivateSongbook());
             songbookArray.add(songbookObject);
         }
         songObject.putArray("songBooks").addAll(songbookArray);
-        //songObject.set("songBooks", songbooksObject);
-        
+        // songObject.set("songBooks", songbooksObject);
+
         songObject.putArray("songLyricsIDs").addAll(songLyricsIDsArray);
 
         return songObject;
@@ -107,7 +105,6 @@ public class SongToJsonConverter {
         songLyricsObject.put("songLyricsId", s.getId());
         songLyricsObject.put("songLyrics", s.getsongLyrics());
         songLyricsObject.put("songKey", s.getSongKey());
-        songLyricsObject.put("songId", s.getSong().getMasterId());
 
         return songLyricsObject;
     }
@@ -118,7 +115,7 @@ public class SongToJsonConverter {
         for (ServiceSong ss : s.getSongs()) {
             ObjectNode serviceObject = Json.newObject();
             serviceObject.put("songName", ss.getSongName());
-            serviceObject.put("songId", ss.getMasterId());
+            serviceObject.put("songId", ss.getSongId());
             serviceObject.put("lyricsId", ss.getLyricsId());
             serviceObject.put("songKey", ss.getSongKey());
             serviceObject.put("songLyrics", ss.getSongLyrics());
@@ -137,13 +134,11 @@ public class SongToJsonConverter {
     }
 
     public static List<ObjectNode> convert(List<Service> serviceList) {
-        // ObjectNode servicesObject = Json.newObject();
         ArrayList<ObjectNode> servicesArray = new ArrayList<>();
         for (Service s : serviceList) {
             servicesArray.add(convert(s));
         }
-        // servicesObject.putArray("services").addAll(servicesArray);
-        // return servicesObject;
+
         return servicesArray;
     }
 

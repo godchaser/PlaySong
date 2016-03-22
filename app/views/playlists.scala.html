@@ -35,10 +35,10 @@
 							<li><i class="fa fa-music"></i>  @song.songName</li>
 						}
 						</ol>				
-						<a href="@routes.Application.generateService(service.id.toString())" download><i class="fa fa-download"></i> Download playlist </a>					
-						<a href='@routes.Application.generateService(service.id.toString()+"_x0")' download><i class="fa fa-download"></i> No chords</a>			
-					    <a href='@routes.Application.generateService(service.id.toString()+"_0c")' download><i class="fa fa-download"></i> No columns</a>							
-					    <a href='@routes.Application.generateService(service.id.toString()+"_xc")' download><i class="fa fa-download"></i> No chords&columns</a>
+						<a href="@routes.Playlists.generateService(service.id.toString())" download><i class="fa fa-download"></i> Download playlist </a>					
+						<a href='@routes.Playlists.generateService(service.id.toString()+"_x0")' download><i class="fa fa-download"></i> No chords</a>			
+					    <a href='@routes.Playlists.generateService(service.id.toString()+"_0c")' download><i class="fa fa-download"></i> No columns</a>							
+					    <a href='@routes.Playlists.generateService(service.id.toString()+"_xc")' download><i class="fa fa-download"></i> No chords&columns</a>
 					</li>
 					}
 				</ul>
@@ -72,11 +72,11 @@
 				var userColumns = document.getElementById('use-columns-checkbox').checked;
 											
 				/*
-				$.ajax("@routes.Application.generateSongbook()", {
+				$.ajax("@routes.Playlists.generateSongbook()", {
 					type : 'GET',
 					data : JSON.stringify(songBookData),
 					success : function(data) {
-						var link = "@routes.Application.downloadAndDeleteFile()";
+						var link = "@routes.Playlists.downloadAndDeleteFile()";
 						link = link.concat("?hash=" + data);
 						link = link.concat("&format=" + format);
 						window.open(link, '_self');

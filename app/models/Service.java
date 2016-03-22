@@ -14,11 +14,8 @@ import com.avaje.ebean.Model;
 public class Service extends Model {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE)
-	public Long id;
+	public String id;
 	
-	public Long masterId;
-
 	@Required
 	public String userEmail;
 	@Required
@@ -29,19 +26,17 @@ public class Service extends Model {
 	
 	public String serviceName;
 
-	public static Service get(Long id) {
-        return find.byId(id);
+	public static Service get(String id) {
+        return find.where().eq("id", id).findUnique();
+        // TODO: try this after compilation
+        // return find.byId(id);
     }
 	
-	public static Service getByMasterId(Long masterId) {
-		return find.where().eq("master_id", masterId).findUnique();
-    }
-	
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	public String getUserEmail() {
@@ -84,7 +79,6 @@ public class Service extends Model {
 		this.serviceName = serviceName;
 	}
 
-
 	@Formats.DateTime(pattern = "dd-MM-yyyy_hhmm")
 	public Date dateCreated = new Date();
 
@@ -93,15 +87,8 @@ public class Service extends Model {
     public static List <Service> all (){
 		return find.all();
 	}
-	public static void delete(Long id) {
-		find.byId(id).delete();
+	public static void deleteById(String id) {
+		get(id).delete();
 	}
 
-	public Long getMasterId() {
-		return masterId;
-	}
-
-	public void setMasterId(Long masterId) {
-		this.masterId = masterId;
-	}
 }

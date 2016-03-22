@@ -43,13 +43,13 @@ public class PlaySongRestService extends Observable {
     public static final String KEY_FAVORITES_FETCHED = "Song Favorites Fetched";
 
     private PlaySongService playsong;
-    private DatabaseHelper db = DatabaseHelper.getInstance();
+    private DatabaseHelper db;
 
     
     public PlaySongRestService() {
         // addObserver(observer);
         setUpRestConnection();
-        DatabaseHelper db = DatabaseHelper.getInstance();
+        db = DatabaseHelper.getInstance();
     }
 
     private void setUpRestConnection() {
@@ -83,7 +83,7 @@ public class PlaySongRestService extends Observable {
                     // 200
                     Logger.trace("PlaySongRestService", "Song Data successfully fetched");
                     Logger.trace("PlaySongRestService", "Writing song data to db");
-                    List<Long> updatedSongs = db.writeJsonSongsToDb(Arrays.asList((SongsJson[]) model), userEmail);
+                    List<String> updatedSongs = db.writeJsonSongsToDb(Arrays.asList((SongsJson[]) model), userEmail);
                     Logger.trace("PlaySongRestService", "Notifying observer that songs are fetched");
                     setChanged();
                     // notifyObservers(updatedSongs);
@@ -98,7 +98,7 @@ public class PlaySongRestService extends Observable {
         });
     }
 
-    private void getSongLyrics(final List<Long> updatedSongs) {
+    private void getSongLyrics(final List<String> updatedSongs) {
         // Fetching song lyrics json data
         Call<SongLyricsJson[]> getsonglyricscall = playsong.getSongLyrics();
         getsonglyricscall.enqueue(new Callback<SongLyricsJson[]>() {
@@ -160,7 +160,7 @@ public class PlaySongRestService extends Observable {
                     // 200
                     Logger.trace("PlaySongRestService", "Favorites Song Data successfully fetched");
                     Logger.trace("PlaySongRestService", "Writing favorites song data to db");
-                    List<Long> updatedFavorites = db.writeJsonFavoritesSongsToDb(Arrays.asList(model));
+                    List<String> updatedFavorites = db.writeJsonFavoritesSongsToDb(Arrays.asList(model));
                     Logger.trace("PlaySongRestService", "Notifying observer that favorites songs are fetched");
                     setChanged();
                     notifyObservers(KEY_FAVORITES_FETCHED);
@@ -219,7 +219,7 @@ public class PlaySongRestService extends Observable {
     }
 
     // NOT USED CURRENTLY
-    public void downloadSongLyricsData(List<Long> updatedSongs) {
+    public void downloadSongLyricsData(List<String> updatedSongs) {
         getSongLyrics(updatedSongs);
     }
 

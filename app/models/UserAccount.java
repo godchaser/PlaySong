@@ -66,7 +66,7 @@ public class UserAccount extends Model {
         Logger.debug("Removed songbook from user");
     }
 
-    public boolean containsSongbook(Long id) {
+    public boolean containsSongbook(String id) {
         SongBook searchedSongbook = new SongBook();
         searchedSongbook.setId(id);
         return getSongbooks().contains(searchedSongbook);

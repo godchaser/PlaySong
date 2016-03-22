@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -19,6 +20,7 @@ import javax.persistence.Transient;
 import com.avaje.ebean.Model;
 
 import database.DatabaseHelper;
+import models.helpers.IdHelper;
 import models.helpers.SongSuggestion;
 import play.Logger;
 import play.data.format.Formats;
@@ -31,10 +33,7 @@ import play.data.validation.Constraints.Required;
 public class Song extends Model implements Comparator<Song> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    public Long id;
-
-    public Long masterId;
+    public String id;
 
     @Required
     public String songName;
@@ -50,8 +49,6 @@ public class Song extends Model implements Comparator<Song> {
     public String songLastModifiedBy;
 
     public boolean privateSong = false;
-
-    private static DatabaseHelper dh = DatabaseHelper.getInstance();
 
     @ManyToMany(mappedBy = "songs")
     public List<SongBook> songbooks = new ArrayList<SongBook>();
@@ -70,9 +67,8 @@ public class Song extends Model implements Comparator<Song> {
     @Transient
     public String songBookName;
     @Transient
-    public Long songBookId;
-    @Transient
-    public Long songBookmasterId;
+    public String songBookId;
+
     @Transient
     public boolean isPrivateSongBook;
 
@@ -84,8 +80,10 @@ public class Song extends Model implements Comparator<Song> {
         return find.all().size();
     }
 
-    public static Song get(Long id) {
-        return find.byId(id);
+    public static Song get(String id) {
+        return find.where().eq("id", id).findUnique();
+        // TODO: try this after compilation
+        // return find.byId(id);
     }
 
     public static Song getByMasterId(Long masterId) {
@@ -111,6 +109,10 @@ public class Song extends Model implements Comparator<Song> {
             for (SongLyrics songLyrics : song.songLyrics) {
                 songLyrics.updateSongKeys();
                 songLyrics.sanitizeLyrics();
+                //create song lyrics id if not present
+                if (songLyrics.getId() == null) {
+                    songLyrics.setId(IdHelper.getRandomId());
+                }
             }
         } else {
             Logger.debug("Song does not have lyrics");
@@ -126,37 +128,36 @@ public class Song extends Model implements Comparator<Song> {
             song.setSongBook(activeSongbook, userEmail);
         } else {
             Logger.debug("Updating or creating new songbook");
-            activeSongbook = SongBook.updateOrCreate(song.getSongBookId(), song.getSongBookmasterId(), song.getSongBookName(), userEmail, song.getPrivateSongBook());
+            activeSongbook = SongBook.updateOrCreate(song.getSongBookId(), song.getSongBookName(), userEmail, song.getPrivateSongBook());
             song.setSongBook(activeSongbook, userEmail);
         }
 
-
+        // SONG HANDLING
         boolean createNewSong = false;
-        
-        if (song.masterId == null) {
+
+        if (song.id == null) {
             // create new song
             createNewSong = true;
-        } else if (song.masterId != null) {
-            Song foundSong = Song.getByMasterId(song.masterId);
+        } else if (song.id != null) {
+            // looking for song - if not found create new
+            Song foundSong = Song.get(song.id);
             if (foundSong == null) {
                 createNewSong = true;
             }
         }
 
+        Date date = new Date();
         // create new song
         if (createNewSong) {
-            song.id = null;
-            song.masterId = dh.getNextSongMasterId();
-            Logger.debug("Saving new song - while master song ID is not in db: " + song.masterId);
-            Date date = new Date();
+            song.setId(IdHelper.getRandomId());
+            Logger.debug("Saving song - by ID: " + song.id);
             song.setDateCreated(date);
             song.setDateModified(date);
             song.save();
         }
-        // update it
+        // update existing song
         else {
-            Logger.debug("Updating song - while song found by master ID: " + song.masterId);
-            Date date = new Date();
+            Logger.debug("Updating song - by ID: " + song.id);
             song.setDateModified(date);
             song.update();
         }
@@ -185,8 +186,8 @@ public class Song extends Model implements Comparator<Song> {
         }
     }
 
-    public static void delete(Long id) {
-        Song thisSong = find.ref(id);
+    public static void deleteById(String id) {
+        Song thisSong = Song.get(id);
 
         // first delete all associatons toward this song
         for (SongBook songbook : thisSong.getSongbooks()) {
@@ -245,11 +246,11 @@ public class Song extends Model implements Comparator<Song> {
         return songCreatedList;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -349,11 +350,11 @@ public class Song extends Model implements Comparator<Song> {
         this.songBookName = songBookName;
     }
 
-    public Long getSongBookId() {
+    public String getSongBookId() {
         return songBookId;
     }
 
-    public void setSongBookId(Long songBookId) {
+    public void setSongBookId(String songBookId) {
         this.songBookId = songBookId;
     }
 
@@ -377,22 +378,6 @@ public class Song extends Model implements Comparator<Song> {
     @Override
     public int hashCode() {
         return getId().hashCode();
-    }
-
-    public Long getMasterId() {
-        return masterId;
-    }
-
-    public void setMasterId(Long masterId) {
-        this.masterId = masterId;
-    }
-
-    public Long getSongBookmasterId() {
-        return songBookmasterId;
-    }
-
-    public void setSongBookmasterId(Long songBookmasterId) {
-        this.songBookmasterId = songBookmasterId;
     }
 
 }

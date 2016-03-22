@@ -1,4 +1,4 @@
-@(songs: List[Song],  songBooks : List [SongBook], songBookId: Long, user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
+@(songs: List[Song],  songBooks : List [SongBook], songBookId: String, user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
 
 @admintheme("", user, songsModified, songsCreated) {
 	<!-- 
@@ -38,7 +38,7 @@
 		  <option value="1">All Songs</option>
 		   @if(songBooks.size>0){
 			  @songBooks.map { songBookItem =>
-			  	   @if(songBookItem.getMasterId()!=1){
+			  	   @if(songBookItem.getId()!=1){
 			  	    	@if(songBookItem.getId().equals(songBookId)){
 					    	<option value="@songBookItem.getId()" selected>@songBookItem.getSongBookName()</option>
 					    }else {
@@ -144,7 +144,7 @@
 		$("#select-songbooks").change(function(){
 		   console.log("value changed" + this.value);
 		   var selectedSongbookId = this.value;
-		   var songBookDefaultUrl = "@routes.Application.playlistmaker(1)";
+		   var songBookDefaultUrl = "@routes.Application.playlistmaker("1")";
 		   var songBookUrl = songBookDefaultUrl.substring(0,songBookDefaultUrl.length-1) + selectedSongbookId;
 		   window.open(songBookUrl, '_self');
 		});
@@ -320,11 +320,11 @@
 											
 				console.log("HERE IS JSON OBJECT:");
 				console.log(songBookData);
-				$.ajax("@routes.Application.generateSongbook()", {
+				$.ajax("@routes.Playlists.generateSongbook()", {
 					type : 'POST',
 					data : JSON.stringify(songBookData),
 					success : function(data) {
-						var link = "@routes.Application.downloadAndDeleteFile()";
+						var link = "@routes.Playlists.downloadAndDeleteFile()";
 						link = link.concat("?hash=" + data);
 						link = link.concat("&format=" + format);
 						window.open(link, '_self');

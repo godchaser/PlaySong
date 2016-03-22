@@ -1,4 +1,4 @@
-@(id: Long, user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
+@(id: String, user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
 
 @admintheme("Song Viewer", user, songsModified, songsCreated) {
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jquery.transposer.css")">
@@ -36,7 +36,7 @@
 
 	var id =   @id;
 	function songView(id) {
-	jsRoutes.controllers.Application.getsongbymasteridjson ( id ).ajax ( {
+	jsRoutes.controllers.Rest.getsongjson(id).ajax( {
 	datatype : 'json',
 	success : function ( data ) {
 	var songLyricsIDs = [];
@@ -53,7 +53,7 @@
 	songLyricsIDs = data.songLyricsIDs ;
 
 	$.each ( songLyricsIDs, function ( i, s ) {
-	jsRoutes.controllers.Application.getsonglyricsjson (s).ajax ( {
+	jsRoutes.controllers.Songs.getsonglyricsjson(s).ajax ( {
 	success : function (data) {
 	var songLyricsTag = '#songLyrics_' + i + '_songLyrics' ;
 	//console.log(songLyricsTag);

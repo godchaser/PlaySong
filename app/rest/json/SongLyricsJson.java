@@ -8,10 +8,7 @@ public class SongLyricsJson {
 
     @SerializedName("songLyricsId")
     @Expose
-    private Long songLyricsId;
-    @SerializedName("masterId")
-    @Expose
-    private Long masterId;
+    private String songLyricsId;
     @SerializedName("songLyrics")
     @Expose
     private String songLyrics;
@@ -20,30 +17,28 @@ public class SongLyricsJson {
     private String songKey;
     @SerializedName("songId")
     @Expose
-    private Long songId;
+    private String songId;
 
     /**
      * 
-     * @return
-     *     The songLyricsId
+     * @return The songLyricsId
      */
-    public Long getSongLyricsId() {
+    public String getSongLyricsId() {
         return songLyricsId;
     }
 
     /**
      * 
      * @param songLyricsId
-     *     The songLyricsId
+     *            The songLyricsId
      */
-    public void setSongLyricsId(Long songLyricsId) {
+    public void setSongLyricsId(String songLyricsId) {
         this.songLyricsId = songLyricsId;
     }
 
     /**
      * 
-     * @return
-     *     The songLyrics
+     * @return The songLyrics
      */
     public String getSongLyrics() {
         return songLyrics;
@@ -52,7 +47,7 @@ public class SongLyricsJson {
     /**
      * 
      * @param songLyrics
-     *     The songLyrics
+     *            The songLyrics
      */
     public void setSongLyrics(String songLyrics) {
         this.songLyrics = songLyrics;
@@ -60,8 +55,7 @@ public class SongLyricsJson {
 
     /**
      * 
-     * @return
-     *     The songKey
+     * @return The songKey
      */
     public String getSongKey() {
         return songKey;
@@ -70,7 +64,7 @@ public class SongLyricsJson {
     /**
      * 
      * @param songKey
-     *     The songKey
+     *            The songKey
      */
     public void setSongKey(String songKey) {
         this.songKey = songKey;
@@ -78,28 +72,19 @@ public class SongLyricsJson {
 
     /**
      * 
-     * @return
-     *     The songId
+     * @return The songId
      */
-    public Long getSongId() {
+    public String getSongId() {
         return songId;
     }
 
     /**
      * 
      * @param songId
-     *     The songId
+     *            The songId
      */
-    public void setSongId(Long songId) {
+    public void setSongId(String songId) {
         this.songId = songId;
     }
-
-	public Long getMasterId() {
-		return masterId;
-	}
-
-	public void setMasterId(Long masterId) {
-		this.masterId = masterId;
-	}
 
 }

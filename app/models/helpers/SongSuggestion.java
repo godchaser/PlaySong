@@ -5,23 +5,23 @@ import java.util.Date;
 import play.data.format.Formats;
 
 public class SongSuggestion {
-	private Long id;
+	private String id;
 	private String songName;
 	
 	@Formats.DateTime(pattern = "dd/MM/yyyy hh:mm")
 	private Date dateModified;
 
-	public SongSuggestion(Long id, String songName, Date dateModified) {
+	public SongSuggestion(String id, String songName, Date dateModified) {
 		this.id = id;
 		this.songName = songName;
 		this.dateModified = dateModified;
 	}
 
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
