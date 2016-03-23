@@ -29,11 +29,20 @@
 			</div>
 			<div class="col-lg-3 col-md-
             @helper.textarea(field = songForm("songLyrics[0].songLyrics"), args = '_label -> "Lyrics: ", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
+            @helper.textarea(field = songForm("songLyrics[0].id"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")        
+            
             @helper.textarea(field = songForm("songLyrics[1].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
+            @helper.textarea(field = songForm("songLyrics[1].id"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")        
+            
             @helper.textarea(field = songForm("songLyrics[2].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
+            @helper.textarea(field = songForm("songLyrics[2].id"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")        
+            
             @helper.textarea(field = songForm("songLyrics[3].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")           
+            @helper.textarea(field = songForm("songLyrics[3].id"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")        
+            
             @helper.inputText(songForm("id"), args = 'style -> "display:none;", 'hidden -> "hidden")
             @helper.inputText(songForm("songBookId"), args = 'style -> "display:none;", 'hidden -> "hidden")
+
 			</div>
             </div>          
         }
@@ -48,19 +57,15 @@
         $('#songEditor' ).remove();
 
         var songLyricsCount = 0;
-        var id = @id;
+        var id = "@id";
 
         $('#id').attr("value", id);
         $('label[for="id"]').hide();
 
         function CreateSongEditor(id){
-            $('label[for="songLyrics_1_songLyrics"]').hide();
-            $('label[for="songLyrics_2_songLyrics"]').hide();
-            $('label[for="songLyrics_3_songLyrics"]').hide();
-
             var songLyricsIDs = [];
-            if (id>0){
-                jsRoutes.controllers.Application.getsongjson(id).ajax({
+            if (id != "00000000"){
+                jsRoutes.controllers.Rest.getsongjson(id).ajax({
                     datatype: 'json',
                     success: function(data) {
                         $('#songName').attr("value", data.songName);
@@ -82,11 +87,14 @@
 
                         $.each(songLyricsIDs, function(i,s){
                             songLyricsCount = songLyricsCount + 1;
-                            jsRoutes.controllers.Application.getsonglyricsjson(s).ajax({
+                            jsRoutes.controllers.Rest.getsonglyricsjson(s).ajax({
                             success : function ( data ) {
                                 var songLyricsTag = '#songLyrics_' + i + '_songLyrics';
-                                $ (songLyricsTag).val (data.songLyrics);
+                                $ (songLyricsTag).val (data.songLyrics);                                      
                                 $ (songLyricsTag).attr ("style", "display:block;");
+                                
+                                var songLyricsIdTag = '#songLyrics_' + i + '_id';
+                                $(songLyricsIdTag).attr("value", s);    
                             },
                             error : function ( ) {
                                 console.log ( "Error: ajax failure" )
@@ -100,6 +108,12 @@
                     }
             })
             }
+            $('label[for="songLyrics_1_songLyrics"]').hide();
+            $('label[for="songLyrics_2_songLyrics"]').hide();
+            $('label[for="songLyrics_3_songLyrics"]').hide();
+            $('label[for="songLyrics_0_id"]').hide();
+            $('label[for="songLyrics_1_id"]').hide();
+            $('label[for="songLyrics_2_id"]').hide();
         }
         
         $("#songbook-select").change(function(){

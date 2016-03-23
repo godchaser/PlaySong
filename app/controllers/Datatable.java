@@ -77,7 +77,7 @@ public class Datatable extends Controller {
                 sqlQuery =  SqlQueries.sqlSelectSong
                             + SqlQueries.sqlFromSong
                             + SqlQueries.sqlJoin
-                            + "where u2.song_book_id = " + songBookIdFilter.toString() 
+                            + "where u2.song_book_id like '" + songBookIdFilter.toString()+"' "
                             + SqlQueries.sqlPrivateSongFalse
                             + "order by " + sortBy + " " + order;
                 // @formatter:on
@@ -86,7 +86,7 @@ public class Datatable extends Controller {
                 sqlQuery =  SqlQueries.sqlSelectSong
                             + SqlQueries.sqlFromSong
                             + SqlQueries.sqlJoin
-                            + "where u2.song_book_id = " + songBookIdFilter.toString() + " " 
+                            + "where u2.song_book_id like '" + songBookIdFilter.toString() + "' " 
                             + "order by " + sortBy + " " + order;
                 // @formatter:on
             }
@@ -101,7 +101,7 @@ public class Datatable extends Controller {
                             + SqlQueries.sqlFromSong
                             + SqlQueries.sqlJoin          
                             + "where lower(t0.song_name) like :songnamefilter "
-                            + "AND (u2.song_book_id = " + songBookIdFilter.toString() + SqlQueries.sqlPrivateSongFalse + ")) "
+                            + "AND (u2.song_book_id like '" + songBookIdFilter.toString() +"' "+ SqlQueries.sqlPrivateSongFalse + ")) "
                             + "UNION ALL "
                             
                             + "(" 
@@ -109,7 +109,7 @@ public class Datatable extends Controller {
                             + SqlQueries.sqlFromSong
                             + SqlQueries.sqlJoin  
                             + "where lower(t0.song_name) like :songnameinlinefilter "
-                            + "AND (u2.song_book_id = " + songBookIdFilter.toString() + SqlQueries.sqlPrivateSongFalse + ")) "
+                            + "AND (u2.song_book_id like '" + songBookIdFilter.toString() +"' "+ SqlQueries.sqlPrivateSongFalse + ")) "
                             + "UNION ALL "
                             
                             + "(" 
@@ -117,7 +117,7 @@ public class Datatable extends Controller {
                             + SqlQueries.sqlFromSong
                             + SqlQueries.sqlJoin     
                             + "where lower(u1.song_lyrics) like :songlyricsfilter "
-                            + "AND (u2.song_book_id = " + songBookIdFilter.toString() + SqlQueries.sqlPrivateSongFalse + ")) "
+                            + "AND (u2.song_book_id like= '" + songBookIdFilter.toString() +"' "+ SqlQueries.sqlPrivateSongFalse + ")) "
                             + "UNION ALL "
                             
                             + "(" 
@@ -125,7 +125,7 @@ public class Datatable extends Controller {
                             + SqlQueries.sqlFromSong
                             + SqlQueries.sqlJoin  
                             + "where lower(t0.song_author) like :songauthorfilter "
-                            + "AND (u2.song_book_id = " + songBookIdFilter.toString() + SqlQueries.sqlPrivateSongFalse +")"
+                            + "AND (u2.song_book_id like '" + songBookIdFilter.toString() +"' "+ SqlQueries.sqlPrivateSongFalse +")"
                             + ")";
                 
             } else {
@@ -134,7 +134,7 @@ public class Datatable extends Controller {
                         + SqlQueries.sqlFromSong
                         + SqlQueries.sqlJoin               
                         + "where lower(t0.song_name) like :songnamefilter "
-                        + "AND (u2.song_book_id = " + songBookIdFilter.toString()+")) "
+                        + "AND (u2.song_book_id like '" + songBookIdFilter.toString()+"')) "
                         + "UNION ALL "
                         
                         + "(" 
@@ -142,7 +142,7 @@ public class Datatable extends Controller {
                         + SqlQueries.sqlFromSong
                         + SqlQueries.sqlJoin   
                         + "where lower(t0.song_name) like :songnameinlinefilter "
-                        + "AND (u2.song_book_id = " + songBookIdFilter.toString() + ")) "
+                        + "AND (u2.song_book_id like '" + songBookIdFilter.toString() + "')) "
                         + "UNION ALL "
                         
                         + "(" 
@@ -150,7 +150,7 @@ public class Datatable extends Controller {
                         + SqlQueries.sqlFromSong
                         + SqlQueries.sqlJoin  
                         + "where lower(u1.song_lyrics) like :songlyricsfilter "
-                        + "AND (u2.song_book_id = " + songBookIdFilter.toString() + ")) "
+                        + "AND (u2.song_book_id like '" + songBookIdFilter.toString() + "')) "
                         + "UNION ALL "
                         
                         + "(" 
@@ -158,7 +158,7 @@ public class Datatable extends Controller {
                         + SqlQueries.sqlFromSong
                         + SqlQueries.sqlJoin    
                         + "where lower(t0.song_author) like :songauthorfilter "
-                        + "AND (u2.song_book_id = " + songBookIdFilter.toString() + "))";
+                        + "AND (u2.song_book_id like '" + songBookIdFilter.toString() + "'))";
             }
             queryResult = Ebean.createSqlQuery(sqlQuery)
                     .setParameter("songnamefilter", filter + "%")

@@ -10,8 +10,7 @@ GET      /admin                          controllers.Application.admin
 GET      /table                          controllers.Application.table
 GET      /playlistmaker/:id              controllers.Application.playlistmaker(id: String)
 GET      /playlists                      controllers.Application.services
-GET      /songeditor/:id                 controllers.Application.songeditor(id: String)
-GET      /newsongeditor                  controllers.Application.newsongeditor
+GET      /songeditor                	 controllers.Application.songeditor(id: String ?= "00000000")
 GET      /song/:id                   	 controllers.Application.songview(id: String)
 GET      /songsbackup                    controllers.Songs.songs
 GET      /suggestions                    controllers.Songs.songsuggestions
@@ -53,7 +52,7 @@ GET      /sanitize                       controllers.Operations.sanitizesongs
 GET      /test                           controllers.Operations.test
 
 # getting paginated data for data table
-GET      /getsongsdatatable/:songbookid  controllers.Datatable.getsongsdatatable(songbookid: String)
+GET      /datatable  					controllers.Datatable.getsongsdatatable(songbookid: String ?= "00000000")
 
 # REST user account management
 POST     /user                           controllers.Users.addUser

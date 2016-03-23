@@ -49,7 +49,7 @@ public class SongBook extends Model {
         SongBook foundSongbook = null;
 
         // first search by master id
-        if (id != null) {
+        if (id != null && !id.isEmpty()) {
             Logger.debug("Received Songbook by ID: " + id);
             foundSongbook = get(id);
         } else {
@@ -79,7 +79,7 @@ public class SongBook extends Model {
             Logger.debug("Not found songbook, creating new.");
             foundSongbook = new SongBook();
             // try reusing songbook id
-            if (id != null) {
+            if (id != null && !id.isEmpty()) {
                 Logger.debug("Trying to reuse songbook id: " + id);
             } else {
                 Logger.debug("New songbook id will be created");
@@ -102,7 +102,7 @@ public class SongBook extends Model {
             Logger.debug("Found user songbook: " + email + "->" + songbookEntry.getSongBookName());
             Logger.debug("Checking if she songbook is empty");
             // I should ignore default songbooks
-            if (songbookEntry.getSongs().isEmpty() && songbookEntry.getId() != SongBook.DEFAULT_SONGBOOK_ID) {
+            if (songbookEntry.getSongs().isEmpty() && !songbookEntry.getId().equals(SongBook.DEFAULT_SONGBOOK_ID)) {
                 Logger.debug("Deleting stale Songbook: " + songbookEntry.getSongBookName());
                 UserAccount ua = UserAccount.getByEmail(email);
                 // I have to remove all many to many relationship first, before

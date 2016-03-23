@@ -96,28 +96,47 @@ public class Song extends Model implements Comparator<Song> {
         boolean songHasSongLyrics = (song.getSongLyrics() != null && (song.getSongLyrics().size() > 0)) ? true : false;
 
         if (songHasSongLyrics) {
+            Logger.debug("Song has lyrics");
+            
             // delete empty lyrics
             List<SongLyrics> removedList = new ArrayList<SongLyrics>();
-            for (int i = 0; i < song.songLyrics.size(); i++) {
-                if (song.songLyrics.get(i).getsongLyrics().length() < 2) {
-                    removedList.add(song.songLyrics.get(i));
+
+            for (SongLyrics singleSongLyrics : song.songLyrics) {
+                if (singleSongLyrics.getsongLyrics().length() < 2) {
+                    Logger.debug("Removing empty lyrics");
+                    removedList.add(singleSongLyrics);
                 }
             }
+
+            // TODO: BUG I should now remove not empty lyrics - but I am removing them because of same reference
             song.songLyrics.removeAll(removedList);
-
+            
             // sanitize song lyrics
-            for (SongLyrics songLyrics : song.songLyrics) {
-                songLyrics.updateSongKeys();
-                songLyrics.sanitizeLyrics();
-                //create song lyrics id if not present
-                if (songLyrics.getId() == null) {
-                    songLyrics.setId(IdHelper.getRandomId());
+            for (SongLyrics singleSongLyrics : song.songLyrics) {
+                singleSongLyrics.updateSongKeys();
+                singleSongLyrics.sanitizeLyrics();
+                // create new song lyrics id if not present
+                if (singleSongLyrics.getId() == null || singleSongLyrics.getId().isEmpty()) {
+                    Logger.debug("Creating new song lyrics with random id");
+                    singleSongLyrics.setId(IdHelper.getRandomId());
+                } else {
+                    Logger.debug("Trying to reuse lyrics Id: " + singleSongLyrics.getId());
                 }
             }
-        } else {
-            Logger.debug("Song does not have lyrics");
+        } 
+        /*
+        // checking again for if song now does not have any lyrics
+        songHasSongLyrics = (song.getSongLyrics() != null && (song.getSongLyrics().size() > 0)) ? true : false;     
+        if (!songHasSongLyrics) {
+            Logger.debug("Song does not have lyrics - creating empty lyrics");
+            SongLyrics emptySongLyrics = new SongLyrics();
+            emptySongLyrics.setId(IdHelper.getRandomId());
+            emptySongLyrics.setsongLyrics("");
+            emptySongLyrics.setSong(song);
+            emptySongLyrics.save();
+            song.getSongLyrics().add(emptySongLyrics);
         }
-
+        */
         // SONGBOOK HANDLING
         // preparing songbook
         SongBook activeSongbook = null;

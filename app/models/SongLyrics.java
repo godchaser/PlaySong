@@ -105,5 +105,22 @@ public class SongLyrics extends Model {
     public void setSong(Song song) {
         this.song = song;
     }
+    
+    
+    /*
+    // used only for removal of empty lyrics by Collection remove all
+    @Override
+    public boolean equals(Object o) {
+        if ((o instanceof SongLyrics) && (((SongLyrics) o).getsongLyrics().equals(getsongLyrics()))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
+    @Override
+    public int hashCode() {
+        return getsongLyrics().hashCode();
+    }
+*/
 }

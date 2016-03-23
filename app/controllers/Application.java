@@ -76,12 +76,6 @@ public class Application extends Controller {
         return ok(songeditor.render(id, songForm, user, Song.getSongModifiedList(), Song.getSongCreatedList(), user.getSongbooks()));
     }
 
-    @Security.Authenticated(Secured.class)
-    public Result newsongeditor() {
-        String id = "-1";
-        return redirect(controllers.routes.Application.songeditor(id));
-    }
-
     public Result songview(String id) {
         UserAccount user = getUserFromCookie();
         return ok(songviewer.render(id, user, Song.getSongModifiedList(), Song.getSongCreatedList()));

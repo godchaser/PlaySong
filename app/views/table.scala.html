@@ -10,12 +10,11 @@
  -->
 <div hidden id="song_table_wrapper" class="panel panel-default hover" cellspacing="0" width="100%">
 	<h2>Songs 
-	
 	<select id="select-songbooks" class="selectpicker">
-		  <option value="1">All Songs</option>
+		  <option value="00000000">All Songs</option>
 		   @if(songBooks.size>0){
 			  @songBooks.map { songBookItem =>
-			  	    @if(songBookItem.getId()!=1){
+			  	    @if(!songBookItem.getId().equals("00000000")){
 				    	<option value="@songBookItem.getId()">@songBookItem.getSongBookName()</option>
 				    }
 			  	}
@@ -47,7 +46,7 @@
 			</div>
 		</div>
 
-		<div class="panel panel-default col-lg-6" id="song_section_div" hidden>
+		<div class="panel panel-default col-lg-6" id="song_section_div">
 			<div class="panel-body">
 				<div class="row">
 					<p class="inline-buttons">
@@ -101,25 +100,15 @@
 	//variable holding reference to selected songlyrics
 	var selectedSongLyricsID;
 	
-	//variable holding initial html of song
-	var initialLyricsSection = $("#song_section_div").html();
-	
 	var oTable;
 	
 	function updateLyricsPanel(lyricsID) {
 			//console.log("Updating lyrics panel with lyrics id: " + lyricsID);
-			jsRoutes.controllers.Application.getsonglyricsjson(lyricsID).ajax({
+			jsRoutes.controllers.Rest.getsonglyricsjson(lyricsID).ajax({
 				success : function(data) {
-					var hidden = $("#song_section_div").attr("hidden");
-					if (hidden) {
-						$("#song_section_div").toggle();
-						$("#song_section_div").removeAttr("hidden");
-					}
-					
-					$("#song_section_div").html(initialLyricsSection);
-					//$('.transpose-keys').remove();
 					$('#songLyrics').html(data.songLyrics);
 					$(function() {
+						$(".transpose-keys").hide();
 						$("#songLyrics").transpose();
 						// Automatic scrool into view if screen width smaller that 800px
 						if ($(window).width()<800) {
@@ -162,7 +151,7 @@
 				}
 		        break;
 		    case "addsongbutton":
-		        openSongEditor(-1);
+		        openSongEditor();
 		        break;
 		    case "deletesongbutton":
 		    	if (selectedSongID != null) {
@@ -183,7 +172,7 @@
 	
 	function updateSongLyrics(id, text){
 		//console.log("updating song lyrics: " + id);
-		jsRoutes.controllers.Application.updatesonglyricsjson(id).ajax({
+		jsRoutes.controllers.Rest.updatesonglyricsjson(id).ajax({
 			type : "POST",
 			data: {songLyrics : text},
 			success : function(data) {
@@ -211,8 +200,8 @@
 	}
 
 	function deleteSong(id) {
-		console.log("deletings song " + id);
-		jsRoutes.controllers.Application.deletesong(id).ajax({
+		//console.log("deletings song " + id);
+		jsRoutes.controllers.Songs.deletesong(id).ajax({
 			type : "DELETE",
 			success : function(data) {
 				$('#song_table').DataTable().ajax.reload();
@@ -269,12 +258,18 @@
 		
 		function selectRow(rowNumber){	
 			// disable songbutton-edit-actions buttons if no songs available	
+			//console.log("SongLyrics, size: " + oTable.DataTable().data().count());
 			if (!oTable.DataTable().data().count()){
 			    $(".songbutton-edit-actions").hide();
+			    $(".transpose-keys").hide();
 			    $("#songLyrics").hide();
-			    $("#song_section_div").show();				
+			    //$("#song_section_div").show();				
 				return;
+			}else {
+				$(".songbutton-edit-actions").show();
+				$("#songLyrics").show();
 			}
+			
 		
 			//console.log("page event fired");
 			var selectRow = true;
@@ -298,8 +293,11 @@
 			  		selectedSongID = $(selectFirstRow).attr('id');
 			  		selectedSongLyricsID = $(selectFirstRow).find('.lyrics-link' )[0].id;
 				  	selectFirstRow.addClass("selected-row");
-				  	
+				  	//console.log("selecting row by id: " + selectedSongLyricsID);
 			  		updateLyricsPanel(selectedSongLyricsID);
+		  		}
+		  		else {
+		  			console.log("no selected row");
 		  		}
 	  		}		
 		}
@@ -316,7 +314,7 @@
 				"bJQueryUI" : true,
 				"paginationType" : "full",
 				"stateSave": true,
-				"sAjaxSource" : "@routes.Datatable.getsongsdatatable("1")",
+				"sAjaxSource" : "@routes.Datatable.getsongsdatatable()",
 				//"dom": 'T<"clear">lfrtip',
 				"dom": '<f<t>lip>',
 				"drawCallback": function( settings ) {
@@ -377,8 +375,8 @@
 		$("#select-songbooks").change(function(){
 		   var selectedSongbookId = this.value;
 		   //var selectedSongbookName = $("#songbook-select option:selected").text();
-		   var songBookDefaultUrl = "@routes.Datatable.getsongsdatatable("1")";
-		   var songBookUrl = songBookDefaultUrl.substring(0,songBookDefaultUrl.length-1) + selectedSongbookId;
+		   var songBookDefaultUrl = "@routes.Datatable.getsongsdatatable()";
+		   var songBookUrl = songBookDefaultUrl +"?songbookid=" + selectedSongbookId;
 		   oTable.DataTable().ajax.url(songBookUrl).load();
 		});
 		
