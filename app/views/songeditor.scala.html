@@ -90,11 +90,12 @@
                             jsRoutes.controllers.Rest.getsonglyricsjson(s).ajax({
                             success : function ( data ) {
                                 var songLyricsTag = '#songLyrics_' + i + '_songLyrics';
-                                $ (songLyricsTag).val (data.songLyrics);                                      
-                                $ (songLyricsTag).attr ("style", "display:block;");
+                                $(songLyricsTag).val(data.songLyrics);
+                                $(songLyricsTag).attr("style", "display:block;");
                                 
                                 var songLyricsIdTag = '#songLyrics_' + i + '_id';
-                                $(songLyricsIdTag).attr("value", s);    
+                                //$(songLyricsIdTag).attr("value", s);
+                                $(songLyricsIdTag).val(s);
                             },
                             error : function ( ) {
                                 console.log ( "Error: ajax failure" )
@@ -114,6 +115,7 @@
             $('label[for="songLyrics_0_id"]').hide();
             $('label[for="songLyrics_1_id"]').hide();
             $('label[for="songLyrics_2_id"]').hide();
+            $('label[for="songLyrics_3_id"]').hide();
         }
         
         $("#songbook-select").change(function(){
