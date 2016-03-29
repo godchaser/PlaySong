@@ -7,8 +7,8 @@ import java.util.List;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlRow;
 
-import models.Service;
-import models.ServiceSong;
+import models.Playlist;
+import models.PlaylistSong;
 import models.Song;
 import models.SongBook;
 import models.SongLyrics;
@@ -158,15 +158,17 @@ public class DatabaseHelper {
 
     public List<String> writeJsonFavoritesSongsToDb(List<ServiceJson> servicesJson) {
         List<String> updatedFavorites = new ArrayList<>();
+        //TODO: conform this to new playlist structure
+        /*
         Logger.trace("PlaySongDatabase : Trying to writes json favorites to db");
         for (ServiceJson favorite : servicesJson) {
-            Service favoriteDb = new Service();
-            Service foundService = null;
+            Playlist favoriteDb = new Playlist();
+            Playlist foundService = null;
             // don't set local ids, but only master ids
             // favoriteDb.setId(favorite.getId());
             if (favorite.getId() != null) {
                 favoriteDb.setId(favorite.getId());
-                foundService = Service.get(favorite.getId());
+                foundService = Playlist.get(favorite.getId());
             } else {
                 // TODO: remove this temp workaround - because I currently don't have master id in db
                 favoriteDb.setId(favorite.getId());
@@ -197,17 +199,17 @@ public class DatabaseHelper {
             Logger.trace("PlaySongDatabase : Saving service");
             for (ServiceSongJson serviceSongJson : favorite.getServiceSongJsons()) {
                 Logger.trace("PlaySongDatabase : Processing " + "");
-                ServiceSong favoriteSong = new ServiceSong();
-                Service favoriteMatch = null;
+                PlaylistSong favoriteSong = new PlaylistSong();
+                Playlist favoriteMatch = null;
 
                 // don't set local ids, but only master ids
                 // favoriteDb.setId(favorite.getId());
                 if (favoriteSong.getSongId() != null) {
                     favoriteDb.setId(favoriteSong.getSongId());
-                    favoriteMatch = Service.get(favorite.getId());
+                    favoriteMatch = Playlist.get(favorite.getId());
                 } else {
                     // TODO: remove this temp workaround - because I currently don't have master id in db
-                    favoriteMatch = Service.get(favorite.getId());
+                    favoriteMatch = Playlist.get(favorite.getId());
                     favoriteSong.setSongId(favorite.getId());
                 }
 
@@ -225,6 +227,7 @@ public class DatabaseHelper {
             }
             updatedFavorites.add(favorite.getId());
         }
+        */
         return updatedFavorites;
     }
 

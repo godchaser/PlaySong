@@ -11,7 +11,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import models.Service;
+import models.Playlist;
 import models.Song;
 import models.SongBook;
 import models.UserAccount;
@@ -78,6 +78,7 @@ public class Application extends Controller {
 
     public Result songview(String id) {
         UserAccount user = getUserFromCookie();
+        //Logger.debug("song view id: "+ id);
         return ok(songviewer.render(id, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
     }
 
@@ -121,13 +122,13 @@ public class Application extends Controller {
         return ok(playlistmaker.render(sortedSongs, new ArrayList<SongBook>(songbooksWithoutDuplicates), id, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
     }
 
-    public Result services() {
+    public Result playlists() {
         UserAccount user = getUserFromCookie();
 
-        List<Service> serviceList = Service.find.all();
+        List<Playlist> playlistList = Playlist.find.all();
         // sort by date created
-        Collections.sort(serviceList, new Comparator<Service>() {
-            public int compare(Service o1, Service o2) {
+        Collections.sort(playlistList, new Comparator<Playlist>() {
+            public int compare(Playlist o1, Playlist o2) {
                 if (o1.getDateCreated() == null || o2.getDateCreated() == null)
                     return 0;
                 return o1.getDateCreated().compareTo(o2.getDateCreated());
@@ -135,16 +136,16 @@ public class Application extends Controller {
         });
 
         // Manual sorting because of JPA OrderBy bidirectional relationship bug
-        for (Service service : serviceList) {
-            Collections.sort(service.getSongs());
+        for (Playlist playlist : playlistList) {
+            Collections.sort(playlist.getSongs());
         }
 
-        return ok(playlists.render(serviceList, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
+        return ok(playlists.render(playlistList, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
     }
 
     public Result login() {
         String redirecturl = flash().get("url");
-        Logger.debug("Login flash redirect url: " + redirecturl);
+        //Logger.debug("Login flash redirect url: " + redirecturl);
         if (redirecturl != null) {
             flash().put("url", redirecturl);
         }
@@ -183,7 +184,7 @@ public class Application extends Controller {
                 redirecturl = "/";
             }
             Logger.debug("Successfull login for: " + email);
-            Logger.debug("Redirecting to: " + redirecturl);
+            //Logger.debug("Redirecting to: " + redirecturl);
             return redirect(redirecturl);
         }
     }
@@ -212,11 +213,12 @@ public class Application extends Controller {
                 controllers.routes.javascript.Application.login(),
                 controllers.routes.javascript.Application.songeditor(),
                 controllers.routes.javascript.Application.playlistmaker(), 
-                controllers.routes.javascript.Application.services(),
+                controllers.routes.javascript.Application.playlists(),
                 controllers.routes.javascript.Songs.deletesong(), 
                 controllers.routes.javascript.Songs.songsuggestions(), 
-                controllers.routes.javascript.Playlists.generateService(), 
-                controllers.routes.javascript.Playlists.deleteservice(), 
+                controllers.routes.javascript.Playlists.downloadPlaylist(), 
+                controllers.routes.javascript.Playlists.generatePlaylist(), 
+                controllers.routes.javascript.Playlists.deletePlayList(), 
                 controllers.routes.javascript.Users.addUser(), 
                 controllers.routes.javascript.Users.getUser(), 
                 controllers.routes.javascript.Users.deleteUser(),

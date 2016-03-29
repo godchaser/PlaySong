@@ -9,7 +9,7 @@ GET      /                               controllers.Application.index
 GET      /admin                          controllers.Application.admin
 GET      /table                          controllers.Application.table
 GET      /playlistmaker/:id              controllers.Application.playlistmaker(id: String)
-GET      /playlists                      controllers.Application.services
+GET      /playlists                      controllers.Application.playlists
 GET      /songeditor                	 controllers.Application.songeditor(id: String ?= "00000000")
 GET      /song/:id                   	 controllers.Application.songview(id: String)
 GET      /songsbackup                    controllers.Songs.songs
@@ -34,10 +34,10 @@ GET      /json/songbooks              	 controllers.Rest.getsongbooksdata
 
 
 # Playlist handling
-POST     /playlist               		 controllers.Playlists.generateSongbook
+POST     /playlist               		 controllers.Playlists.generatePlaylist
 GET      /playlist               	     controllers.Playlists.downloadAndDeleteFile
-GET      /playlist/:id                   controllers.Playlists.generateService(id: String)
-DELETE   /playlist/:id                   controllers.Playlists.deleteservice(id: String)
+GET      /playlist/:id                   controllers.Playlists.downloadPlaylist(id: String)
+DELETE   /playlist/:id                   controllers.Playlists.deletePlayList(id: String)
 
 ##Various operations
 # used for db init

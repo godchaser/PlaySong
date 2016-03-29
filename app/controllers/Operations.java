@@ -55,18 +55,7 @@ public class Operations extends Controller {
 
     @Transactional
     public Result inituser() {
-        try {
-            Ebean.createSqlUpdate("delete from user_account").execute();
-            UserAccount test = new UserAccount("test@test.com", "test", "test");
-            test.save();
-            test.setDefaultSongbook();
-            test.update();
-        } catch (Exception e) {
-            Logger.error("Exception occured during init" + e.getStackTrace());
-            e.printStackTrace();
-            System.out.print(e.getStackTrace());
-            System.out.print(e.getMessage());
-        }
+        UserAccount.initDefaultUser();
         return redirect(controllers.routes.Application.index());
     }
     

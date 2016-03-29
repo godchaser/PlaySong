@@ -5,8 +5,14 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import play.data.validation.Constraints.Required;
+
+import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Model;
+
+import database.SqlQueries;
 import play.Logger;
 
 @Entity
@@ -19,7 +25,14 @@ public class UserAccount extends Model {
     public String name;
     @Required
     public String password;
-
+    
+    @Transient
+    public static String defaultUserEmail = "test@test.com"; 
+    @Transient
+    public static String defaultUserName = "test";
+    @Transient
+    public static String defaultUserPassword = "test";
+    
     @ManyToMany
     public List<SongBook> songbooks = new ArrayList<SongBook>();
 
@@ -72,6 +85,21 @@ public class UserAccount extends Model {
         return getSongbooks().contains(searchedSongbook);
     }
 
+    public static void initDefaultUser() {
+        try {
+            Ebean.createSqlUpdate(SqlQueries.sqlDeleteAllUserAccounts).execute();
+            UserAccount test = new UserAccount(defaultUserEmail, defaultUserName, defaultUserPassword);
+            test.save();
+            test.setDefaultSongbook();
+            test.update();
+        } catch (Exception e) {
+            Logger.error("Exception occured during init" + e.getStackTrace());
+            e.printStackTrace();
+            System.out.print(e.getStackTrace());
+            System.out.print(e.getMessage());
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if ((o instanceof UserAccount) && (((UserAccount) o).getEmail().equals(getEmail()))) {
@@ -116,6 +144,11 @@ public class UserAccount extends Model {
 
     public void setSongbooks(List<SongBook> songbooks) {
         this.songbooks = songbooks;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 
 }

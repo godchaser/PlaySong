@@ -7,7 +7,7 @@ import javax.inject.Inject;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import models.Service;
+import models.Playlist;
 import models.Song;
 import models.SongBook;
 import models.SongLyrics;
@@ -54,7 +54,7 @@ public class Rest extends Controller {
     }
 
     public Result getfavoritessongsdata() {
-        List<Service> services = Service.all();
+        List<Playlist> services = Playlist.all();
         return ok(Json.toJson(SongToJsonConverter.convert(services)));
     }
 

@@ -37,8 +37,8 @@ import document.tools.DocxGenerator;
 import document.tools.PdfGenerator;
 import document.tools.XlsHelper;
 import document.tools.XmlSongsParser;
-import models.Service;
-import models.ServiceSong;
+import models.Playlist;
+import models.PlaylistSong;
 import models.Song;
 import models.SongBook;
 import models.SongLyrics;
@@ -48,7 +48,7 @@ import models.helpers.PdfPrintable;
 import models.helpers.SongPrint;
 import models.helpers.SongTableData;
 import models.helpers.SongToJsonConverter;
-import models.json.JsonSongbook;
+import models.json.JsonPlaylist;
 import play.Logger;
 import play.data.DynamicForm;
 import play.data.Form;
@@ -172,18 +172,18 @@ public class Songs extends Controller {
                 .setParameter("songauthorfilter", "%" + filter + "%")
                 .findList();
         //@formatter:on
-        ArrayList<Long> ids = new ArrayList<>();
+        ArrayList<String> ids = new ArrayList<>();
         // TODO: Get song name through this sql query
         for (SqlRow res : result) {
-            ids.add(res.getLong("id"));
+            ids.add(res.getString("id"));
         }
-        ids = ArrayHelper.removeDuplicates(ids);
+        ids = ArrayHelper.removeDuplicatesFromStrings(ids);
         List<ObjectNode> songSuggestions = new ArrayList<ObjectNode>();
 
-        for (Long id : ids) {
+        for (String id : ids) {
             ObjectNode songSuggestion = Json.newObject();
             songSuggestion.put("key", id);
-            songSuggestion.put("value", Song.getByMasterId(id).getSongName());
+            songSuggestion.put("value", Song.get(id).getSongName());
             songSuggestions.add(songSuggestion);
         }
 

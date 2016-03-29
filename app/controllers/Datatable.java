@@ -117,7 +117,7 @@ public class Datatable extends Controller {
                             + SqlQueries.sqlFromSong
                             + SqlQueries.sqlJoin     
                             + "where lower(u1.song_lyrics) like :songlyricsfilter "
-                            + "AND (u2.song_book_id like= '" + songBookIdFilter.toString() +"' "+ SqlQueries.sqlPrivateSongFalse + ")) "
+                            + "AND (u2.song_book_id like '" + songBookIdFilter.toString() +"' "+ SqlQueries.sqlPrivateSongFalse + ")) "
                             + "UNION ALL "
                             
                             + "(" 

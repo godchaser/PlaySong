@@ -13,19 +13,19 @@
 			<div class="panel-title">
 				<ol>
 					<li>
-						Select the <strong>Songbooks</strong> or leave all songs as default
+						Select the <strong>Songbook</strong> or leave all songs as default
 					</li>
 					<li>
 						Click the <strong>Select songs</strong> button to choose songs
 					</li>
 					<li>
-						Click the <strong>Prepare Songbook</strong> button
+						Click the <strong>Prepare Playlists</strong> button
 					</li>
 					<li>
 						Check the order of songs (you can transpose them or change order by drag and drop or with arrows)
 					</li>
 					<li>
-						Click the <strong>Download songbook</strong> button
+						Click the <strong>Download Playlist</strong> button
 					</li>
 				</ol>
 			</div>
@@ -35,10 +35,10 @@
 	<label for="select-songbooks">Songbook:</label>
 	<br>
 	<select id="select-songbooks" class="selectpicker">
-		  <option value="1">All Songs</option>
+		  <option value="00000000">All Songs</option>
 		   @if(songBooks.size>0){
 			  @songBooks.map { songBookItem =>
-			  	   @if(songBookItem.getId()!=1){
+			  	   @if(!songBookItem.getId().equals("00000000")){
 			  	    	@if(songBookItem.getId().equals(songBookId)){
 					    	<option value="@songBookItem.getId()" selected>@songBookItem.getSongBookName()</option>
 					    }else {
@@ -106,7 +106,7 @@
 		}
 		<br>
 		<button type="button" id="submit-button" class="btn btn-warning">
-			<i class="fa fa-book fa-fw"></i> Prepare songbook
+			<i class="fa fa-book fa-fw"></i> Prepare playlist
 		</button>
 		<button type="button" id="submit-button" onClick="location.reload(); " class="btn btn-danger">
 			<i class="fa fa-refresh fa-fw"></i> Reset
@@ -144,8 +144,8 @@
 		$("#select-songbooks").change(function(){
 		   console.log("value changed" + this.value);
 		   var selectedSongbookId = this.value;
-		   var songBookDefaultUrl = "@routes.Application.playlistmaker("1")";
-		   var songBookUrl = songBookDefaultUrl.substring(0,songBookDefaultUrl.length-1) + selectedSongbookId;
+		   var songBookDefaultUrl = "@routes.Application.playlistmaker("00000000")";
+		   var songBookUrl = songBookDefaultUrl.substring(0,songBookDefaultUrl.length-8) + selectedSongbookId;
 		   window.open(songBookUrl, '_self');
 		});
 
@@ -154,12 +154,12 @@
 		}
 
 		var dataSet = [];
-		var songBookData;
-		var songBookPrepared = false;
+		var playListData;
+		var playListPrepared = false;
 		//generate button
 		$('#submit-button').on('click', function() {
-			if (songBookPrepared === false) {
-				console.log("GENERATE SONGBOOK!");
+			if (playListPrepared === false) {
+				console.log("GENERATE PLAYLIST!");
 				$('#notificationdiv').html('<div class="alert alert-info close" data-dismiss="alert">Generated song list</div>');		
 				var songIds = [];
 				$('#song-selector option:selected').each(function() {
@@ -183,8 +183,8 @@
 					$('#notificationdiv').html('');
 					window.alert("Select songs first");
 				} else {	
-					songBookData = new Object();
-					songBookData.songs = songIds;
+					playListData = new Object();
+					playListData.songs = songIds;
 					var songFont = new Object();
 					var titleFont = $('#title-font option:selected').text();
 					if (titleFont == "Title font") {
@@ -199,7 +199,7 @@
 						lyricsFont = "Courier New";
 					}
 					songFont.lyricsFont = lyricsFont;
-					songBookData.fonts = songFont;
+					playListData.fonts = songFont;
 					//console.log(dataSet);
 					$('#song_table').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="example"></table>');
 					var oTable = $('#song_table').dataTable({
@@ -249,13 +249,13 @@
 						else
 							row.next().after(row);
 					});
-					songBookPrepared = true;
+					playListPrepared = true;
 					$('#submit-button').removeClass('btn-warning');
 					$('#submit-button').addClass('btn-success');
-					$('#submit-button').html('Download Songbook ' + '<i class="glyphicon glyphicon-download-alt"></i>');
+					$('#submit-button').html('Download Playlist ' + '<i class="glyphicon glyphicon-download-alt"></i>');
 				}
 			} else {
-				console.log("DOWNLOAD SONGBOOK!");
+				console.log("DOWNLOAD PLAYLIST STARTED!");
 				$('#notificationdiv').html('<div class="alert alert-info close" data-dismiss="alert">Preparing and downloading</div>');				
 				var lyricsData = [];
 				$('#song_table .json-lyrics-id').each(function() {
@@ -282,8 +282,8 @@
 					songObject.song = songValue;
 					songIds.push(songObject);
 				}
-				songBookData = new Object();
-				songBookData.songs = songIds;
+				playListData = new Object();
+				playListData.songs = songIds;
 
 				var songFont = new Object();
 				var titleFont = $('#title-font option:selected').text();
@@ -299,36 +299,36 @@
 					lyricsFont = "Courier New";
 				}
 				songFont.lyricsFont = lyricsFont;
-				songBookData.fonts = songFont;
+				playListData.fonts = songFont;
 				
 				var format = $('#document-format' + ' option:selected').text();
 				if (!format){
 				format = "pdf";
 				}
-				songBookData.format = format;
+				playListData.format = format;
 				
 				@if(user.email != "Guest"){
-				songBookData.publishPlaylist = document.getElementById('publish-playlist-checkbox').checked;
-				songBookData.songBookName = $('#playlist-name').val();
+				playListData.publishPlaylist = document.getElementById('publish-playlist-checkbox').checked;
+				playListData.playListName = $('#playlist-name').val();
 				}
 				if (document.getElementById('exclude-chords-checkbox').checked){
-					songBookData.excludeChords = false;
+					playListData.excludeChords = false;
 				} else {
-					songBookData.excludeChords = true;
+					playListData.excludeChords = true;
 				}
-				songBookData.useColumns = document.getElementById('use-columns-checkbox').checked;
+				playListData.useColumns = document.getElementById('use-columns-checkbox').checked;
 											
 				console.log("HERE IS JSON OBJECT:");
-				console.log(songBookData);
-				$.ajax("@routes.Playlists.generateSongbook()", {
+				console.log(playListData);
+				$.ajax("@routes.Playlists.generatePlaylist()", {
 					type : 'POST',
-					data : JSON.stringify(songBookData),
+					data : JSON.stringify(playListData),
 					success : function(data) {
 						var link = "@routes.Playlists.downloadAndDeleteFile()";
 						link = link.concat("?hash=" + data);
 						link = link.concat("&format=" + format);
 						window.open(link, '_self');
-						$('#notificationdiv').html('<div class="alert alert-info close" data-dismiss="alert">Songbook downloaded</div>');		
+						$('#notificationdiv').html('<div class="alert alert-info close" data-dismiss="alert">Playlist downloaded</div>');		
 					},
 					contentType : 'application/json'
 				});

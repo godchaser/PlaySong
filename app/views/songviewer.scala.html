@@ -34,7 +34,8 @@
 		return regexp.test(s);
 	}
 
-	var id =   @id;
+	var id = "@id";
+	//console.log("id is:" + id);
 	function songView(id) {
 	jsRoutes.controllers.Rest.getsongjson(id).ajax( {
 	datatype : 'json',
@@ -53,7 +54,7 @@
 	songLyricsIDs = data.songLyricsIDs ;
 
 	$.each ( songLyricsIDs, function ( i, s ) {
-	jsRoutes.controllers.Songs.getsonglyricsjson(s).ajax ( {
+	jsRoutes.controllers.Rest.getsonglyricsjson(s).ajax ( {
 	success : function (data) {
 	var songLyricsTag = '#songLyrics_' + i + '_songLyrics' ;
 	//console.log(songLyricsTag);

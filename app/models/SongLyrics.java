@@ -10,6 +10,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import chord.tools.LineTypeChecker;
 import chord.tools.SongSanitizer;
 import com.avaje.ebean.Model;
@@ -105,7 +107,10 @@ public class SongLyrics extends Model {
     public void setSong(Song song) {
         this.song = song;
     }
-    
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
     
     /*
     // used only for removal of empty lyrics by Collection remove all
@@ -123,4 +128,5 @@ public class SongLyrics extends Model {
         return getsongLyrics().hashCode();
     }
 */
+    
 }

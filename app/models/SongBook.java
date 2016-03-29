@@ -6,6 +6,8 @@ import java.util.List;
 import javax.crypto.spec.DHGenParameterSpec;
 import javax.persistence.*;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.Model;
 
@@ -182,7 +184,7 @@ public class SongBook extends Model {
 
     public static void addSong(Song song, SongBook activeSongbook) {
         // Add song to songbook if it is not already added
-        if (!activeSongbook.getSongs().contains(song)) {
+        if (activeSongbook != null && !activeSongbook.getSongs().contains(song)) {
             Logger.debug("Adding song to songbook:" + song.getSongName() + "->" + activeSongbook.getSongBookName());
             activeSongbook.getSongs().add(song);
             activeSongbook.update();
@@ -253,6 +255,11 @@ public class SongBook extends Model {
 
     public void setUsers(List<UserAccount> users) {
         this.users = users;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 
 }

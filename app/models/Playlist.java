@@ -6,12 +6,14 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import play.data.format.Formats;
 import play.data.validation.Constraints.Required;
 import com.avaje.ebean.Model;
 
 @Entity
-public class Service extends Model {
+public class Playlist extends Model {
 
 	@Id
 	public String id;
@@ -21,12 +23,12 @@ public class Service extends Model {
 	@Required
 	public String userName;
 
-	@OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
-	public List<ServiceSong> songs = new ArrayList<>();
+	@OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL)
+	public List<PlaylistSong> songs = new ArrayList<>();
 	
-	public String serviceName;
+	public String playListName;
 
-	public static Service get(String id) {
+	public static Playlist get(String id) {
         return find.where().eq("id", id).findUnique();
         // TODO: try this after compilation
         // return find.byId(id);
@@ -55,11 +57,11 @@ public class Service extends Model {
 		this.userName = userName;
 	}
 
-	public List<ServiceSong> getSongs() {
+	public List<PlaylistSong> getSongs() {
 		return songs;
 	}
 
-	public void setSongs(List<ServiceSong> songs) {
+	public void setSongs(List<PlaylistSong> songs) {
 		this.songs = songs;
 	}
 
@@ -71,24 +73,29 @@ public class Service extends Model {
 		this.dateCreated = dateCreated;
 	}
 	
-	public String getServiceName() {
-		return serviceName;
+	public String getPlayListName() {
+		return playListName;
 	}
 
-	public void setServiceName(String serviceName) {
-		this.serviceName = serviceName;
+	public void setPlayListName(String playListName) {
+		this.playListName = playListName;
 	}
 
 	@Formats.DateTime(pattern = "dd-MM-yyyy_hhmm")
 	public Date dateCreated = new Date();
 
-	public static Finder<Long, Service> find = new Finder<>(Service.class);
+	public static Finder<Long, Playlist> find = new Finder<>(Playlist.class);
     
-    public static List <Service> all (){
+    public static List <Playlist> all (){
 		return find.all();
 	}
 	public static void deleteById(String id) {
 		get(id).delete();
 	}
+	
+	@Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
 
 }

@@ -2,15 +2,21 @@ package models;
 
 import javax.persistence.*;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import models.helpers.PdfPrintable;
 import play.data.validation.Constraints.Required;
 import com.avaje.ebean.Model;
+import com.avaje.ebean.Model.Finder;
 
 @Entity
-public class ServiceSong extends Model implements PdfPrintable, Comparable<ServiceSong> {
+public class PlaylistSong extends Model implements PdfPrintable, Comparable<PlaylistSong> {
 
-    @Id
     public String id;
+    
+    @Id
+    @GeneratedValue(strategy=GenerationType.SEQUENCE)
+    public Long insertSequence;
 
     @Required
     public String songName;
@@ -25,7 +31,7 @@ public class ServiceSong extends Model implements PdfPrintable, Comparable<Servi
     public String songKey;
 
     @ManyToOne
-    public Service service;
+    public Playlist playlist;
 
     @Required
     @Column(columnDefinition = "TEXT")
@@ -33,6 +39,15 @@ public class ServiceSong extends Model implements PdfPrintable, Comparable<Servi
 
     public String getSongName() {
         return songName;
+    }
+    
+    public static Finder<Long, PlaylistSong> find = new Finder<>(PlaylistSong.class);
+    
+    
+    public static PlaylistSong get(String id) {
+        return find.where().eq("id", id).findUnique();
+        // TODO: try this after compilation
+        // return find.byId(id);
     }
 
     public void setSongName(String songName) {
@@ -71,12 +86,20 @@ public class ServiceSong extends Model implements PdfPrintable, Comparable<Servi
         this.songLyrics = songLyrics;
     }
 
-    public Service getService() {
-        return service;
+    public Playlist getPlaylist() {
+        return playlist;
     }
 
-    public void setService(Service service) {
-        this.service = service;
+    public void setPlaylist(Playlist service) {
+        this.playlist = service;
+    }
+    
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -88,10 +111,23 @@ public class ServiceSong extends Model implements PdfPrintable, Comparable<Servi
         String songLyrics = getSongLyrics();
         return songLyrics;
     }
+    
+    public Long getInsertSequence() {
+        return insertSequence;
+    }
+
+    public void setInsertSequence(Long insertSequence) {
+        this.insertSequence = insertSequence;
+    }
 
     @Override
-    public int compareTo(ServiceSong otherSong) {
-        return this.id.compareTo(otherSong.id);
+    public int compareTo(PlaylistSong otherSong) {
+        return this.insertSequence.compareTo(otherSong.insertSequence);
+    }
+    
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 
 }

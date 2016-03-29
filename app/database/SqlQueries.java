@@ -24,6 +24,8 @@ public class SqlQueries {
     public static final String sqlSelectSongMaxMasterId = "SELECT MAX(master_id) FROM song";
     public static final String sqlSelectSongBookMaxMasterId = "SELECT MAX(master_id) FROM song_book";
     
+    public static final String sqlDeleteAllUserAccounts = "delete from user_account";
+    
     // Seq fixes
     // Postgresql
     public static final String sqlPGSeqFix = 

@@ -14,8 +14,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.SongLyrics;
 import play.libs.Json;
-import models.Service;
-import models.ServiceSong;
+import models.Playlist;
+import models.PlaylistSong;
 import models.Song;
 import models.SongBook;
 
@@ -109,10 +109,10 @@ public class SongToJsonConverter {
         return songLyricsObject;
     }
 
-    public static ObjectNode convert(Service s) {
+    public static ObjectNode convert(Playlist s) {
 
         ArrayList<ObjectNode> serviceSongs = new ArrayList<>();
-        for (ServiceSong ss : s.getSongs()) {
+        for (PlaylistSong ss : s.getSongs()) {
             ObjectNode serviceObject = Json.newObject();
             serviceObject.put("songName", ss.getSongName());
             serviceObject.put("songId", ss.getSongId());
@@ -127,15 +127,15 @@ public class SongToJsonConverter {
         serviceObject.put("dateCreated", s.getDateCreated().getTime());
         serviceObject.put("userEmail", s.getUserEmail());
         serviceObject.put("userName", s.getUserName());
-        serviceObject.put("songBookName", s.getServiceName());
+        serviceObject.put("songBookName", s.getPlayListName());
         serviceObject.putArray("serviceSongs").addAll(serviceSongs);
 
         return serviceObject;
     }
 
-    public static List<ObjectNode> convert(List<Service> serviceList) {
+    public static List<ObjectNode> convert(List<Playlist> serviceList) {
         ArrayList<ObjectNode> servicesArray = new ArrayList<>();
-        for (Service s : serviceList) {
+        for (Playlist s : serviceList) {
             servicesArray.add(convert(s));
         }
 

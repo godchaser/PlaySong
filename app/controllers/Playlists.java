@@ -20,14 +20,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import chord.tools.LineTypeChecker;
 import document.tools.DocxGenerator;
 import document.tools.PdfGenerator;
-import models.Service;
-import models.ServiceSong;
+import models.Playlist;
+import models.PlaylistSong;
 import models.Song;
 import models.SongLyrics;
 import models.UserAccount;
+import models.helpers.IdHelper;
 import models.helpers.PdfPrintable;
 import models.helpers.SongPrint;
-import models.json.JsonSongbook;
+import models.json.JsonPlaylist;
 import play.Logger;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -77,32 +78,32 @@ public class Playlists extends Controller {
         return ok(fin);
     }
 
-    public Result generateSongbook() {
+    public Result generatePlaylist() {
 
         UserAccount user = getUserFromCookie();
 
         JsonNode jsonNode = request().body().asJson();
         List<SongPrint> songsForPrint = new ArrayList<>();
         DocxGenerator docWriter = null;
-        Logger.trace("Songbook generator json string: " + jsonNode);
+        Logger.trace("Playlist generator json string: " + jsonNode);
         ObjectMapper mapper = new ObjectMapper();
         String format = "word";
 
         boolean publishPlaylist = false;
-        String songBookName = null;
+        String playListName = null;
         boolean excludeChords = false;
         boolean useColumns = false;
 
         try {
-            JsonSongbook jsonSongbook = mapper.treeToValue(jsonNode, JsonSongbook.class);
-            format = jsonSongbook.getFormat();
-            Map<String, Object> additionalProperties = jsonSongbook.getAdditionalProperties();
+            JsonPlaylist jsonPlaylist = mapper.treeToValue(jsonNode, JsonPlaylist.class);
+            format = jsonPlaylist.getFormat();
+            Map<String, Object> additionalProperties = jsonPlaylist.getAdditionalProperties();
             if (additionalProperties != null) {
                 if (additionalProperties.get("publishPlaylist") != null) {
                     publishPlaylist = Boolean.parseBoolean(additionalProperties.get("publishPlaylist").toString());
                 }
-                if (additionalProperties.get("songBookName") != null) {
-                    songBookName = additionalProperties.get("songBookName").toString();
+                if (additionalProperties.get("playListName") != null) {
+                    playListName = additionalProperties.get("playListName").toString();
                 }
                 if (additionalProperties.get("excludeChords") != null) {
                     excludeChords = Boolean.parseBoolean(additionalProperties.get("excludeChords").toString());
@@ -111,15 +112,15 @@ public class Playlists extends Controller {
                     useColumns = Boolean.parseBoolean(additionalProperties.get("useColumns").toString());
                 }
             }
-            List<models.json.Song> songsJson = jsonSongbook.getSongs();
+            List<models.json.Song> songsJson = jsonPlaylist.getSongs();
             for (models.json.Song songJson : songsJson) {
                 songsForPrint.add(new SongPrint(Song.get(songJson.getSong().getId()), songJson.getSong().getLyricsID(), songJson.getSong().getKey(), excludeChords));
             }
             if ("word".equals(format)) {
                 docWriter = new DocxGenerator();
                 try {
-                    docWriter.setSongLyricsFont(jsonSongbook.getFonts().getLyricsFont());
-                    docWriter.setSongTitleFont(jsonSongbook.getFonts().getTitleFont());
+                    docWriter.setSongLyricsFont(jsonPlaylist.getFonts().getLyricsFont());
+                    docWriter.setSongTitleFont(jsonPlaylist.getFonts().getTitleFont());
                 } catch (NullPointerException e) {
                 } finally {
                 }
@@ -131,17 +132,17 @@ public class Playlists extends Controller {
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_hhmmss");
         Date date = new Date();
 
-        // use songbook name as file hash if available
-        String hash = songBookName + "_" + dateFormat.format(date);
-        if (songBookName == null || songBookName.isEmpty()) {
-            hash = "Songbook_" + (dateFormat.format(date));
+        // use playlist name as file hash if available
+        String playlistHash = playListName + "_" + dateFormat.format(date);
+        if (playListName == null || playListName.isEmpty()) {
+            playlistHash = "Playlist_" + (dateFormat.format(date));
         }
 
         try {
             if ("word".equals(format)) {
-                docWriter.newSongbookWordDoc(hash, songsForPrint);
+                docWriter.newSongbookWordDoc(playlistHash, songsForPrint);
             } else if ("pdf".equals(format)) {
-                String outputPdfPath = "resources/pdf/" + hash + ".pdf";
+                String outputPdfPath = "resources/pdf/" + playlistHash + ".pdf";
                 try {
                     Logger.debug("Writing PDF: " + outputPdfPath);
                     PdfGenerator.writeListContent(outputPdfPath, songsForPrint, useColumns);
@@ -157,86 +158,89 @@ public class Playlists extends Controller {
         // TODO: this should maybe made async somehow, because it is not crucial for this response
         if (!("Guest".equals(user.name)) && publishPlaylist) {
             try {
-                Service service = new Service();
-                ArrayList<ServiceSong> serviceSongList = new ArrayList<ServiceSong>();
+                Playlist playlist = new Playlist();
+                ArrayList<PlaylistSong> playlistList = new ArrayList<PlaylistSong>();
                 for (SongPrint sp : songsForPrint) {
-                    ServiceSong servicesong = new ServiceSong();
-                    servicesong.setSongName(sp.getSong().getSongName());
-                    servicesong.setSongId(sp.getSong().getId());
-                    servicesong.setLyricsId(sp.getLyricsID());
-                    servicesong.setSongKey(sp.getKey());
-                    servicesong.setSongLyrics(SongLyrics.get((sp.getLyricsID())).songLyrics);
-                    serviceSongList.add(servicesong);
+                    PlaylistSong playlistsong = new PlaylistSong();
+                    playlistsong.setId(IdHelper.getNextAvailablePlayListSongId(sp.getSong().getSongName()));
+                    playlistsong.setSongName(sp.getSong().getSongName());
+                    playlistsong.setSongId(sp.getSong().getId());
+                    playlistsong.setLyricsId(sp.getLyricsID());
+                    playlistsong.setSongKey(sp.getKey());
+                    playlistsong.setSongLyrics(SongLyrics.get((sp.getLyricsID())).songLyrics);
+                    playlistList.add(playlistsong);
                 }
-                service.setSongs(serviceSongList);
-                service.setDateCreated(new Date());
-                service.setUserEmail(user.email);
-                service.setUserName(user.name);
-                if (songBookName != null) {
-                    service.setServiceName(songBookName);
+                playlist.setId(playlistHash);
+                playlist.setSongs(playlistList);
+                playlist.setDateCreated(new Date());
+                playlist.setUserEmail(user.email);
+                playlist.setUserName(user.name);
+                if (playListName != null) {
+                    playlist.setPlayListName(playListName);
                 }
-                service.save();
-                Logger.debug("Publishing playlist: " + service.getDateCreated());
+                playlist.save();
+                Logger.debug("Publishing playlist: " + playlist.getDateCreated());
             } catch (Exception e) {
                 Logger.error("Failed to publish playlist");
                 e.printStackTrace();
             }
         }
-        return ok(hash);
+        return ok(playlistHash);
     }
 
-    public Result generateService(String id) {
+    public Result downloadPlaylist(String id) {
         UserAccount user = getUserFromCookie();
 
         boolean useColumns = true;
         boolean excludeChords = false;
-        String service_id = null;
-        boolean defaultServiceOptions = true;
+        String playlist_id = null;
+        boolean defaultPlayListOptions = true;
 
         // Skip this if id is shorter than 3 digits while it is default case
         if (id.length() > 3) {
             switch (id.substring(id.length() - 3)) {
             case "_x0":
                 excludeChords = true;
-                defaultServiceOptions = false;
+                defaultPlayListOptions = false;
                 break;
             case "_0c":
                 useColumns = false;
-                defaultServiceOptions = false;
+                defaultPlayListOptions = false;
                 break;
             case "_xc":
                 excludeChords = true;
                 useColumns = false;
-                defaultServiceOptions = false;
+                defaultPlayListOptions = false;
                 break;
             default:
             }
         }
-        if (!defaultServiceOptions) {
-            service_id = id.substring(0, id.length() - 3);
+        if (!defaultPlayListOptions) {
+            playlist_id = id.substring(0, id.length() - 3);
         } else {
-            service_id = id;
+            playlist_id = id;
         }
 
-        Service service = Service.get(service_id);
+        Playlist playlist = Playlist.get(playlist_id);
 
         ArrayList<PdfPrintable> songPrintList = new ArrayList<PdfPrintable>();
 
+        // TODO: BUG - now I cannot sort song by id which was int before
         // Manual sorting because of JPA OrderBy bidirectional relationship bug
-        Collections.sort(service.getSongs());
+        Collections.sort(playlist.getSongs());
 
-        for (ServiceSong serviceSong : service.getSongs()) {
+        for (PlaylistSong playListSong : playlist.getSongs()) {
             if (excludeChords) {
-                String lyricsWithoutChords = serviceSong.getContent();
+                String lyricsWithoutChords = playListSong.getContent();
                 lyricsWithoutChords = LineTypeChecker.removeChordLines(lyricsWithoutChords);
-                serviceSong.setSongLyrics(lyricsWithoutChords);
+                playListSong.setSongLyrics(lyricsWithoutChords);
             }
-            songPrintList.add(serviceSong);
+            songPrintList.add(playListSong);
         }
         DateFormat df = new SimpleDateFormat("dd-MM-yyyy_hhmm");
-        String date = (df.format(service.getDateCreated()));
+        String date = (df.format(playlist.getDateCreated()));
 
-        String normalizedFileName = service.serviceName.replaceAll("\\W+", "");
+        String normalizedFileName = playlist.playListName.replaceAll("\\W+", "");
 
         String outputPdfPath = "resources/pdf/" + normalizedFileName + "_" + date + ".pdf";
         try {
@@ -280,8 +284,8 @@ public class Playlists extends Controller {
     }
     
     @Security.Authenticated(Secured.class)
-    public Result deleteservice(String id) {
-        Service.deleteById(id);
+    public Result deletePlayList(String id) {
+        Playlist.deleteById(id);
         return ok();
     }
 

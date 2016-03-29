@@ -15,17 +15,29 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.avaje.ebean.Ebean;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
+import static org.hamcrest.CoreMatchers.containsString;
+
+import static org.junit.Assert.assertThat;
 
 import database.SqlQueries;
+import models.Song;
+import models.SongBook;
+import models.SongLyrics;
+import models.UserAccount;
 import play.Logger;
 import play.db.Database;
 import play.db.Databases;
 import play.db.evolutions.*;
+import play.libs.ws.WSClient;
+import play.libs.ws.WSRequest;
+import play.libs.ws.WSResponse;
 
 import org.junit.*;
 
@@ -34,10 +46,14 @@ import play.test.*;
 import org.openqa.selenium.Keys;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletionStage;
+
+import javax.validation.constraints.AssertTrue;
 
 import static play.test.Helpers.*;
 
 public class IntegrationTest {
+
     private static WebDriver driver;
     // private HtmlUnitDriver driver;
     private static int timeout = 3;
@@ -46,6 +62,10 @@ public class IntegrationTest {
     private static TestServer testServer;
     private static WebDriverWait wait;
     private static Database database;
+
+    private static String testUserEmail = "testuser@test.com";
+    private static String testUserName = "testuser";
+    private static String testUserPasswod = "testpassword";
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -56,14 +76,14 @@ public class IntegrationTest {
         Map<String, Object> testDb = new HashMap<String, Object>();
         testDb.put("db.default.driver", "org.h2.Driver");
         testDb.put("db.default.url", database.getUrl());
-        Logger.warn("Db info: " + testDb);
+        // Logger.warn("Db info: " + testDb);
 
         // initializing browser driver
-        
+
         // uncomment this if you want firefox driver and comment headless setup
-        //driver = new FirefoxDriver();
-        
-        //headless setup
+        // driver = new FirefoxDriver();
+
+        // headless setup
         driver = new HtmlUnitDriver(BrowserVersion.CHROME) {
             @Override
             protected WebClient newWebClient(BrowserVersion version) {
@@ -82,8 +102,8 @@ public class IntegrationTest {
         };
 
         ((HtmlUnitDriver) driver).setJavascriptEnabled(true);
-        //headless setup
-        
+        // headless setup
+
         wait = new WebDriverWait(driver, timeout);
         // driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 
@@ -93,44 +113,197 @@ public class IntegrationTest {
         testServer.start();
 
         // setting up test data
-        Logger.warn("Setting up test data");
-        Logger.warn("Provisioning user");
-        driver.get(baseUrl + controllers.routes.Application.inituser());
-        Thread.sleep(1000);
-        Logger.warn("Running Login Test");
-        driver.get(baseUrl);
-        String expectedTitle = "PlaySong Login";
-        String expectedRedirectedTitle = "PlaySong";
-        String testEmail = "test@test.com";
-        String testPassword = "test";
-        Logger.info("Clicking on user dropdown box");
-        driver.findElement(By.id("dropdown-user-box")).click();
-        driver.findElement(By.id("user-login")).click();
-        String actualTitle = driver.getTitle();
-        Logger.info("Current Title: " + actualTitle);
-        Assert.assertTrue(expectedTitle.equals(actualTitle));
-        Logger.info("Entering login credentials");
-        driver.findElement(By.name("email")).sendKeys(testEmail);
-        driver.findElement(By.name("password")).sendKeys(testPassword);
-        Logger.info("Submitting form");
-        driver.findElement(By.name("password")).submit();
-        String redirectedTitle = driver.getTitle();
-        Logger.info("Current Title: " + redirectedTitle);
-        Assert.assertTrue(expectedRedirectedTitle.equals(redirectedTitle));
-        Thread.sleep(1000);
-        Logger.warn("Sync with remote db");
-        driver.get(baseUrl + controllers.routes.Application.syncDb());
-        Thread.sleep(10000);
-        driver.get(baseUrl);
-        // Fix sequences
-        Logger.info("Fixing db sequences");
-        Ebean.createSqlUpdate(SqlQueries.sqlH2SongBookSeqFix).execute();
+        /*
+         * Logger.warn("Setting up test data"); Logger.warn("Provisioning user"); driver.get(baseUrl + controllers.routes.Operations.inituser()); Thread.sleep(1000); Logger.warn(
+         * "Running Login Test"); driver.get(baseUrl); String expectedTitle = "PlaySong Login"; String expectedRedirectedTitle = "PlaySong"; String testEmail = "test@test.com"; String
+         * testPassword = "test"; Logger.info("Clicking on user dropdown box"); driver.findElement(By.id("dropdown-user-box")).click(); driver.findElement(By.id("user-login")).click();
+         * String actualTitle = driver.getTitle(); Logger.info("Current Title: " + actualTitle); Assert.assertTrue(expectedTitle.equals(actualTitle)); Logger.info(
+         * "Entering login credentials"); driver.findElement(By.name("email")).sendKeys(testEmail); driver.findElement(By.name("password")).sendKeys(testPassword); Logger.info(
+         * "Submitting form"); driver.findElement(By.name("password")).submit(); String redirectedTitle = driver.getTitle(); Logger.info("Current Title: " + redirectedTitle);
+         * Assert.assertTrue(expectedRedirectedTitle.equals(redirectedTitle)); Thread.sleep(1000); Logger.warn("Sync with remote db"); driver.get(baseUrl +
+         * controllers.routes.Operations.syncDb()); Thread.sleep(10000); driver.get(baseUrl); // Fix sequences Logger.info("Fixing db sequences");
+         * Ebean.createSqlUpdate(SqlQueries.sqlH2SongBookSeqFix).execute();
+         */
     }
 
     @Test
+    public void rawDbTests() throws Exception {
+        Logger.warn("<------------------- DB OPERATIONS TEST ------------------->");
+        Logger.trace("initializing default user");
+        // driver.get(baseUrl + controllers.routes.Operations.inituser());
+        UserAccount.initDefaultUser();
+
+        UserAccount ua = UserAccount.getByEmail(UserAccount.defaultUserEmail);
+        Logger.debug("---USER ACCOUNT MODEL---\n" + ua.toString());
+        Logger.trace("now validating default user account data");
+
+        //@formatter:off
+        assertThat(ua.toString(), containsString(
+                "email=test@test.com,"
+                + "name=test," 
+                + "password=test"));
+        assertThat(ua.toString(), containsString(
+                "id=00000000," 
+                + "songBookName=default,"
+                + "privateSongbook=false"));
+
+        //@formatter:on
+
+        Logger.warn("<-- TESTING USER PROVISIONING -->");
+        UserAccount newUserAccount = new UserAccount(testUserEmail, testUserName, testUserPasswod);
+        newUserAccount.setDefaultSongbook();
+        newUserAccount.save();
+        Logger.debug("---USER ACCOUNT MODEL---\n" + newUserAccount.toString());
+        Logger.trace("now validating default user account data");
+        //@formatter:off
+        assertThat(newUserAccount.toString(),containsString(
+                "email=testuser@test.com," 
+                + "name=testuser," 
+                + "password=testpassword"));
+        assertThat(newUserAccount.toString(), containsString(
+                "id=00000000," 
+                + "songBookName=default," 
+                + "privateSongbook=false"));
+        //@formatter:on
+
+        Logger.warn("<-- TESTING SONG CREATION -->");
+        Logger.trace("creating new song");
+        Song newSong = new Song();
+        newSong.setSongName("Example song 1");
+        newSong.setSongAuthor("Some author");
+        newSong.setSongLink("www.youtube.com/43235");
+        newSong.setSongImporter(ua.getEmail());
+        newSong.setSongLastModifiedBy(ua.getEmail());
+        Song.updateOrCreateSong(newSong, ua.getEmail());
+        Logger.debug("<--SONG MODEL-->\n" + newSong.toString());
+        String songId = newSong.getId();
+        Logger.trace("Created song id: " + songId);
+        Assert.assertNotNull(songId);
+        Logger.trace("now validating song data");
+        // basic song data
+        //@formatter:off
+        assertThat(newSong.toString(),containsString(
+                "songName=Example song 1," 
+                + "songOriginalTitle=<null>," 
+                + "songAuthor=Some author,"
+                + "songLink=www.youtube.com/43235,"
+                + "songImporter=test@test.com,"
+                + "songLastModifiedBy=test@test.com,"
+                + "privateSong=false"));
+        
+        assertThat(newSong.toString(),containsString(
+                "id=00000000,"
+                + "songBookName=default,"
+                + "privateSongbook=false"));
+        //@formatter:off
+        
+        Logger.warn("<-- TESTING SONG UPDATE -->");
+        Logger.trace("updating existing song");
+        newSong.setSongName("Updated Example song 1");
+        newSong.setSongAuthor("Updated Some author");
+        newSong.setSongLink("www.youtube.com/43236");
+        newSong.setSongImporter(ua.getEmail());
+        newSong.setSongLastModifiedBy(ua.getEmail());
+        newSong.setPrivateSong(true);
+        Song.updateOrCreateSong(newSong, ua.getEmail());
+        Logger.debug("<--SONG MODEL-->\n" + newSong.toString());
+        Logger.trace("validating that song id is not changed");
+        Assert.assertEquals(newSong.getId(), songId);
+        //@formatter:off
+        assertThat(newSong.toString(),containsString(
+                "songName=Updated Example song 1," 
+                + "songOriginalTitle=<null>," 
+                + "songAuthor=Updated Some author,"
+                + "songLink=www.youtube.com/43236,"
+                + "songImporter=test@test.com,"
+                + "songLastModifiedBy=test@test.com,"
+                + "privateSong=true"));
+        
+        assertThat(newSong.toString(),containsString(
+                "id=00000000,"
+                + "songBookName=default,"
+                + "privateSongbook=false"));
+        //@formatter:off
+        
+        Logger.warn("<-- TESTING SONG LYRICS CREATION -->");
+        Logger.trace("updating existing song with lyrics");
+        SongLyrics newSongLyrics = new SongLyrics();
+        newSongLyrics.setsongLyrics("Example song lyrics");
+        newSongLyrics.setSongKey("C");
+        List <SongLyrics> songLyrics = new ArrayList<SongLyrics>();
+        songLyrics.add(newSongLyrics);
+        newSong.setSongLyrics(songLyrics);
+        Song.updateOrCreateSong(newSong, ua.getEmail());
+        Logger.debug("<--SONG MODEL-->\n" + newSong.toString());
+        Logger.trace("validating that song id is not changed");
+        Assert.assertEquals(newSong.getId(), songId);
+        //@formatter:off
+        assertThat(newSong.toString(),containsString(
+                "songName=Updated Example song 1," 
+                + "songOriginalTitle=<null>," 
+                + "songAuthor=Updated Some author,"
+                + "songLink=www.youtube.com/43236,"
+                + "songImporter=test@test.com,"
+                + "songLastModifiedBy=test@test.com,"
+                + "privateSong=true"));
+        
+        assertThat(newSong.toString(),containsString(
+                "id=00000000,"
+                + "songBookName=default,"
+                + "privateSongbook=false"));
+        
+        assertThat(newSong.toString(),containsString(
+                "id=00000000,"
+                + "songBookName=default,"
+                + "privateSongbook=false"));
+        
+        assertThat(newSong.toString(),containsString(
+                "songLyrics=Example song lyrics"));
+        //@formatter:off
+        
+        Logger.warn("<-- TESTING SONG LYRICS UPDATE -->");
+        Logger.trace("updating existing song with lyrics");
+        SongLyrics updatedSongLyrics = new SongLyrics();
+        updatedSongLyrics.setsongLyrics("Updated Example song lyrics");
+        updatedSongLyrics.setSongKey("D");
+        songLyrics = new ArrayList<SongLyrics>();
+        songLyrics.add(updatedSongLyrics);
+        newSong.setSongLyrics(songLyrics);
+        Song.updateOrCreateSong(newSong, ua.getEmail());
+        Logger.debug("<--SONG MODEL-->\n" + newSong.toString());
+        Logger.trace("validating that song id is not changed");
+        Assert.assertEquals(newSong.getId(), songId);
+        //@formatter:off
+        assertThat(newSong.toString(),containsString(
+                "songName=Updated Example song 1," 
+                + "songOriginalTitle=<null>," 
+                + "songAuthor=Updated Some author,"
+                + "songLink=www.youtube.com/43236,"
+                + "songImporter=test@test.com,"
+                + "songLastModifiedBy=test@test.com,"
+                + "privateSong=true"));
+        
+        assertThat(newSong.toString(),containsString(
+                "id=00000000,"
+                + "songBookName=default,"
+                + "privateSongbook=false"));
+        
+        assertThat(newSong.toString(),containsString(
+                "id=00000000,"
+                + "songBookName=default,"
+                + "privateSongbook=false"));
+        
+        assertThat(newSong.toString(),containsString(
+                "songLyrics=Updated Example song lyrics"));
+        //@formatter:off
+         
+    }
+
+    @Ignore
+    @Test
     public void quickSearchTest() throws Exception {
         Logger.warn("Running Quick Search Test");
-        //driver.get(baseUrl);
+        // driver.get(baseUrl);
         String queryString = "Nitko";
         List<String> expectedSuggestions = Arrays.asList("Nitko kao ti", "Moj Isus, moj Gospod", "Odlučio sam", "Dajemo ti hvalu", "Ovo su proročki dani", "Prebivat ću", "Predivan si",
                 "Naš Bog je velik", "Zagrli me ti", "Alabare", "To je Bog koga slavimo mi");

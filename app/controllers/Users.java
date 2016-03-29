@@ -2,6 +2,8 @@ package controllers;
 
 import javax.inject.Inject;
 
+import com.avaje.ebean.Ebean;
+
 import models.Song;
 import models.UserAccount;
 import play.Logger;
@@ -111,6 +113,6 @@ public class Users extends Controller {
             user = new UserAccount("Guest", "", "");
         }
         return user;
-    }
+    } 
 
 }
