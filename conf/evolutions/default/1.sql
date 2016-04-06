@@ -27,6 +27,7 @@ create sequence playlist_song_seq;
 
 create table song (
   id                            varchar(255) not null,
+  tmp_id                        varchar(255),
   song_name                     varchar(255),
   song_original_title           varchar(255),
   song_author                   varchar(255),

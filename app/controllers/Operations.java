@@ -47,8 +47,8 @@ public class Operations extends Controller {
         Ebean.createSqlUpdate("delete from user_account_song_book").execute();
         Ebean.createSqlUpdate("delete from song_book").execute();
         Ebean.createSqlUpdate("delete from song").execute();
-        Ebean.createSqlUpdate("delete from service_song").execute();
-        Ebean.createSqlUpdate("delete from service").execute();
+        Ebean.createSqlUpdate("delete from playlist_song").execute();
+        Ebean.createSqlUpdate("delete from playlist").execute();
         Ebean.createSqlUpdate("delete from song_book").execute();
         return redirect(controllers.routes.Application.table());
     }

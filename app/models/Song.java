@@ -37,6 +37,9 @@ public class Song extends Model implements Comparator<Song> {
     @Id
     public String id;
 
+    // used during db migration
+    public String tmpId;
+
     @Required
     public String songName;
 
@@ -94,6 +97,10 @@ public class Song extends Model implements Comparator<Song> {
 
     public static Song getBySongName(String songName) {
         return find.where().ilike("song_name", songName).findUnique();
+    }
+
+    public static Song getByTmpId(String tmpId) {
+        return find.where().ilike("tmp_id", tmpId).findUnique();
     }
 
     public static void updateOrCreateSong(Song song, String userEmail) {
@@ -176,6 +183,11 @@ public class Song extends Model implements Comparator<Song> {
             // don't set songbook if song already exists while I can reuse its existing default songbook association
             if (createNewSong) {
                 Logger.debug("Using default songbook while song does not have any songbooks");
+                activeSongbook = SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail));
+                song.setSongBook(activeSongbook, userEmail);
+                // TODO: remove this temporary workaround for song migration
+            } else if (song.getTmpId() != null) {
+                Logger.debug("Tmp workaround: Using default songbook while song does not have any songbooks");
                 activeSongbook = SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail));
                 song.setSongBook(activeSongbook, userEmail);
             }
@@ -425,6 +437,14 @@ public class Song extends Model implements Comparator<Song> {
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
+    }
+
+    public String getTmpId() {
+        return tmpId;
+    }
+
+    public void setTmpId(String tmpId) {
+        this.tmpId = tmpId;
     }
 
 }

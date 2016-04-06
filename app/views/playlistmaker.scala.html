@@ -144,8 +144,9 @@
 		$("#select-songbooks").change(function(){
 		   console.log("value changed" + this.value);
 		   var selectedSongbookId = this.value;
-		   var songBookDefaultUrl = "@routes.Application.playlistmaker("00000000")";
-		   var songBookUrl = songBookDefaultUrl.substring(0,songBookDefaultUrl.length-8) + selectedSongbookId;
+		   var songBookDefaultUrl = "@routes.Application.playlistmaker()";
+		   //var songBookUrl = songBookDefaultUrl.substring(0,songBookDefaultUrl.length-8) + selectedSongbookId;
+		   var songBookUrl = songBookDefaultUrl +"?id=" + selectedSongbookId;
 		   window.open(songBookUrl, '_self');
 		});
 

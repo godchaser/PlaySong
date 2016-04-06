@@ -78,7 +78,7 @@ public class Application extends Controller {
 
     public Result songview(String id) {
         UserAccount user = getUserFromCookie();
-        //Logger.debug("song view id: "+ id);
+        // Logger.debug("song view id: "+ id);
         return ok(songviewer.render(id, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
     }
 
@@ -111,13 +111,16 @@ public class Application extends Controller {
             }
         }
 
-        List<Song> sortedSongs = filteredSongbook.getSongs();
-        Collections.sort(sortedSongs, new Comparator<Song>() {
-            @Override
-            public int compare(Song s1, Song s2) {
-                return HR_COLLATOR.compare(s1.songName, s2.songName);
-            }
-        });
+        List<Song> sortedSongs = new ArrayList<Song>();
+        if (filteredSongbook != null) {
+            sortedSongs = filteredSongbook.getSongs();
+            Collections.sort(sortedSongs, new Comparator<Song>() {
+                @Override
+                public int compare(Song s1, Song s2) {
+                    return HR_COLLATOR.compare(s1.songName, s2.songName);
+                }
+            });
+        }
 
         return ok(playlistmaker.render(sortedSongs, new ArrayList<SongBook>(songbooksWithoutDuplicates), id, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
     }
@@ -145,7 +148,7 @@ public class Application extends Controller {
 
     public Result login() {
         String redirecturl = flash().get("url");
-        //Logger.debug("Login flash redirect url: " + redirecturl);
+        // Logger.debug("Login flash redirect url: " + redirecturl);
         if (redirecturl != null) {
             flash().put("url", redirecturl);
         }
@@ -184,7 +187,7 @@ public class Application extends Controller {
                 redirecturl = "/";
             }
             Logger.debug("Successfull login for: " + email);
-            //Logger.debug("Redirecting to: " + redirecturl);
+            // Logger.debug("Redirecting to: " + redirecturl);
             return redirect(redirecturl);
         }
     }

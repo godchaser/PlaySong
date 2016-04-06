@@ -8,7 +8,7 @@ GET      /                               controllers.Application.index
 # views
 GET      /admin                          controllers.Application.admin
 GET      /table                          controllers.Application.table
-GET      /playlistmaker/:id              controllers.Application.playlistmaker(id: String)
+GET      /playlistmaker              	 controllers.Application.playlistmaker(id: String ?= "00000000")
 GET      /playlists                      controllers.Application.playlists
 GET      /songeditor                	 controllers.Application.songeditor(id: String ?= "00000000")
 GET      /song/:id                   	 controllers.Application.songview(id: String)

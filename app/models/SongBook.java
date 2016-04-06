@@ -20,6 +20,7 @@ import play.db.ebean.Transactional;
 public class SongBook extends Model {
 
     public static final String DEFAULT_SONGBOOK_ID = "00000000";
+    public static final String DEFAULT_SONGBOOK_NAME = "default";
 
     @Id
     public String id;
@@ -83,6 +84,7 @@ public class SongBook extends Model {
             // try reusing songbook id
             if (id != null && !id.isEmpty()) {
                 Logger.debug("Trying to reuse songbook id: " + id);
+                foundSongbook.id = id;
             } else {
                 Logger.debug("New songbook id will be created");
                 foundSongbook.id = IdHelper.getRandomId();
