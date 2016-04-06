@@ -1,80 +1,31 @@
 package controllers;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.text.Collator;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
+
+import javax.inject.Inject;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlRow;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import chord.tools.LineTypeChecker;
 import database.SqlQueries;
-import document.tools.DocxGenerator;
-import document.tools.PdfGenerator;
-import document.tools.XlsHelper;
-import document.tools.XmlSongsParser;
-import models.Playlist;
-import models.PlaylistSong;
 import models.Song;
 import models.SongBook;
-import models.SongLyrics;
 import models.UserAccount;
 import models.helpers.ArrayHelper;
-import models.helpers.PdfPrintable;
-import models.helpers.SongPrint;
-import models.helpers.SongTableData;
-import models.helpers.SongToJsonConverter;
-import models.json.JsonPlaylist;
 import play.Logger;
 import play.data.DynamicForm;
 import play.data.Form;
+import play.data.FormFactory;
 import play.db.ebean.Transactional;
 import play.libs.Json;
 import play.mvc.Controller;
-import play.mvc.Http.MultipartFormData;
-import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
 import play.mvc.Security;
 import play.mvc.With;
-import play.mvc.BodyParser;
-import play.routing.JavaScriptReverseRouter;
-import play.data.FormFactory;
-
-import javax.inject.*;
-import rest.PlaySongRestService;
-import songimporters.SongImporter;
-import views.html.admin;
-import views.html.login;
-import views.html.playlists;
-import views.html.playlistmaker;
-import views.html.songeditor;
 import views.html.songs;
-import views.html.songviewer;
-import views.html.table;
 
 public class Songs extends Controller {
 
@@ -94,6 +45,7 @@ public class Songs extends Controller {
 
     @Security.Authenticated(Secured.class)
     public Result deletesong(String id) {
+        Logger.debug("Deleting song by id: " + id);
         UserAccount user = getUserFromCookie();
         deleteSong(id);
         SongBook.staleSongbookCleanup(user.getEmail());
@@ -109,7 +61,6 @@ public class Songs extends Controller {
     // TODO: remove this body parser workaround when Bug gets fixed https://github.com/playframework/playframework/issues/5919
     @Security.Authenticated(Secured.class)
     @With(VerboseAction.class)
-    @BodyParser.Of(FormBodyParser.class)
     public Result updateorcreatesong() {
         Form<Song> filledForm = songForm.bindFromRequest();
         // filledForm.

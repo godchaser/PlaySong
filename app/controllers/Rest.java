@@ -12,6 +12,7 @@ import models.Song;
 import models.SongBook;
 import models.SongLyrics;
 import models.helpers.SongToJsonConverter;
+import play.Logger;
 import play.data.DynamicForm;
 import play.data.FormFactory;
 import play.db.ebean.Transactional;
@@ -73,12 +74,13 @@ public class Rest extends Controller {
         String lyrics = lyricsObject.getsongLyrics();
         ObjectNode lyricsResult = Json.newObject();
         lyricsResult.put("songLyrics", lyrics);
-        return ok(lyricsResult);
+        return ok(Json.toJson(lyricsResult));
     }
     
     @Transactional
     @Security.Authenticated(Secured.class)
     public Result updatesonglyricsjson(String id) {
+        Logger.debug("Updating lyrics by id: " + id);
         SongLyrics lyricsObject = SongLyrics.get(id);
         DynamicForm df = dynamicForm.bindFromRequest();
         String songLyrics = df.get("songLyrics");
