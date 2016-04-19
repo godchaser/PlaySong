@@ -15,6 +15,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import chord.tools.LineTypeChecker;
 import chord.tools.SongSanitizer;
 import com.avaje.ebean.Model;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Created by samuel on 3/31/15.
@@ -26,6 +28,7 @@ public class SongLyrics extends Model {
     public String id;
 
     @ManyToOne
+    @JsonBackReference
     public Song song;
 
     @Column(columnDefinition = "TEXT")
@@ -69,18 +72,18 @@ public class SongLyrics extends Model {
 
     public void sanitizeLyrics() {
         String newSongLyrics = SongSanitizer.sanitizeSong(songLyrics);
-        setsongLyrics(newSongLyrics);
+        setSongLyrics(newSongLyrics);
     }
 
-    public String getsongLyrics() {
+    public String getSongLyrics() {
         return songLyrics;
     }
 
-    public void setsongLyrics(String lyrics) {
+    public void setSongLyrics(String lyrics) {
         songLyrics = lyrics;
     }
 
-    public String getsongLyricsId() {
+    public String getSongLyricsId() {
         return id;
     }
 

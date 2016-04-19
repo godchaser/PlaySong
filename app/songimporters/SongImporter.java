@@ -119,7 +119,7 @@ public class SongImporter {
 		song.songAuthor = author;
 		// TODO: this is temp solution to clean all .
 		SongLyrics songLyrics = new SongLyrics();
-		songLyrics.setsongLyrics(cleanlyrics);
+		songLyrics.setSongLyrics(cleanlyrics);
 		song.songLyrics.add(songLyrics);
 		Song.updateOrCreateSong(song, "");
 	}
@@ -161,8 +161,8 @@ public class SongImporter {
 		ObjectMapper mapper = new ObjectMapper();
 		//mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		try {
-			System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(SongLyrics.get("106L").getsongLyrics()));			
-			mapper.writeValue(new File("conf/songs.json"), SongLyrics.get("106L").getsongLyrics());
+			System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(SongLyrics.get("106L").getSongLyrics()));			
+			mapper.writeValue(new File("conf/songs.json"), SongLyrics.get("106L").getSongLyrics());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -213,17 +213,17 @@ public class SongImporter {
         System.out.println("########11");
         try {
             PrintWriter out = new PrintWriter("1324.txt");
-            out.println(SongLyrics.get("1324L").getsongLyrics());
+            out.println(SongLyrics.get("1324L").getSongLyrics());
             out.close();
             PrintWriter out2 = new PrintWriter("1323.txt");
-            out2.println(SongLyrics.get("1323L").getsongLyrics());
+            out2.println(SongLyrics.get("1323L").getSongLyrics());
             out2.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
         System.out.println();
         System.out.println("########22");
-        //System.out.println(SongLyrics.get(290L).getsongLyrics());
+        //System.out.println(SongLyrics.get(290L).getSongLyrics());
         //System.out.println("keys: " + keys);
         //System.out.println("values: " + data.toString());
     }

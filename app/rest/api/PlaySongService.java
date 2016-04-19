@@ -1,6 +1,6 @@
 package rest.api;
 
-import rest.json.ServiceJson;
+import rest.json.PlaylistJson;
 import rest.json.SongLyricsJson;
 import rest.json.SongBookJson;
 import rest.json.SongsJson;
@@ -18,7 +18,7 @@ public interface PlaySongService {
     Call<SongLyricsJson[]> getSongLyrics();
 
     @GET("/json/favoritesongs")
-    Call<ServiceJson[]> getFavoritesSongs();
+    Call<PlaylistJson[]> getFavoritesSongs();
     
     @GET("/json/songbooks")
     Call<SongBookJson[]> getSongbooks();

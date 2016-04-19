@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -25,6 +26,13 @@ import models.SongBook;
 public class SongToJsonConverter {
 
     public static ObjectNode convert(Song s) {
+        ObjectNode songObject = (ObjectNode) new ObjectMapper().valueToTree(s);
+        return songObject;
+    }
+
+    //TODO: remove this
+    // old deprecated api where I've build json on my own
+    public static ObjectNode convertCustom(Song s) {
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode songLyricsIDs = mapper.createObjectNode();
@@ -32,7 +40,7 @@ public class SongToJsonConverter {
         ArrayNode songLyricsIDsArray = songLyricsIDs.putArray("songLyricsIDs");
 
         for (SongLyrics lyrics : s.songLyrics) {
-            songLyricsIDsArray.add(lyrics.getsongLyricsId());
+            songLyricsIDsArray.add(lyrics.getSongLyricsId());
         }
 
         ObjectNode songObject = convert(s.songName, s.songLink, s.songOriginalTitle, s.songAuthor, s.id, s.songImporter, s.dateCreated.getTime(), s.dateModified.getTime(),
@@ -65,6 +73,7 @@ public class SongToJsonConverter {
         return songObject;
     }
 
+    // this is old api where there are only song lyrics id-s and integrated songbooks
     public static ObjectNode convert(String songName, String songLink, String songOriginalTitle, String songAuthor, String id, String songImporter, Long dateCreated, Long dateModified,
             boolean privateSong, ArrayNode songLyricsIDsArray, List<SongBook> songbooks) {
 
@@ -103,7 +112,7 @@ public class SongToJsonConverter {
         ObjectNode songLyricsObject = Json.newObject();
 
         songLyricsObject.put("songLyricsId", s.getId());
-        songLyricsObject.put("songLyrics", s.getsongLyrics());
+        songLyricsObject.put("songLyrics", s.getSongLyrics());
         songLyricsObject.put("songKey", s.getSongKey());
 
         return songLyricsObject;

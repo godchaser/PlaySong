@@ -53,7 +53,7 @@ public class SongPrint implements PdfPrintable {
 
     public String getContent() {
         SongLyrics songLyricsObject = SongLyrics.get(getLyricsID());
-        String songLyrics = songLyricsObject.getsongLyrics();
+        String songLyrics = songLyricsObject.getSongLyrics();
         // SONG TRANSPOSE FUNCTION
         String origKey = songLyricsObject.getSongKey();
         String newKey = getKey();

@@ -3,7 +3,7 @@ package rest;
 //import com.zeppelin.app.playsong.database.PlaySongDatabase;
 
 import rest.api.PlaySongService;
-import rest.json.ServiceJson;
+import rest.json.PlaylistJson;
 import rest.json.SongLyricsJson;
 import rest.json.SongBookJson;
 import rest.json.SongsJson;
@@ -138,11 +138,11 @@ public class PlaySongRestService extends Observable {
 
     private void getFavoritesSongsData() {
         // Fetching song json data
-        Call<ServiceJson[]> getsongscall = playsong.getFavoritesSongs();
-        getsongscall.enqueue(new Callback<ServiceJson[]>() {
+        Call<PlaylistJson[]> getsongscall = playsong.getFavoritesSongs();
+        getsongscall.enqueue(new Callback<PlaylistJson[]>() {
             @Override
-            public void onResponse(Response<ServiceJson[]> response) {
-                ServiceJson[] model = response.body();
+            public void onResponse(Response<PlaylistJson[]> response) {
+                PlaylistJson[] model = response.body();
 
                 if (model == null) {
                     // 404 or the response cannot be converted to Model.

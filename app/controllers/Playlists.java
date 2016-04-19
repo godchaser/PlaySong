@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URLEncodedUtils;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +31,7 @@ import models.UserAccount;
 import models.helpers.IdHelper;
 import models.helpers.PdfPrintable;
 import models.helpers.SongPrint;
+import models.helpers.URLParamEncoder;
 import models.json.JsonPlaylist;
 import play.Logger;
 import play.mvc.Controller;
@@ -133,7 +137,7 @@ public class Playlists extends Controller {
         Date date = new Date();
 
         // use playlist name as file hash if available
-        String playlistHash = playListName + "_" + dateFormat.format(date);
+        String playlistHash = URLParamEncoder.stripAccentsAndEncode(playListName) + "_" + dateFormat.format(date);
         if (playListName == null || playListName.isEmpty()) {
             playlistHash = "Playlist_" + (dateFormat.format(date));
         }

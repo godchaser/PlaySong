@@ -20,6 +20,8 @@ import javax.persistence.Transient;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.avaje.ebean.Model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import database.DatabaseHelper;
 import models.helpers.IdHelper;
@@ -39,6 +41,8 @@ public class Song extends Model implements Comparator<Song> {
 
     // used during db migration
     public String tmpId;
+    
+    public String syncId;
 
     @Required
     public String songName;
@@ -56,6 +60,7 @@ public class Song extends Model implements Comparator<Song> {
     public boolean privateSong = false;
 
     @ManyToMany(mappedBy = "songs")
+    @JsonManagedReference
     public List<SongBook> songbooks = new ArrayList<SongBook>();
 
     @Column(updatable = false)
@@ -66,12 +71,15 @@ public class Song extends Model implements Comparator<Song> {
     public Date dateModified = new Date();
 
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
+    @JsonManagedReference
     public List<SongLyrics> songLyrics = new ArrayList<>();
 
-    // this is for form validation
+    // this fields are only for form validation
     @Transient
+    @JsonIgnore
     public String songBookName;
     @Transient
+    @JsonIgnore
     public String songBookId;
 
     @Transient
@@ -94,6 +102,10 @@ public class Song extends Model implements Comparator<Song> {
     public static Song getByMasterId(Long masterId) {
         return find.where().eq("master_id", masterId).findUnique();
     }
+    
+    public static Song getBySyncId(String syncId) {
+        return find.where().eq("sync_id", syncId).findUnique();
+    }
 
     public static Song getBySongName(String songName) {
         return find.where().ilike("song_name", songName).findUnique();
@@ -108,7 +120,7 @@ public class Song extends Model implements Comparator<Song> {
         // TODO: Fix bug when song has empty lyrics
         Logger.debug("Received song with name: " + song.getSongName());
         // LYRICS HANDLING
-        boolean songHasSongLyrics = (song.getSongLyrics() != null && (song.getSongLyrics().size() > 0) && !(song.getSongLyrics().get(0).getsongLyrics().isEmpty())) ? true : false;
+        boolean songHasSongLyrics = (song.getSongLyrics() != null && (song.getSongLyrics().size() > 0) && !(song.getSongLyrics().get(0).getSongLyrics().isEmpty())) ? true : false;
 
         if (songHasSongLyrics) {
             Logger.debug("Song contains lyrics");
@@ -119,7 +131,7 @@ public class Song extends Model implements Comparator<Song> {
 
             for (SongLyrics singleSongLyrics : song.songLyrics) {
                 // Logger.debug("Song for check content: " + singleSongLyrics.getsongLyrics());
-                if (singleSongLyrics.getsongLyrics().length() < 2) {
+                if (singleSongLyrics.getSongLyrics().length() < 2) {
                     removedIdxList.add(i);
                     // Logger.debug("Removed song content: " + singleSongLyrics.getsongLyrics());
                     // Logger.debug("Index for removal: " + i);
@@ -203,9 +215,12 @@ public class Song extends Model implements Comparator<Song> {
             // check if song with same name already exists
             song.setId(IdHelper.getNextAvailableSongId(song.songName));
             Logger.debug("Saving song - by ID: " + song.id);
+            song.setSyncId(IdHelper.getNextAvailableSyncId());
+            //Logger.debug("Saving song - by ID: " + song.id);
             song.setDateCreated(date);
             song.setDateModified(date);
             song.save();
+            Logger.debug("Saving song: " + song.toString());
         }
         // update existing song
         else {
@@ -446,5 +461,15 @@ public class Song extends Model implements Comparator<Song> {
     public void setTmpId(String tmpId) {
         this.tmpId = tmpId;
     }
+
+    public String getSyncId() {
+        return syncId;
+    }
+
+    public void setSyncId(String syncId) {
+        this.syncId = syncId;
+    }
+
+    
 
 }

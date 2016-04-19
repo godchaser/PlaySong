@@ -71,7 +71,7 @@ public class Rest extends Controller {
 
     public Result getsonglyricsjson(String id) {
         SongLyrics lyricsObject = SongLyrics.get(id);
-        String lyrics = lyricsObject.getsongLyrics();
+        String lyrics = lyricsObject.getSongLyrics();
         ObjectNode lyricsResult = Json.newObject();
         lyricsResult.put("songLyrics", lyrics);
         return ok(Json.toJson(lyricsResult));
@@ -84,7 +84,7 @@ public class Rest extends Controller {
         SongLyrics lyricsObject = SongLyrics.get(id);
         DynamicForm df = dynamicForm.bindFromRequest();
         String songLyrics = df.get("songLyrics");
-        lyricsObject.setsongLyrics(songLyrics);
+        lyricsObject.setSongLyrics(songLyrics);
         lyricsObject.updateSongLyrics();
         return ok();
     }

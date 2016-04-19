@@ -79,7 +79,7 @@ public class Application extends Controller {
     public Result songview(String id) {
         UserAccount user = getUserFromCookie();
         // Logger.debug("song view id: "+ id);
-        return ok(songviewer.render(id, user, Song.getSongModifiedList(), Song.getSongCreatedList()));
+        return ok(songviewer.render(Song.get(id), user, Song.getSongModifiedList(), Song.getSongCreatedList()));
     }
 
     public Result playlistmaker(String id) {

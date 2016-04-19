@@ -77,13 +77,17 @@
                         	$('#privateSong').attr('checked', 'checked');
                         }
                         
-                        if (data.songBooks[0].songBookPrivate){
+                        if (data.songbooks[0].privateSongbook){
                         	$('#isPrivateSongBook').attr('checked', 'checked');
                         }
       
-                        $('#songBookName').attr("value", data.songBooks[0].songBookName);
-                        $('#songBookId').attr("value", data.songBooks[0].songBookId);
-                        songLyricsIDs = data.songLyricsIDs;
+                        $('#songBookName').attr("value", data.songbooks[0].songBookName);
+                        $('#songBookId').attr("value", data.songbooks[0].id);
+                        
+                        var songLyricsIDs = [];
+					    for (var j = 0; j < data.songLyrics.length; j++){
+						  songLyricsIDs.push(data.songLyrics[j].id);
+						}
 
                         $.each(songLyricsIDs, function(i,s){
                             songLyricsCount = songLyricsCount + 1;

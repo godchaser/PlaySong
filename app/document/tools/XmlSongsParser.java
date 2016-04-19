@@ -62,7 +62,7 @@ public class XmlSongsParser {
 						sanitizedLyrics = lyricsXML.getSongLyrics();
 					}
 
-					lyrics.setsongLyrics(sanitizedLyrics);
+					lyrics.setSongLyrics(sanitizedLyrics);
 					String songKey = LineTypeChecker.getSongKey(lyricsXML
 							.getSongLyrics());
 					lyrics.setSongKey(songKey);

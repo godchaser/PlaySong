@@ -10,6 +10,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.Model;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import database.DatabaseHelper;
 import models.helpers.IdHelper;
@@ -30,9 +32,11 @@ public class SongBook extends Model {
     public boolean privateSongbook = false;
 
     @ManyToMany
+    @JsonBackReference
     public List<Song> songs = new ArrayList<>();
 
     @ManyToMany
+    @JsonBackReference
     public List<UserAccount> users = new ArrayList<>();
 
     public static SongBook getDefaultSongbook(UserAccount user) {
@@ -82,13 +86,13 @@ public class SongBook extends Model {
             Logger.debug("Not found songbook, creating new.");
             foundSongbook = new SongBook();
             // try reusing songbook id
-            if (id != null && !id.isEmpty()) {
-                Logger.debug("Trying to reuse songbook id: " + id);
-                foundSongbook.id = id;
-            } else {
+            //if ((id != null && !id.isEmpty() && !id.equals(DEFAULT_SONGBOOK_ID))) {
+            //    Logger.debug("Trying to reuse songbook id: " + id);
+            //    foundSongbook.id = id;
+            //} else {
                 Logger.debug("New songbook id will be created");
                 foundSongbook.id = IdHelper.getRandomId();
-            }
+            //}
             foundSongbook.setSongBookName(songbookName);
             foundSongbook.setPrivateSongbook(isPrivateSongBook);
             foundSongbook.save();

@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -55,6 +57,7 @@ public class Operations extends Controller {
 
     @Transactional
     public Result inituser() {
+        Logger.debug("Initializing default user!");
         UserAccount.initDefaultUser();
         return redirect(controllers.routes.Application.index());
     }
@@ -63,8 +66,8 @@ public class Operations extends Controller {
     @Security.Authenticated(Secured.class)
     @Transactional
     public Result sanitizesongs() {
-        System.out.println("sanitizesongs!");
-
+        Logger.debug("Sanitizing songs!");
+        
         UserAccount ua = getUserFromCookie();
 
         // Sanitizing all songs
@@ -77,7 +80,8 @@ public class Operations extends Controller {
     }
     
     public Result test() {
-        Logger.debug("TEST! " + java.util.UUID.randomUUID().toString().substring(0, 8));
+        //Logger.debug("TEST! " + java.util.UUID.randomUUID().toString().substring(0, 8));
+        Logger.debug("Replace " + StringUtils.stripAccents("ČĆŽŠĐčćžšđ"));
         return redirect(controllers.routes.Application.table());
     }
 

@@ -6,14 +6,25 @@ import models.Playlist;
 import models.PlaylistSong;
 import models.Song;
 import models.SongLyrics;
-
+import org.apache.commons.codec.net.*;
+import org.apache.commons.lang3.StringUtils;
 public class IdHelper {
     public static String getRandomId() {
         return UUID.randomUUID().toString().substring(0, 8);
     }
+    
+    public static String getNextAvailableSyncId(){
+        String syncId = getRandomId();
+        // search for next available syncid
+        while (Song.getBySyncId(syncId) != null){
+            syncId = getRandomId();
+        }    
+        return syncId;
+    }
 
-    public static String getIdFromName(String name) {
-        return name.toLowerCase().replace(' ', '-');
+    public static String getIdFromName(String name) { 
+        name = name.replace(" ", "-").replace(",", "-").replace("'", "").toLowerCase();
+        return URLParamEncoder.stripAccentsAndEncode(name);
     }
 
     public static String getNextAvailableSongId(String songName) {

@@ -23,6 +23,12 @@ public class SongsJson {
     @SerializedName("songId")
     @Expose
     private String songId;
+    
+    //TODO: remove this tmp migration field
+    @SerializedName("masterId")
+    @Expose
+    private String masterId;
+    
     @SerializedName("songImporter")
     @Expose
     private String songImporter;
@@ -227,5 +233,13 @@ public class SongsJson {
      */
     public void setSongLyricsIDs(List<Integer> songLyricsIDs) {
         this.songLyricsIDs = songLyricsIDs;
+    }
+
+    public String getMasterId() {
+        return masterId;
+    }
+
+    public void setMasterId(String masterId) {
+        this.masterId = masterId;
     }
 }
