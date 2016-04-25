@@ -16,6 +16,7 @@ import document.tools.XlsHelper;
 import document.tools.XmlSongsParser;
 import models.Song;
 import models.UserAccount;
+import models.helpers.URLParamEncoder;
 import play.Logger;
 import play.db.ebean.Transactional;
 import play.mvc.Controller;
@@ -81,7 +82,8 @@ public class Operations extends Controller {
     
     public Result test() {
         //Logger.debug("TEST! " + java.util.UUID.randomUUID().toString().substring(0, 8));
-        Logger.debug("Replace " + StringUtils.stripAccents("ČĆŽŠĐčćžšđ"));
+        String name = "Tko' je kao ti, što tamo radiš, Đurđice! .";
+        Logger.debug("Encoded URL: " + (new URLParamEncoder(name)).encode());
         return redirect(controllers.routes.Application.table());
     }
 

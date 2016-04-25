@@ -24,7 +24,7 @@ public class IdHelper {
 
     public static String getIdFromName(String name) { 
         name = name.replace(" ", "-").replace(",", "-").replace("'", "").toLowerCase();
-        return URLParamEncoder.stripAccentsAndEncode(name);
+        return (new URLParamEncoder(name)).encode();
     }
 
     public static String getNextAvailableSongId(String songName) {

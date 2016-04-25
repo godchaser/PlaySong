@@ -137,7 +137,7 @@ public class Playlists extends Controller {
         Date date = new Date();
 
         // use playlist name as file hash if available
-        String playlistHash = URLParamEncoder.stripAccentsAndEncode(playListName) + "_" + dateFormat.format(date);
+        String playlistHash = (new URLParamEncoder(playListName)).encode() + "_" + dateFormat.format(date);
         if (playListName == null || playListName.isEmpty()) {
             playlistHash = "Playlist_" + (dateFormat.format(date));
         }

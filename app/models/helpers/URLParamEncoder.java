@@ -1,22 +1,56 @@
 package models.helpers;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.*;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 
 /**
  * Created by samuel on 4/7/15.
  */
 public class URLParamEncoder {
-    
-    public static String stripAccentsAndEncode(String input){
-        // remove all punctuation - ! . ,
-        input = input.replaceAll("[^a-zA-Z0-9\\s]", "");
-        // remove diacritic letters
-        input = StringUtils.stripAccents(input);
-        input = input.replace("đ", "d").replace("Đ", "d"); 
+    String input;
+    Map<String, String> searchAndReplaceMap = new HashMap<String, String>();
 
-        return encode(input);
+    public URLParamEncoder(String input) {
+        this.input = input;
+        searchAndReplaceMap.put("đ", "d");
+        searchAndReplaceMap.put("Đ", "D");
+        searchAndReplaceMap.put("'", "");
+        searchAndReplaceMap.put(",", "");
+        searchAndReplaceMap.put(".", "");
+        searchAndReplaceMap.put("!", "");
+        searchAndReplaceMap.put("?", "");
+        searchAndReplaceMap.put(" ", "-");
+        searchAndReplaceMap.put("--", "-");
     }
-    public static String encode(String input) {
+
+    public String encode() {
+        String inputWithoutDiacritics = removeDiacritics(input);
+        String inputWithoutSpecialCharacters = searchAndReplace(inputWithoutDiacritics, searchAndReplaceMap);
+        return encodeForUrl(inputWithoutSpecialCharacters.toLowerCase());
+    }
+
+    public String searchAndReplace(String inputString, Map<String, String> searchAndReplaceStrings) {
+        String replacedString = inputString;
+        for (Map.Entry<String, String> entry : searchAndReplaceStrings.entrySet()) {
+            //System.out.println("Changing: " + entry.getKey() + " -> " + entry.getValue());
+            replacedString = replacedString.replace(entry.getKey(), entry.getValue());
+        }
+        return replacedString;
+    }
+
+    public String removeDiacritics(String input) {
+        StringBuilder resultStr = new StringBuilder();
+        for (char ch : input.toCharArray()) {
+            String decomposed = Normalizer.normalize(String.valueOf(ch), Form.NFD);
+            String normalized = decomposed.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+            resultStr.append(normalized);
+        }
+
+        return resultStr.toString();
+    }
+
+    public String encodeForUrl(String input) {
         StringBuilder resultStr = new StringBuilder();
         for (char ch : input.toCharArray()) {
             if (isUnsafe(ch)) {
@@ -30,11 +64,11 @@ public class URLParamEncoder {
         return resultStr.toString();
     }
 
-    private static char toHex(int ch) {
+    public char toHex(int ch) {
         return (char) (ch < 10 ? '0' + ch : 'A' + ch - 10);
     }
 
-    private static boolean isUnsafe(char ch) {
+    public boolean isUnsafe(char ch) {
         if (ch > 128 || ch < 0)
             return true;
         return " %$&+,/:;=?@<>#%".indexOf(ch) >= 0;
