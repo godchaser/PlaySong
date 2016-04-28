@@ -32,7 +32,7 @@ public class XmlSongsParser {
 					.println("Now converting unmarshalled XML songs to Song object: ");
 			for (SongXML songXML : songs.getSongs()) {
 				Song song = new Song();
-				song.setId(Long.parseLong(songXML.getId()));
+				song.setId((songXML.getId()));
 				song.setSongName(songXML.getSongName());
 				song.setSongOriginalTitle(songXML.getSongOriginalTitle());
 				song.setSongAuthor(songXML.getSongAuthor());
@@ -41,7 +41,7 @@ public class XmlSongsParser {
 				List<SongLyrics> songLyrics = new ArrayList<SongLyrics>();
 				for (SongLyricsXML lyricsXML : songXML.getLyrics()) {
 					SongLyrics lyrics = new SongLyrics();
-					lyrics.setId(Long.parseLong(lyricsXML.getId()));
+					lyrics.setId(lyricsXML.getId());
 
 					String[] lines = lyricsXML.getSongLyrics().split("\n");
 					String sanitizedLyrics = null;
@@ -62,7 +62,7 @@ public class XmlSongsParser {
 						sanitizedLyrics = lyricsXML.getSongLyrics();
 					}
 
-					lyrics.setsongLyrics(sanitizedLyrics);
+					lyrics.setSongLyrics(sanitizedLyrics);
 					String songKey = LineTypeChecker.getSongKey(lyricsXML
 							.getSongLyrics());
 					lyrics.setSongKey(songKey);

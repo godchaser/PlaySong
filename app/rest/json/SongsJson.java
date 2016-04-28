@@ -22,10 +22,13 @@ public class SongsJson {
     private String songAuthor;
     @SerializedName("songId")
     @Expose
-    private Long songId;
+    private String songId;
+    
+    //TODO: remove this tmp migration field
     @SerializedName("masterId")
     @Expose
-    private Long masterId;
+    private String masterId;
+    
     @SerializedName("songImporter")
     @Expose
     private String songImporter;
@@ -47,8 +50,7 @@ public class SongsJson {
 
     /**
      * 
-     * @return
-     *     The songName
+     * @return The songName
      */
     public String getSongName() {
         return songName;
@@ -57,7 +59,7 @@ public class SongsJson {
     /**
      * 
      * @param songName
-     *     The songName
+     *            The songName
      */
     public void setSongName(String songName) {
         this.songName = songName;
@@ -65,8 +67,7 @@ public class SongsJson {
 
     /**
      * 
-     * @return
-     *     The songLink
+     * @return The songLink
      */
     public String getSongLink() {
         return songLink;
@@ -75,7 +76,7 @@ public class SongsJson {
     /**
      * 
      * @param songLink
-     *     The songLink
+     *            The songLink
      */
     public void setSongLink(String songLink) {
         this.songLink = songLink;
@@ -83,8 +84,7 @@ public class SongsJson {
 
     /**
      * 
-     * @return
-     *     The songOriginalTitle
+     * @return The songOriginalTitle
      */
     public String getSongOriginalTitle() {
         return songOriginalTitle;
@@ -93,7 +93,7 @@ public class SongsJson {
     /**
      * 
      * @param songOriginalTitle
-     *     The songOriginalTitle
+     *            The songOriginalTitle
      */
     public void setSongOriginalTitle(String songOriginalTitle) {
         this.songOriginalTitle = songOriginalTitle;
@@ -101,8 +101,7 @@ public class SongsJson {
 
     /**
      * 
-     * @return
-     *     The songAuthor
+     * @return The songAuthor
      */
     public String getSongAuthor() {
         return songAuthor;
@@ -111,7 +110,7 @@ public class SongsJson {
     /**
      * 
      * @param songAuthor
-     *     The songAuthor
+     *            The songAuthor
      */
     public void setSongAuthor(String songAuthor) {
         this.songAuthor = songAuthor;
@@ -119,26 +118,24 @@ public class SongsJson {
 
     /**
      * 
-     * @return
-     *     The songId
+     * @return The songId
      */
-    public Long getSongId() {
+    public String getSongId() {
         return songId;
     }
 
     /**
      * 
      * @param songId
-     *     The songId
+     *            The songId
      */
-    public void setSongId(Long songId) {
+    public void setSongId(String songId) {
         this.songId = songId;
     }
 
     /**
      * 
-     * @return
-     *     The songImporter
+     * @return The songImporter
      */
     public String getSongImporter() {
         return songImporter;
@@ -147,7 +144,7 @@ public class SongsJson {
     /**
      * 
      * @param songImporter
-     *     The songImporter
+     *            The songImporter
      */
     public void setSongImporter(String songImporter) {
         this.songImporter = songImporter;
@@ -155,8 +152,7 @@ public class SongsJson {
 
     /**
      * 
-     * @return
-     *     The dateCreated
+     * @return The dateCreated
      */
     public Long getDateCreated() {
         return dateCreated;
@@ -165,7 +161,7 @@ public class SongsJson {
     /**
      * 
      * @param dateCreated
-     *     The dateCreated
+     *            The dateCreated
      */
     public void setDateCreated(Long dateCreated) {
         this.dateCreated = dateCreated;
@@ -173,8 +169,7 @@ public class SongsJson {
 
     /**
      * 
-     * @return
-     *     The dateModified
+     * @return The dateModified
      */
     public Long getDateModified() {
         return dateModified;
@@ -183,7 +178,7 @@ public class SongsJson {
     /**
      * 
      * @param dateModified
-     *     The dateModified
+     *            The dateModified
      */
     public void setDateModified(Long dateModified) {
         this.dateModified = dateModified;
@@ -191,8 +186,7 @@ public class SongsJson {
 
     /**
      * 
-     * @return
-     *     The privateSong
+     * @return The privateSong
      */
     public Boolean getPrivateSong() {
         return privateSong;
@@ -201,7 +195,7 @@ public class SongsJson {
     /**
      * 
      * @param privateSong
-     *     The privateSong
+     *            The privateSong
      */
     public void setPrivateSong(Boolean privateSong) {
         this.privateSong = privateSong;
@@ -209,8 +203,7 @@ public class SongsJson {
 
     /**
      * 
-     * @return
-     *     The songBooks
+     * @return The songBooks
      */
     public List<SongBookJson> getSongBooks() {
         return songBooks;
@@ -219,7 +212,7 @@ public class SongsJson {
     /**
      * 
      * @param songBooks
-     *     The songBooks
+     *            The songBooks
      */
     public void setSongBooks(List<SongBookJson> songBooks) {
         this.songBooks = songBooks;
@@ -227,8 +220,7 @@ public class SongsJson {
 
     /**
      * 
-     * @return
-     *     The songLyricsIDs
+     * @return The songLyricsIDs
      */
     public List<Integer> getSongLyricsIDs() {
         return songLyricsIDs;
@@ -237,18 +229,17 @@ public class SongsJson {
     /**
      * 
      * @param songLyricsIDs
-     *     The songLyricsIDs
+     *            The songLyricsIDs
      */
     public void setSongLyricsIDs(List<Integer> songLyricsIDs) {
         this.songLyricsIDs = songLyricsIDs;
     }
 
-	public Long getMasterId() {
-		return masterId;
-	}
+    public String getMasterId() {
+        return masterId;
+    }
 
-	public void setMasterId(Long masterId) {
-		this.masterId = masterId;
-	}
-
+    public void setMasterId(String masterId) {
+        this.masterId = masterId;
+    }
 }

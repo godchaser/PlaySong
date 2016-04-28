@@ -3,7 +3,6 @@ package database;
 public class SqlQueries {
     //@formatter:off
     public static final String sqlSelectSong = "SELECT t0.id,  "
-                                            + "t0.master_id, "
                                             + "t0.song_name, "
                                             + "t0.song_original_title, "
                                             + "t0.song_author, "
@@ -16,7 +15,7 @@ public class SqlQueries {
                                             + "u1.id as l_id, "
                                             + "u2.song_book_id as r_id ";
 
-    public static final String sqlSelectSongId = "SELECT t0.master_id ";
+    public static final String sqlSelectSongId = "SELECT t0.id ";
     public static final String sqlFromSong = "FROM song t0 ";
     public static final String sqlJoin = "JOIN song_lyrics u1 on u1.song_id = t0.id "
                    + "JOIN song_book_song u2 on u2.song_id = t0.id ";
@@ -24,6 +23,8 @@ public class SqlQueries {
     
     public static final String sqlSelectSongMaxMasterId = "SELECT MAX(master_id) FROM song";
     public static final String sqlSelectSongBookMaxMasterId = "SELECT MAX(master_id) FROM song_book";
+    
+    public static final String sqlDeleteAllUserAccounts = "delete from user_account";
     
     // Seq fixes
     // Postgresql

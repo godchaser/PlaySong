@@ -3,7 +3,7 @@ package rest;
 //import com.zeppelin.app.playsong.database.PlaySongDatabase;
 
 import rest.api.PlaySongService;
-import rest.json.ServiceJson;
+import rest.json.PlaylistJson;
 import rest.json.SongLyricsJson;
 import rest.json.SongBookJson;
 import rest.json.SongsJson;
@@ -34,22 +34,22 @@ import play.db.ebean.Transactional;
  */
 public class PlaySongRestService extends Observable {
 
-    private final String PLAY_SONG_REST_ADDR = "http://playsong.herokuapp.com";
+    //private final String PLAY_SONG_REST_ADDR = "http://playsong.herokuapp.com";
     //private final String PLAY_SONG_REST_ADDR = "http://localhost:9000";
     // private final String PLAY_SONG_REST_ADDR = "http://10.0.2.2:9000";
-    //private final String PLAY_SONG_REST_ADDR = "http://playsong.duckdns.org:9000";
+    private final String PLAY_SONG_REST_ADDR = "http://playsong.duckdns.org:9000";
     public static final String KEY_SONGS_FETCHED = "Songs Fetched";
     public static final String KEY_LYRICS_FETCHED = "Song Lyrics Fetched";
     public static final String KEY_FAVORITES_FETCHED = "Song Favorites Fetched";
 
     private PlaySongService playsong;
-    private DatabaseHelper db = DatabaseHelper.getInstance();
+    private DatabaseHelper db;
 
     
     public PlaySongRestService() {
         // addObserver(observer);
         setUpRestConnection();
-        DatabaseHelper db = DatabaseHelper.getInstance();
+        db = DatabaseHelper.getInstance();
     }
 
     private void setUpRestConnection() {
@@ -83,7 +83,7 @@ public class PlaySongRestService extends Observable {
                     // 200
                     Logger.trace("PlaySongRestService", "Song Data successfully fetched");
                     Logger.trace("PlaySongRestService", "Writing song data to db");
-                    List<Long> updatedSongs = db.writeJsonSongsToDb(Arrays.asList((SongsJson[]) model), userEmail);
+                    List<String> updatedSongs = db.writeJsonSongsToDb(Arrays.asList((SongsJson[]) model), userEmail);
                     Logger.trace("PlaySongRestService", "Notifying observer that songs are fetched");
                     setChanged();
                     // notifyObservers(updatedSongs);
@@ -98,7 +98,7 @@ public class PlaySongRestService extends Observable {
         });
     }
 
-    private void getSongLyrics(final List<Long> updatedSongs) {
+    private void getSongLyrics(final List<String> updatedSongs) {
         // Fetching song lyrics json data
         Call<SongLyricsJson[]> getsonglyricscall = playsong.getSongLyrics();
         getsonglyricscall.enqueue(new Callback<SongLyricsJson[]>() {
@@ -138,11 +138,11 @@ public class PlaySongRestService extends Observable {
 
     private void getFavoritesSongsData() {
         // Fetching song json data
-        Call<ServiceJson[]> getsongscall = playsong.getFavoritesSongs();
-        getsongscall.enqueue(new Callback<ServiceJson[]>() {
+        Call<PlaylistJson[]> getsongscall = playsong.getFavoritesSongs();
+        getsongscall.enqueue(new Callback<PlaylistJson[]>() {
             @Override
-            public void onResponse(Response<ServiceJson[]> response) {
-                ServiceJson[] model = response.body();
+            public void onResponse(Response<PlaylistJson[]> response) {
+                PlaylistJson[] model = response.body();
 
                 if (model == null) {
                     // 404 or the response cannot be converted to Model.
@@ -160,7 +160,7 @@ public class PlaySongRestService extends Observable {
                     // 200
                     Logger.trace("PlaySongRestService", "Favorites Song Data successfully fetched");
                     Logger.trace("PlaySongRestService", "Writing favorites song data to db");
-                    List<Long> updatedFavorites = db.writeJsonFavoritesSongsToDb(Arrays.asList(model));
+                    List<String> updatedFavorites = db.writeJsonFavoritesSongsToDb(Arrays.asList(model));
                     Logger.trace("PlaySongRestService", "Notifying observer that favorites songs are fetched");
                     setChanged();
                     notifyObservers(KEY_FAVORITES_FETCHED);
@@ -219,7 +219,7 @@ public class PlaySongRestService extends Observable {
     }
 
     // NOT USED CURRENTLY
-    public void downloadSongLyricsData(List<Long> updatedSongs) {
+    public void downloadSongLyricsData(List<String> updatedSongs) {
         getSongLyrics(updatedSongs);
     }
 

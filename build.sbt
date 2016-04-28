@@ -13,7 +13,7 @@ lazy val myProject = (project in file("."))
   .enablePlugins(PlayJava, PlayEbean)
 
 libraryDependencies ++= Seq( javaJdbc , cache , javaWs , filters, evolutions,
-  "org.avaje.ebeanorm" % "avaje-ebeanorm" % "6.13.5",
+  "org.avaje.ebeanorm" % "avaje-ebeanorm" % "7.5.1",
   "org.seleniumhq.selenium" % "selenium-java" % "2.48.2",
   "org.hsqldb" % "hsqldb" % "2.3.3",
   "org.postgresql" % "postgresql" % "9.4-1206-jdbc42",

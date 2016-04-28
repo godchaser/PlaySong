@@ -1,9 +1,9 @@
-@(id: Long, songForm: Form[Song], user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion], songBooks : List [SongBook])
+@(id: String, songForm: Form[Song], user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion], songBooks : List [SongBook])
 
 @admintheme("Song Editor", user, songsModified, songsCreated) {
     <div id="songEditor">
         <h2>Edit or create song</h2>
-        @helper.form(action = routes.Application.updateorcreatesong()) {
+        @helper.form(action = routes.Songs.updateorcreatesong()) {
         	<div class="row">
 			<div class="col-lg-3 col-md-6">		
             @helper.inputText(songForm("songName"), args = '_label -> "Song name: ", 'class -> "form-control")
@@ -29,12 +29,20 @@
 			</div>
 			<div class="col-lg-3 col-md-
             @helper.textarea(field = songForm("songLyrics[0].songLyrics"), args = '_label -> "Lyrics: ", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
+            @helper.textarea(field = songForm("songLyrics[0].id"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")        
+            
             @helper.textarea(field = songForm("songLyrics[1].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
+            @helper.textarea(field = songForm("songLyrics[1].id"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")        
+            
             @helper.textarea(field = songForm("songLyrics[2].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")
+            @helper.textarea(field = songForm("songLyrics[2].id"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")        
+            
             @helper.textarea(field = songForm("songLyrics[3].songLyrics"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")           
+            @helper.textarea(field = songForm("songLyrics[3].id"), args = 'style -> "display:none;", 'rows -> 40, 'cols -> 35, 'class -> "form-textarea monoSpaceTextArea", 'lang -> "hr")        
+            
             @helper.inputText(songForm("id"), args = 'style -> "display:none;", 'hidden -> "hidden")
-            @helper.inputText(songForm("masterId"), args = 'style -> "display:none;", 'hidden -> "hidden")
             @helper.inputText(songForm("songBookId"), args = 'style -> "display:none;", 'hidden -> "hidden")
+
 			</div>
             </div>          
         }
@@ -49,21 +57,15 @@
         $('#songEditor' ).remove();
 
         var songLyricsCount = 0;
-        var id = @id;
+        var id = "@id";
 
         $('#id').attr("value", id);
-        //$('#masterId').attr("value", masterId);
         $('label[for="id"]').hide();
-        $('label[for="masterId"]').hide();
 
         function CreateSongEditor(id){
-            $('label[for="songLyrics_1_songLyrics"]').hide();
-            $('label[for="songLyrics_2_songLyrics"]').hide();
-            $('label[for="songLyrics_3_songLyrics"]').hide();
-
             var songLyricsIDs = [];
-            if (id>0){
-                jsRoutes.controllers.Application.getsongjson(id).ajax({
+            if (id != "00000000"){
+                jsRoutes.controllers.Rest.getsongjson(id).ajax({
                     datatype: 'json',
                     success: function(data) {
                         $('#songName').attr("value", data.songName);
@@ -71,27 +73,33 @@
                         $('#songAuthor').attr("value", data.songAuthor);
                         $('#songLink').attr("value", data.songLink);
                         
-                        $('#masterId').attr("value", data.masterId);
-                        
                         if (data.privateSong){
                         	$('#privateSong').attr('checked', 'checked');
                         }
                         
-                        if (data.songBooks[0].songBookPrivate){
+                        if (data.songbooks[0].privateSongbook){
                         	$('#isPrivateSongBook').attr('checked', 'checked');
                         }
       
-                        $('#songBookName').attr("value", data.songBooks[0].songBookName);
-                        $('#songBookId').attr("value", data.songBooks[0].songBookId);
-                        songLyricsIDs = data.songLyricsIDs;
+                        $('#songBookName').attr("value", data.songbooks[0].songBookName);
+                        $('#songBookId').attr("value", data.songbooks[0].id);
+                        
+                        var songLyricsIDs = [];
+					    for (var j = 0; j < data.songLyrics.length; j++){
+						  songLyricsIDs.push(data.songLyrics[j].id);
+						}
 
                         $.each(songLyricsIDs, function(i,s){
                             songLyricsCount = songLyricsCount + 1;
-                            jsRoutes.controllers.Application.getsonglyricsjson(s).ajax({
+                            jsRoutes.controllers.Rest.getsonglyricsjson(s).ajax({
                             success : function ( data ) {
                                 var songLyricsTag = '#songLyrics_' + i + '_songLyrics';
-                                $ (songLyricsTag).val (data.songLyrics);
-                                $ (songLyricsTag).attr ("style", "display:block;");
+                                $(songLyricsTag).val(data.songLyrics);
+                                $(songLyricsTag).attr("style", "display:block;");
+                                
+                                var songLyricsIdTag = '#songLyrics_' + i + '_id';
+                                //$(songLyricsIdTag).attr("value", s);
+                                $(songLyricsIdTag).val(s);
                             },
                             error : function ( ) {
                                 console.log ( "Error: ajax failure" )
@@ -105,6 +113,13 @@
                     }
             })
             }
+            $('label[for="songLyrics_1_songLyrics"]').hide();
+            $('label[for="songLyrics_2_songLyrics"]').hide();
+            $('label[for="songLyrics_3_songLyrics"]').hide();
+            $('label[for="songLyrics_0_id"]').hide();
+            $('label[for="songLyrics_1_id"]').hide();
+            $('label[for="songLyrics_2_id"]').hide();
+            $('label[for="songLyrics_3_id"]').hide();
         }
         
         $("#songbook-select").change(function(){

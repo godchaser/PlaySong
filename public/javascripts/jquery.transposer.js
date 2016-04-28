@@ -215,7 +215,8 @@
         
         return $(this).each(function() {
             var output = [];
-            
+            console.log($(this));
+            console.log("transposer received: " + $(this).text());
             var lines = $(this).text().split("\n");
             var line = "";
             var initialChordSet = false;
@@ -305,6 +306,8 @@
 
 
             $(this).before(keysHtml);
+            $(this).html(output.join("\n"));
+            console.log("transposer output: " + output);
             
             $('#hideChordsButton').click(function(event) {
             	// hide
@@ -328,7 +331,7 @@
             		$(this).text("Hide Chords");
             	}
             });
-            $(this).html(output.join("\n"));
+            
         });
     };
 

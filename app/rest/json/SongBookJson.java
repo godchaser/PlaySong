@@ -10,10 +10,7 @@ public class SongBookJson {
 
     @SerializedName("id")
     @Expose
-    private Long id;
-    @SerializedName("masterId")
-    @Expose
-    private Long masterId;
+    private String id;
     @SerializedName("songBookName")
     @Expose
     private String songBookName;
@@ -26,42 +23,45 @@ public class SongBookJson {
     @SerializedName("songIDs")
     @Expose
     private List<Long> songIDs = new ArrayList<Long>();
-    
-    public Long getId() {
+
+    public String getId() {
         return id;
     }
-    public void setId(Long id) {
+
+    public void setId(String id) {
         this.id = id;
     }
+
     public String getSongBookName() {
         return songBookName;
     }
+
     public void setSongBookName(String songBookName) {
         this.songBookName = songBookName;
     }
+
     public boolean getPrivateSongbook() {
         return privateSongbook;
     }
+
     public void setPrivateSongbook(boolean privateSongbook) {
         this.privateSongbook = privateSongbook;
     }
+
     public String getSongbookOwner() {
         return songbookOwner;
     }
+
     public void setSongbookOwner(String songbookOwner) {
         this.songbookOwner = songbookOwner;
     }
+
     public List<Long> getSongIDs() {
         return songIDs;
     }
+
     public void setSongIDs(List<Long> songIDs) {
         this.songIDs = songIDs;
     }
-	public Long getMasterId() {
-		return masterId;
-	}
-	public void setMasterId(Long masterId) {
-		this.masterId = masterId;
-	}
 
 }

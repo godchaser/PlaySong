@@ -25,7 +25,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
     "frontpage",
     "format"
 })
-public class JsonSongbook {
+public class JsonPlaylist {
 
     @JsonProperty("songs")
     private List<Song> songs = new ArrayList<Song>();
@@ -165,10 +165,10 @@ public class JsonSongbook {
         if (other == this) {
             return true;
         }
-        if ((other instanceof JsonSongbook) == false) {
+        if ((other instanceof JsonPlaylist) == false) {
             return false;
         }
-        JsonSongbook rhs = ((JsonSongbook) other);
+        JsonPlaylist rhs = ((JsonPlaylist) other);
         return new EqualsBuilder().append(songs, rhs.songs).append(fonts, rhs.fonts).append(sizes, rhs.sizes).append(frontpage, rhs.frontpage).append(format, rhs.format).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 

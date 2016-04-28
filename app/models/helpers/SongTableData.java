@@ -11,8 +11,6 @@ public class SongTableData {
 	private String song_author;
 	private String song_link;
 	private String song_importer;
-	private Long master_id;
-
 
     private ArrayList<String> lyrics_id;
 
@@ -68,12 +66,4 @@ public class SongTableData {
 		this.lyrics_id = lyrics_id;
 	}
 	
-	   public Long getMaster_id() {
-	        return master_id;
-	    }
-
-	    public void setMaster_id(Long master_id) {
-	        this.master_id = master_id;
-	    }
-
 }

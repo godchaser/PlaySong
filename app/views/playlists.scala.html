@@ -1,11 +1,11 @@
-@(services: List[Service], user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
+@(playlists: List[Playlist], user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
 
-@admintheme("Services", user, songsModified, songsCreated) {
+@admintheme("Playlists", user, songsModified, songsCreated) {
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap-select/dist/css/bootstrap-select.min.css")">
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/handsontable/handsontable.full.min.css")">
 <script src="@routes.Application.javascriptRoutes()" ></script>
 
-<div hidden id="service_wrapper">
+<div hidden id="playlists_wrapper">
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-12">
@@ -21,24 +21,24 @@
 				</div>
 				
 				<ul>
-					@services.reverse.map { service =>
+					@playlists.reverse.map { playlist =>
 					<li>
-						<strong>  @service.serviceName: </strong>   <small><small>(@service.dateCreated)</small></small>
+						<strong>  @playlist.playListName: </strong>   <small><small>(@playlist.dateCreated)</small></small>
 						@if(user.email != "Guest"){
-						<button class="deletebutton" type="button" id=@service.id class="btn btn-default">
+						<button class="deletebutton" type="button" id=@playlist.id class="btn btn-default">
 							<i class="fa fa-times"></i>
 						</button>
 						}
 						<br>
 						<ol>
-						@service.songs.map { song =>											
+						@playlist.songs.map { song =>											
 							<li><i class="fa fa-music"></i>  @song.songName</li>
 						}
 						</ol>				
-						<a href="@routes.Application.generateService(service.id.toString())" download><i class="fa fa-download"></i> Download playlist </a>					
-						<a href='@routes.Application.generateService(service.id.toString()+"_x0")' download><i class="fa fa-download"></i> No chords</a>			
-					    <a href='@routes.Application.generateService(service.id.toString()+"_0c")' download><i class="fa fa-download"></i> No columns</a>							
-					    <a href='@routes.Application.generateService(service.id.toString()+"_xc")' download><i class="fa fa-download"></i> No chords&columns</a>
+						<a href="@routes.Playlists.downloadPlaylist(playlist.id.toString())" download><i class="fa fa-download"></i> Download playlist </a>					
+						<a href='@routes.Playlists.downloadPlaylist(playlist.id.toString()+"_x0")' download><i class="fa fa-download"></i> No chords</a>			
+					    <a href='@routes.Playlists.downloadPlaylist(playlist.id.toString()+"_0c")' download><i class="fa fa-download"></i> No columns</a>							
+					    <a href='@routes.Playlists.downloadPlaylist(playlist.id.toString()+"_xc")' download><i class="fa fa-download"></i> No chords&columns</a>
 					</li>
 					}
 				</ul>
@@ -51,48 +51,31 @@
 
 <script >
 	$(document).ready(function() {
-		$('#dynamiccontent').html($('#service_wrapper').html());
-		$('#service_wrapper').remove();
-	
-		function deleteService(id) {
+		$('#dynamiccontent').html($('#playlists_wrapper').html());
+		$('#playlists_wrapper').remove();
+						
+		function deletePlaylist(id) {
 			console.log("Delete playlist : " + id);
-			jsRoutes.controllers.Application.deleteservice(id).ajax({
+			jsRoutes.controllers.Playlists.deletePlayList(id).ajax({
 				type : 'DELETE',
 				success : function() {
-					var link = "@routes.Application.services()";
+					var link = "@routes.Application.playlists()";
 					window.location = link;
 				},
 				error : function() {
 					console.log("Error: ajax failure");
 				}
 			});
-		}
-		
-				var excludeChords = document.getElementById('exclude-chords-checkbox').checked;
-				var userColumns = document.getElementById('use-columns-checkbox').checked;
-											
-				/*
-				$.ajax("@routes.Application.generateSongbook()", {
-					type : 'GET',
-					data : JSON.stringify(songBookData),
-					success : function(data) {
-						var link = "@routes.Application.downloadAndDeleteFile()";
-						link = link.concat("?hash=" + data);
-						link = link.concat("&format=" + format);
-						window.open(link, '_self');
-						$('#notificationdiv').html('<div class="alert alert-info close" data-dismiss="alert">Playlist downloaded</div>');		
-					},
-					contentType : 'application/json'
-				});
-				*/
+		}		
 
 		$('.deletebutton').click(function(event) {
-			if( ! confirm("Do you really want to delete playlist?") ){
+			if( !confirm("Do you really want to delete playlist?") ){
 		            event.preventDefault();
 		        } 
 		        else {
+		        	//console.log("this is id for deletion" + this.id);
 		            var id = this.id;
-					deleteService(id);
+					deletePlaylist(id);
 		        }
 		});
 		

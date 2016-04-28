@@ -23,7 +23,7 @@
 			</div>
 			<div class="col-md-4">
 				<h3>Add new users</h3>
-				@helper.form(action = routes.Application.addUser()) {
+				@helper.form(action = routes.Users.addUser()) {
 				@helper.inputText(userAccountForm("name"), args = '_label -> "User name: ", 'class -> "form-control")
 				@helper.inputText(userAccountForm("email"), args = '_label -> "E-mail: ", 'class -> "form-control")
 				@helper.inputText(userAccountForm("password"), args = '_label -> "Password: ", 'class -> "form-control")
@@ -39,7 +39,7 @@
 		</div>
 		<div>
 			<h3>Upload updated song data in xls format</h3>
-			@helper.form(action = routes.Application.upload, 'enctype -> "multipart/form-data") {
+			@helper.form(action = routes.Operations.upload, 'enctype -> "multipart/form-data") {
 			<input type="file" name="uploadedfile">
 			<p>
 				<input type="submit" class="btn btn-default">
@@ -91,7 +91,7 @@
 			deleteUser(email);
 		});
 		$('#downloadxlsx').click(function(event) {
-			var link = "@routes.Application.getXLS()";
+			var link = "@routes.Operations.getXLS()";
 			window.location = link;
 		});
 		$('#updatefromspreadsheet').click(function(event) {
@@ -103,7 +103,7 @@
 			console.log("j3");
 			console.log(j);
 			$.ajax({
-		        url: "@routes.Application.updateFromOnlineSpreadsheet()",
+		        url: "@routes.Operations.updateFromOnlineSpreadsheet()",
 		        data: {"data": j}, //returns all cells' data
 		        type: 'POST',
 		        success: function (data) {
@@ -121,7 +121,7 @@
 		};
 
 		var getSongsData = function() {
-			$.get("@routes.Application.getsongdata()", function(data) {
+			$.get("@routes.Rest.getsongdata()", function(data) {
 				handsontable = new Handsontable(container, {
 					data : data,
 					colHeaders : ['songName', 'songOriginalTitle', 'songAuthor', 'songLink', 'songImporter', 'songId', 'songLyricsIDs'],
