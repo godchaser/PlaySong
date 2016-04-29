@@ -29,7 +29,7 @@ GET      /json/song/:id                  controllers.Rest.getsongjson(id: String
 GET      /json/songlyrics                controllers.Rest.getsonglyricsdata
 GET      /json/songlyrics/:id            controllers.Rest.getsonglyricsjson(id: String)
 POST     /json/songlyrics/:id            controllers.Rest.updatesonglyricsjson(id: String)
-GET      /json/favoritesongs             controllers.Rest.getfavoritessongsdata
+GET      /json/playlists                 controllers.Rest.getplaylistdata
 GET      /json/songbooks              	 controllers.Rest.getsongbooksdata
 
 

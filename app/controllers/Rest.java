@@ -54,9 +54,9 @@ public class Rest extends Controller {
         return ok(Json.toJson(songlyricsJson));
     }
 
-    public Result getfavoritessongsdata() {
-        List<Playlist> services = Playlist.all();
-        return ok(Json.toJson(SongToJsonConverter.convert(services)));
+    public Result getplaylistdata() {
+        List<Playlist> playlists = Playlist.all();
+        return ok(Json.toJson(SongToJsonConverter.convert(playlists)));
     }
 
     public Result getsongbooksdata() {

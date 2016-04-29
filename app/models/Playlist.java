@@ -11,6 +11,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import play.data.format.Formats;
 import play.data.validation.Constraints.Required;
 import com.avaje.ebean.Model;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 public class Playlist extends Model {
@@ -24,6 +25,7 @@ public class Playlist extends Model {
 	public String userName;
 
 	@OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL)
+	@JsonManagedReference
 	public List<PlaylistSong> songs = new ArrayList<>();
 	
 	public String playListName;

@@ -8,6 +8,7 @@ import models.helpers.PdfPrintable;
 import play.data.validation.Constraints.Required;
 import com.avaje.ebean.Model;
 import com.avaje.ebean.Model.Finder;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 public class PlaylistSong extends Model implements PdfPrintable, Comparable<PlaylistSong> {
@@ -31,6 +32,7 @@ public class PlaylistSong extends Model implements PdfPrintable, Comparable<Play
     public String songKey;
 
     @ManyToOne
+    @JsonBackReference
     public Playlist playlist;
 
     @Required
@@ -101,7 +103,7 @@ public class PlaylistSong extends Model implements PdfPrintable, Comparable<Play
     public void setId(String id) {
         this.id = id;
     }
-
+   
     public String getTitle() {
         String songName = getSongName();
         return songName;
