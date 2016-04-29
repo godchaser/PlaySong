@@ -33,7 +33,7 @@ public class UserAccount extends Model {
     @Transient
     public static String defaultUserPassword = "test";
     
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     public List<SongBook> songbooks = new ArrayList<SongBook>();
 
     public UserAccount(String email, String name, String password) {
