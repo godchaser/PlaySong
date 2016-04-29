@@ -1,12 +1,12 @@
 @(songs: List[Song],  songBooks : List [SongBook], songBookId: String, user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
 
-@admintheme("", user, songsModified, songsCreated) {
+@playlist_maker_wrapper = {
 	<!-- 
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap/css/bootstrap.min.css")">
  -->
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap-multiselect/dist/css/bootstrap-multiselect.css")">
 
-<div hidden class="panel-group" id="collapse-accordion">
+<div class="panel-group" id="collapse-accordion">
 	<h2>Playlist Maker <i class="glyphicon glyphicon-cog"></i></h2>
 	<div class="panel panel-default" style="overflow:visible;">
 		<div class="panel-heading">
@@ -124,9 +124,9 @@
 <script >
 	$(document).ready(function() {
 		// copy song table div to dynamic content div
-		$('#dynamiccontent').html($('#collapse-accordion').html());
+		//$('#dynamiccontent').html($('#collapse-accordion').html());
 		// delete initial table div
-		$('#collapse-accordion').remove();
+		//$('#collapse-accordion').remove();
 
 		$('#song-selector').multiselect({
 			enableCaseInsensitiveFiltering : true,
@@ -346,5 +346,6 @@
 <script src="@routes.Assets.at("lib/datatables.net/js/jquery.dataTables.min.js")" ></script>
 <script src="@routes.Assets.at("lib/datatables-responsive/js/dataTables.responsive.js")" ></script>
 <script src="@routes.Assets.at("javascripts/dataTables.balkan_sort.js")"></script>
-
 }
+
+@admintheme("", user, songsModified, songsCreated)(playlist_maker_wrapper)

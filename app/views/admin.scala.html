@@ -1,6 +1,6 @@
 @(user: UserAccount, userAccountForm: Form[UserAccount], userAccounts: List[UserAccount], message: String, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
 
-@admintheme("Admin", user, songsModified, songsCreated) {
+@admin_wrapper = {
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap-select/dist/css/bootstrap-select.min.css")">
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/handsontable/handsontable.full.min.css")">
 
@@ -66,14 +66,14 @@
 
 <script >
 	$(document).ready(function() {
-		$('#dynamiccontent').html($('#admin_wrapper').html());
-		$('#admin_wrapper').remove();
+		//$('#dynamiccontent').html($('#admin_wrapper').html());
+		//$('#admin_wrapper').remove();
 		
 		var container = document.getElementById('songtable');
 		var handsontable;
 		function deleteUser(email) {
 			console.log("Delete user : " + email);
-			jsRoutes.controllers.Application.deleteUser(email).ajax({
+			jsRoutes.controllers.Users.deleteUser(email).ajax({
 				type : 'DELETE',
 				success : function() {
 					var link = "@routes.Application.admin()";
@@ -150,3 +150,4 @@
 	}); 
 </script>
 }
+@admintheme("Admin", user, songsModified, songsCreated)(admin_wrapper)

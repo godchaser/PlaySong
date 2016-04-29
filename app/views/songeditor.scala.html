@@ -1,6 +1,6 @@
 @(id: String, songForm: Form[Song], user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion], songBooks : List [SongBook])
 
-@admintheme("Song Editor", user, songsModified, songsCreated) {
+@songeditor_wrapper = {
     <div id="songEditor">
         <h2>Edit or create song</h2>
         @helper.form(action = routes.Songs.updateorcreatesong()) {
@@ -53,8 +53,8 @@
 
     <script >
     $ ( document ).ready ( function ( ) {
-        $('#dynamiccontent').html($('#songEditor' ).html());
-        $('#songEditor' ).remove();
+        //$('#dynamiccontent').html($('#songEditor' ).html());
+        //$('#songEditor' ).remove();
 
         var songLyricsCount = 0;
         var id = "@id";
@@ -140,4 +140,5 @@
     });
     </script>
 }
+@admintheme("Song Editor", user, songsModified, songsCreated)(songeditor_wrapper)
 

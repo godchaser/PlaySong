@@ -1,11 +1,11 @@
 @(playlists: List[Playlist], user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion])
 
-@admintheme("Playlists", user, songsModified, songsCreated) {
+@playlists_wrapper = {
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap-select/dist/css/bootstrap-select.min.css")">
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/handsontable/handsontable.full.min.css")">
 <script src="@routes.Application.javascriptRoutes()" ></script>
 
-<div hidden id="playlists_wrapper">
+<div id="playlists_wrapper">
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-12">
@@ -51,8 +51,8 @@
 
 <script >
 	$(document).ready(function() {
-		$('#dynamiccontent').html($('#playlists_wrapper').html());
-		$('#playlists_wrapper').remove();
+		//$('#dynamiccontent').html($('#playlists_wrapper').html());
+		//$('#playlists_wrapper').remove();
 						
 		function deletePlaylist(id) {
 			console.log("Delete playlist : " + id);
@@ -82,3 +82,4 @@
 	}); 
 </script>
 }
+@admintheme("Playlists", user, songsModified, songsCreated)(playlists_wrapper)
