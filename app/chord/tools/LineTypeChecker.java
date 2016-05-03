@@ -59,7 +59,7 @@ public class LineTypeChecker {
 		}
 		// First check if this is possibly a verse marker - (C) (V)
 		if (line.trim().startsWith("(") || line.trim().startsWith("[")) {
-			Logger.debug("Not chord - most likely verse marker - " + line);
+			//Logger.debug("Not chord - most likely verse marker - " + line);
 			return false;
 		}
 
@@ -77,7 +77,7 @@ public class LineTypeChecker {
 				continue;
 			}
 			if (!s.matches("([a-gA-G](#|b)?[0-9]*((sus|dim|maj|dom|min|m|aug|add)?[0-9]*){3}(#|b)?[0-9]*)(/([a-gA-G](#|b)?[0-9]*((sus|dim|maj|dom|min|m|aug|add)?[0-9]*){3}(#|b)?[0-9]*))?")) {
-				Logger.debug("This prevents this string to be chord: " + s);
+				//Logger.debug("This prevents this string to be chord: " + s);
 				return false;
 			}
 		}

@@ -1,5 +1,6 @@
 package models;
 
+import javax.persistence.Transient;
 import java.util.Date;
 import java.util.List;
 
@@ -14,6 +15,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import chord.tools.LineTypeChecker;
 import chord.tools.SongSanitizer;
+import models.helpers.AndroidLyricsHtmlBuilder;
+
 import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -35,6 +38,9 @@ public class SongLyrics extends Model {
     public String songLyrics;
 
     public String songKey;
+    
+    @Transient
+    public String songLyricsAndroidHtml;
 
     public static SongLyrics get(String id) {
         return find.where().eq("id", id).findUnique();
@@ -113,6 +119,14 @@ public class SongLyrics extends Model {
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
+    }
+
+    public String getSongLyricsAndroidHtml() {
+        return AndroidLyricsHtmlBuilder.buildHtmlFromSongLyrics(songLyrics);
+    }
+
+    public void setSongLyricsAndroidHtml(String songLyricsAndroidHtml) {
+        this.songLyricsAndroidHtml = songLyricsAndroidHtml;
     }
     
     /*
