@@ -4,11 +4,14 @@ import javax.persistence.*;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import models.helpers.AndroidLyricsHtmlBuilder;
 import models.helpers.PdfPrintable;
 import play.data.validation.Constraints.Required;
 import com.avaje.ebean.Model;
 import com.avaje.ebean.Model.Finder;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import chord.tools.LineTypeChecker;
 
 @Entity
 public class PlaylistSong extends Model implements PdfPrintable, Comparable<PlaylistSong> {
@@ -38,6 +41,29 @@ public class PlaylistSong extends Model implements PdfPrintable, Comparable<Play
     @Required
     @Column(columnDefinition = "TEXT")
     public String songLyrics;
+    
+    @Transient
+    public String songLyricsAndroidHtml;
+    
+    @Transient
+    public String songLyricsAndroidChordsHtml;
+    
+    // used for android html generation
+    public String getSongLyricsAndroidHtml() {
+        return AndroidLyricsHtmlBuilder.buildHtmlFromSongLyrics(songLyrics);
+    }
+
+    public void setSongLyricsAndroidHtml(String songLyricsAndroidHtml) {
+        this.songLyricsAndroidHtml = songLyricsAndroidHtml;
+    }
+    
+    public String getSongLyricsAndroidChordsHtml() {
+        return AndroidLyricsHtmlBuilder.buildHtmlFromSongLyrics(LineTypeChecker.removeChordLines(songLyrics));
+    }
+
+    public void setSongLyricsAndroidChordsHtml(String songLyricsAndroidChordsHtml) {
+        this.songLyricsAndroidChordsHtml = songLyricsAndroidChordsHtml;
+    }
 
     public String getSongName() {
         return songName;

@@ -41,6 +41,9 @@ public class SongLyrics extends Model {
     
     @Transient
     public String songLyricsAndroidHtml;
+    
+    @Transient
+    public String songLyricsAndroidChordsHtml;
 
     public static SongLyrics get(String id) {
         return find.where().eq("id", id).findUnique();
@@ -120,13 +123,22 @@ public class SongLyrics extends Model {
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
     }
-
+    
+    // used for android html generation
     public String getSongLyricsAndroidHtml() {
         return AndroidLyricsHtmlBuilder.buildHtmlFromSongLyrics(songLyrics);
     }
 
     public void setSongLyricsAndroidHtml(String songLyricsAndroidHtml) {
         this.songLyricsAndroidHtml = songLyricsAndroidHtml;
+    }
+    
+    public String getSongLyricsAndroidChordsHtml() {
+        return AndroidLyricsHtmlBuilder.buildHtmlFromSongLyrics(LineTypeChecker.removeChordLines(songLyrics));
+    }
+
+    public void setSongLyricsAndroidChordsHtml(String songLyricsAndroidChordsHtml) {
+        this.songLyricsAndroidChordsHtml = songLyricsAndroidChordsHtml;
     }
     
     /*
