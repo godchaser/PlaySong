@@ -48,23 +48,6 @@ public class PlaylistSong extends Model implements PdfPrintable, Comparable<Play
     @Transient
     public String songLyricsAndroidChordsHtml;
     
-    // used for android html generation
-    public String getSongLyricsAndroidHtml() {
-        return AndroidLyricsHtmlBuilder.buildHtmlFromSongLyrics(songLyrics);
-    }
-
-    public void setSongLyricsAndroidHtml(String songLyricsAndroidHtml) {
-        this.songLyricsAndroidHtml = songLyricsAndroidHtml;
-    }
-    
-    public String getSongLyricsAndroidChordsHtml() {
-        return AndroidLyricsHtmlBuilder.buildHtmlFromSongLyrics(LineTypeChecker.removeChordLines(songLyrics));
-    }
-
-    public void setSongLyricsAndroidChordsHtml(String songLyricsAndroidChordsHtml) {
-        this.songLyricsAndroidChordsHtml = songLyricsAndroidChordsHtml;
-    }
-
     public String getSongName() {
         return songName;
     }
@@ -146,6 +129,24 @@ public class PlaylistSong extends Model implements PdfPrintable, Comparable<Play
 
     public void setInsertSequence(Long insertSequence) {
         this.insertSequence = insertSequence;
+    }
+    
+    // used for android html generation
+    public String getSongLyricsAndroidHtml() {
+        return AndroidLyricsHtmlBuilder.buildHtmlFromSongLyrics(LineTypeChecker.removeChordLines(songLyrics));
+    }
+
+    public void setSongLyricsAndroidHtml(String songLyricsAndroidHtml) {
+        this.songLyricsAndroidHtml = songLyricsAndroidHtml;
+    }
+
+    public String getSongLyricsAndroidChordsHtml() {
+        return AndroidLyricsHtmlBuilder.buildHtmlFromSongLyrics(songLyrics);
+
+    }
+
+    public void setSongLyricsAndroidChordsHtml(String songLyricsAndroidChordsHtml) {
+        this.songLyricsAndroidChordsHtml = songLyricsAndroidChordsHtml;
     }
 
     @Override

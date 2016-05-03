@@ -38,10 +38,10 @@ public class SongLyrics extends Model {
     public String songLyrics;
 
     public String songKey;
-    
+
     @Transient
     public String songLyricsAndroidHtml;
-    
+
     @Transient
     public String songLyricsAndroidChordsHtml;
 
@@ -119,43 +119,36 @@ public class SongLyrics extends Model {
     public void setSong(Song song) {
         this.song = song;
     }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
     }
-    
+
     // used for android html generation
     public String getSongLyricsAndroidHtml() {
-        return AndroidLyricsHtmlBuilder.buildHtmlFromSongLyrics(songLyrics);
+        return AndroidLyricsHtmlBuilder.buildHtmlFromSongLyrics(LineTypeChecker.removeChordLines(songLyrics));
     }
 
     public void setSongLyricsAndroidHtml(String songLyricsAndroidHtml) {
         this.songLyricsAndroidHtml = songLyricsAndroidHtml;
     }
-    
+
     public String getSongLyricsAndroidChordsHtml() {
-        return AndroidLyricsHtmlBuilder.buildHtmlFromSongLyrics(LineTypeChecker.removeChordLines(songLyrics));
+        return AndroidLyricsHtmlBuilder.buildHtmlFromSongLyrics(songLyrics);
+
     }
 
     public void setSongLyricsAndroidChordsHtml(String songLyricsAndroidChordsHtml) {
         this.songLyricsAndroidChordsHtml = songLyricsAndroidChordsHtml;
     }
-    
-    /*
-    // used only for removal of empty lyrics by Collection remove all
-    @Override
-    public boolean equals(Object o) {
-        if ((o instanceof SongLyrics) && (((SongLyrics) o).getsongLyrics().equals(getsongLyrics()))) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
-    @Override
-    public int hashCode() {
-        return getsongLyrics().hashCode();
-    }
-*/
-    
+    /*
+     * // used only for removal of empty lyrics by Collection remove all
+     * 
+     * @Override public boolean equals(Object o) { if ((o instanceof SongLyrics) && (((SongLyrics) o).getsongLyrics().equals(getsongLyrics()))) { return true; } else { return false; } }
+     * 
+     * @Override public int hashCode() { return getsongLyrics().hashCode(); }
+     */
+
 }
