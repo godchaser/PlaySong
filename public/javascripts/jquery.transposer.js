@@ -292,6 +292,9 @@
             });
             var hideChords = "<button id='hideChordsButton' type='button' class='btn btn-xs'>Hide Chords</button>";
             keyLinks.push(hideChords);
+            
+            var printSong = "  <button id='printSongButton' type='button' class='btn btn-xs'><i class='fa fa-print' aria-hidden='true'></i> Print</button>"; 
+            keyLinks.push(printSong);
 
             var $this = $(this);
             var keysHtml = $("<div class='transpose-keys'></div>");
@@ -330,6 +333,10 @@
             		backupHtml = null;
             		$(this).text("Hide Chords");
             	}
+            });
+            
+            $('#printSongButton').click(function(event) {
+            	//check if I should print with chords or without chords
             });
             
         });
