@@ -1,8 +1,8 @@
 package rest.api;
 
 import rest.json.PlaylistJson;
-import rest.json.SongLyricsJson;
 import rest.json.SongBookJson;
+import rest.json.SongLyricsJson;
 import rest.json.SongsJson;
 import retrofit2.Call;
 import retrofit2.http.GET;

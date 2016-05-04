@@ -22,13 +22,8 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
 import play.routing.JavaScriptReverseRouter;
-import views.html.admin;
-import views.html.login;
-import views.html.playlistmaker;
-import views.html.playlists;
-import views.html.songeditor;
-import views.html.songviewer;
-import views.html.table;
+
+import views.html.*;
 
 public class Application extends Controller {
     private Form<Song> songForm;
@@ -218,7 +213,8 @@ public class Application extends Controller {
                 controllers.routes.javascript.Application.playlistmaker(), 
                 controllers.routes.javascript.Application.playlists(),
                 controllers.routes.javascript.Songs.deletesong(), 
-                controllers.routes.javascript.Songs.songsuggestions(), 
+                controllers.routes.javascript.Songs.songsuggestions(),
+                controllers.routes.javascript.Songs.printSong(),
                 controllers.routes.javascript.Playlists.downloadPlaylist(), 
                 controllers.routes.javascript.Playlists.generatePlaylist(), 
                 controllers.routes.javascript.Playlists.deletePlayList(), 

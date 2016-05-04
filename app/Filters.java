@@ -1,8 +1,8 @@
-import play.mvc.EssentialFilter;
+import javax.inject.Inject;
+
 import play.filters.gzip.GzipFilter;
 import play.http.HttpFilters;
-
-import javax.inject.Inject;
+import play.mvc.EssentialFilter;
 
 public class Filters implements HttpFilters {
 

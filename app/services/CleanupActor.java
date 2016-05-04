@@ -2,10 +2,10 @@ package services;
 import java.io.File;
 import java.util.Date;
 
+import play.Logger;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
 import akka.japi.Creator;
-import play.Logger;
 
 public class CleanupActor extends UntypedActor {
 

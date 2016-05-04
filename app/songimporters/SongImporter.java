@@ -11,12 +11,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import models.Song;
+import models.SongLyrics;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -26,9 +28,6 @@ import org.xml.sax.SAXException;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import models.Song;
-import models.SongLyrics;
 
 /**
  * Created by samuel on 23.02.15..

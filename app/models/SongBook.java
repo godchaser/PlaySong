@@ -3,20 +3,19 @@ package models;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.crypto.spec.DHGenParameterSpec;
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+
+import models.helpers.IdHelper;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import com.avaje.ebean.Expr;
-import com.avaje.ebean.Model;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import database.DatabaseHelper;
-import models.helpers.IdHelper;
 import play.Logger;
 import play.db.ebean.Transactional;
+
+import com.avaje.ebean.Model;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 public class SongBook extends Model {
@@ -154,11 +153,6 @@ public class SongBook extends Model {
 
     public static List<SongBook> getAllPublicSongbooks() {
         return find.where().eq("private_songbook", false).findList();
-    }
-
-    // INTERESTING: I have to fetch users first and then query it's members
-    private static List<SongBook> getSongbooksOwnedByUserExample(String email, String songBookName) {
-        return find.fetch("users").where().and(Expr.eq("users.email", email), Expr.eq("song_book_name", songBookName)).findList();
     }
 
     public static SongBook getByNameAndEmail(String songBookName, String email) {

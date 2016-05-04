@@ -1,17 +1,23 @@
 package models;
 
-import javax.persistence.*;
-
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 import models.helpers.AndroidLyricsHtmlBuilder;
 import models.helpers.PdfPrintable;
-import play.data.validation.Constraints.Required;
-import com.avaje.ebean.Model;
-import com.avaje.ebean.Model.Finder;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import play.data.validation.Constraints.Required;
 import chord.tools.LineTypeChecker;
+
+import com.avaje.ebean.Model;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 public class PlaylistSong extends Model implements PdfPrintable, Comparable<PlaylistSong> {

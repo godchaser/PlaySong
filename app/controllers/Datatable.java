@@ -5,12 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.SqlRow;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import database.SqlQueries;
 import models.SongBook;
 import models.UserAccount;
 import models.helpers.SongTableData;
@@ -18,6 +12,13 @@ import models.helpers.SongToJsonConverter;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.SqlRow;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import database.SqlQueries;
 
 public class Datatable extends Controller {
 

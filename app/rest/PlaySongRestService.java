@@ -2,32 +2,24 @@ package rest;
 
 //import com.zeppelin.app.playsong.database.PlaySongDatabase;
 
-import rest.api.PlaySongService;
-import rest.json.PlaylistJson;
-import rest.json.SongLyricsJson;
-import rest.json.SongBookJson;
-import rest.json.SongsJson;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Observable;
-import java.util.Observer;
 
-import org.h2.engine.Database;
-
-import com.google.inject.Inject;
-
-import database.DatabaseHelper;
 import okhttp3.ResponseBody;
+import play.Logger;
+import rest.api.PlaySongService;
+import rest.json.PlaylistJson;
+import rest.json.SongBookJson;
+import rest.json.SongLyricsJson;
+import rest.json.SongsJson;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.GsonConverterFactory;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-
-import play.Logger;
-import play.db.ebean.Transactional;
+import database.DatabaseHelper;
 
 /**
  * Created by samuel on 12/28/15.
@@ -160,7 +152,7 @@ public class PlaySongRestService extends Observable {
                     // 200
                     Logger.trace("PlaySongRestService", "Favorites Song Data successfully fetched");
                     Logger.trace("PlaySongRestService", "Writing favorites song data to db");
-                    List<String> updatedFavorites = db.writeJsonFavoritesSongsToDb(Arrays.asList(model));
+                    db.writeJsonFavoritesSongsToDb(Arrays.asList(model));
                     Logger.trace("PlaySongRestService", "Notifying observer that favorites songs are fetched");
                     setChanged();
                     notifyObservers(KEY_FAVORITES_FETCHED);

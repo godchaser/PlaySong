@@ -1,6 +1,13 @@
 package document.tools;
 
-import com.avaje.ebean.Expr;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import models.Song;
 
@@ -9,18 +16,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.avaje.ebean.Expr;
 
 /**
  * Created by samuel on 5/8/15.
@@ -77,12 +73,13 @@ public class XlsHelper {
 
 	public static List<XLSSong> importXLS2Songs2() {
 		List<XLSSong> songs = new ArrayList<XLSSong>();
+		XSSFWorkbook workbook = null;
 		try {
 			FileInputStream file = new FileInputStream(new File(
 					"resources/PJESMARICA.xlsx"));
 
 			// Create Workbook instance holding reference to .xlsx file
-			XSSFWorkbook workbook = new XSSFWorkbook(file);
+			workbook = new XSSFWorkbook(file);
 
 			// Get first/desired sheet from the workbook
 			XSSFSheet sheet = workbook.getSheetAt(0);
@@ -140,6 +137,14 @@ public class XlsHelper {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		finally {
+			try {
+				workbook.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		for (XLSSong s : songs) {
 			System.out.println(s.getSongName() + " " + s.getSongOriginalTitle()
 					+ " " + s.getSongAuthor() + " " + s.getSongLink());
@@ -150,12 +155,13 @@ public class XlsHelper {
 	public static List<XLSSong> importXLS2Songs() {
 		int MY_MINIMUM_COLUMN_COUNT = 4;
 		List<XLSSong> songs = new ArrayList<>();
+		XSSFWorkbook workbook = null;
 		try {
 			FileInputStream file = new FileInputStream(new File(
 					"resources/PJESMARICA.xlsx"));
 
 			// Create Workbook instance holding reference to .xlsx file
-			XSSFWorkbook workbook = new XSSFWorkbook(file);
+			workbook = new XSSFWorkbook(file);
 
 			// Get first/desired sheet from the workbook
 			XSSFSheet sheet = workbook.getSheetAt(0);
@@ -215,6 +221,14 @@ public class XlsHelper {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		finally {
+			try {
+				workbook.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
 		for (XLSSong s : songs) {
 			System.out.println(s.getSongName() + " " + s.getSongOriginalTitle()
@@ -227,12 +241,13 @@ public class XlsHelper {
 	public static List<XLSSong> importXLS2Songs3() {
 		int MY_MINIMUM_COLUMN_COUNT = 5;
 		List<XLSSong> songs = new ArrayList<>();
+		XSSFWorkbook workbook = null;
 		try {
 			FileInputStream file = new FileInputStream(new File(
 					"resources/upload/songs.xlsx"));
 
 			// Create Workbook instance holding reference to .xlsx file
-			XSSFWorkbook workbook = new XSSFWorkbook(file);
+			 workbook = new XSSFWorkbook(file);
 
 			// Get first/desired sheet from the workbook
 			XSSFSheet sheet = workbook.getSheetAt(0);
@@ -294,6 +309,14 @@ public class XlsHelper {
 			file.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		finally {
+			try {
+				workbook.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		for (XLSSong s : songs) {
@@ -391,6 +414,7 @@ public class XlsHelper {
 					"resources/xlsx/songs.xlsx"));
 			workbook.write(out);
 			out.close();
+			workbook.close();
 			System.out.println("Excel written successfully..");
 
 		} catch (FileNotFoundException e) {

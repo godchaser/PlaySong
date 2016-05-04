@@ -13,16 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import chord.tools.LineTypeChecker;
-import document.tools.DocxGenerator;
-import document.tools.PdfGenerator;
 import models.Playlist;
 import models.PlaylistSong;
 import models.Song;
@@ -37,6 +27,14 @@ import play.Logger;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import chord.tools.LineTypeChecker;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import document.tools.DocxGenerator;
+import document.tools.PdfGenerator;
 
 public class Playlists extends Controller {
 
@@ -96,6 +94,7 @@ public class Playlists extends Controller {
         boolean publishPlaylist = false;
         String playListName = null;
         boolean excludeChords = false;
+        boolean excludePageOfContent = false;
         boolean useColumns = false;
 
         try {
@@ -149,7 +148,7 @@ public class Playlists extends Controller {
                 String outputPdfPath = "resources/pdf/" + playlistHash + ".pdf";
                 try {
                     Logger.debug("Writing PDF: " + outputPdfPath);
-                    PdfGenerator.writeListContent(outputPdfPath, songsForPrint, useColumns);
+                    PdfGenerator.writeListContent(outputPdfPath, songsForPrint, useColumns, excludePageOfContent);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -193,12 +192,11 @@ public class Playlists extends Controller {
     }
 
     public Result downloadPlaylist(String id) {
-        UserAccount user = getUserFromCookie();
-
         boolean useColumns = true;
         boolean excludeChords = false;
         String playlist_id = null;
         boolean defaultPlayListOptions = true;
+        boolean excludePageOfContent = false;
 
         // Skip this if id is shorter than 3 digits while it is default case
         if (id.length() > 3) {
@@ -249,7 +247,7 @@ public class Playlists extends Controller {
         String outputPdfPath = "resources/pdf/" + normalizedFileName + "_" + date + ".pdf";
         try {
             Logger.debug("Writing PDF: " + outputPdfPath);
-            PdfGenerator.writeListContent(outputPdfPath, songPrintList, useColumns);
+            PdfGenerator.writeListContent(outputPdfPath, songPrintList, useColumns, excludePageOfContent);
         } catch (Exception e) {
             e.printStackTrace();
         }

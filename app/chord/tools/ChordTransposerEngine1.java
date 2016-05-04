@@ -1,9 +1,9 @@
 package chord.tools;
 
-import play.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import play.Logger;
 
 /**
  * Created by samuel on 5/1/15.

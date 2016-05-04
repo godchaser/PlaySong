@@ -6,8 +6,6 @@ import models.Playlist;
 import models.PlaylistSong;
 import models.Song;
 import models.SongLyrics;
-import org.apache.commons.codec.net.*;
-import org.apache.commons.lang3.StringUtils;
 public class IdHelper {
     public static String getRandomId() {
         return UUID.randomUUID().toString().substring(0, 8);

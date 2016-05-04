@@ -21,7 +21,6 @@ package chord.tools;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import play.Logger;
 
 /**
  * Transposes a chord down or up a certain number of semitones.

@@ -3,16 +3,16 @@ package services;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
-import javax.inject.*;
-
-import akka.actor.*;
-import play.Logger;
-import play.inject.ApplicationLifecycle;
-import play.libs.Akka;
-import scala.concurrent.duration.Duration;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import play.Logger;
+import play.inject.ApplicationLifecycle;
+import scala.concurrent.duration.Duration;
 import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
 
 
 /**

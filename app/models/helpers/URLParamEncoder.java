@@ -1,8 +1,9 @@
 package models.helpers;
 
-import java.util.*;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by samuel on 4/7/15.

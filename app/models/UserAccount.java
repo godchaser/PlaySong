@@ -3,17 +3,21 @@ package models;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import play.Logger;
 import play.data.validation.Constraints.Required;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Model;
 
 import database.SqlQueries;
-import play.Logger;
 
 @Entity
 public class UserAccount extends Model {

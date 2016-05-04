@@ -1,16 +1,11 @@
 package document.tools;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import models.Song;
@@ -116,7 +111,7 @@ public class XmlSongsParser {
 	}
 
 	public static void main(String[] args) throws Exception {
-		SongsXML songs = readXMLFile("resources/songs.html");
+		readXMLFile("resources/songs.html");
 	}
 
 }

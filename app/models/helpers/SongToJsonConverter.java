@@ -3,22 +3,15 @@ package models.helpers;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import models.Playlist;
+import models.Song;
+import models.SongBook;
+import models.SongLyrics;
+import play.libs.Json;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import models.SongLyrics;
-import play.libs.Json;
-import models.Playlist;
-import models.PlaylistSong;
-import models.Song;
-import models.SongBook;
 
 /**
  * Created by samuel on 4/1/15.

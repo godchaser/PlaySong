@@ -1,25 +1,23 @@
 package models;
 
-import javax.persistence.Transient;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
+
+import models.helpers.AndroidLyricsHtmlBuilder;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import chord.tools.LineTypeChecker;
 import chord.tools.SongSanitizer;
-import models.helpers.AndroidLyricsHtmlBuilder;
 
 import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Created by samuel on 3/31/15.

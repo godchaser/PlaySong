@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.SqlRow;
-
 import models.Playlist;
 import models.PlaylistSong;
 import models.Song;
@@ -112,10 +109,6 @@ public class DatabaseHelper {
         // TODO: IMPLEMENT OPTIONAL DELETION OF MISSING REMOTE SONGS
         for (SongLyricsJson songlyrics : songLyricsJson) {
             SongLyrics songlyricsdb = new SongLyrics();
-            SongLyrics foundSongLyrics = null;
-
-            foundSongLyrics = SongLyrics.get(songlyrics.getSongLyricsId());
-
             Logger.trace("PlaySongDatabase : Checking if song lyrics is already in db: " + songlyrics.getSongLyricsId() + " : " + songlyrics.getSongId());
 
             boolean shouldUpdateSong = false;
