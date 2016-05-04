@@ -5,30 +5,27 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
+import models.helpers.IdHelper;
+import models.helpers.SongSuggestion;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import play.Logger;
+import play.data.format.Formats;
+import play.data.validation.Constraints.Required;
 
 import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
-import database.DatabaseHelper;
-import models.helpers.IdHelper;
-import models.helpers.SongSuggestion;
-import play.Logger;
-import play.data.format.Formats;
-import play.data.validation.Constraints.Required;
 
 /**
  * Created by samuel on 19.02.15..

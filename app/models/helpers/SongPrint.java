@@ -1,25 +1,24 @@
 package models.helpers;
 
-import chord.tools.ChordLineTransposer;
-import chord.tools.LineTypeChecker;
 import models.Song;
 import models.SongLyrics;
-import play.Logger;
+import chord.tools.ChordLineTransposer;
+import chord.tools.LineTypeChecker;
 
 /**
  * Created by samuel on 4/7/15.
  */
 public class SongPrint implements PdfPrintable {
     Song song;
-    String lyricsID;
-    String key;
+    String lyricsId;
+    String lyricsKey;
     boolean excludeChords;
 
-    public SongPrint(Song s, String lid, String key, boolean excludeChords) {
-        setSong(s);
-        setLyricsID(lid);
-        setKey(key);
-        setExcludeChords(excludeChords);
+    public SongPrint(Song song, String lyricsId, String lyricsKey, boolean excludeChords) {
+        this.song = song;
+        this.lyricsId = lyricsId;
+        this.lyricsKey = lyricsKey;
+        this.excludeChords = excludeChords;
     }
 
     public Song getSong() {
@@ -31,19 +30,19 @@ public class SongPrint implements PdfPrintable {
     }
 
     public String getLyricsID() {
-        return lyricsID;
+        return lyricsId;
     }
 
     public void setLyricsID(String lyricsID) {
-        this.lyricsID = lyricsID;
+        this.lyricsId = lyricsID;
     }
 
     public String getKey() {
-        return key;
+        return lyricsKey;
     }
 
     public void setKey(String key) {
-        this.key = key;
+        this.lyricsKey = key;
     }
 
     public String getTitle() {
@@ -57,12 +56,12 @@ public class SongPrint implements PdfPrintable {
         // SONG TRANSPOSE FUNCTION
         String origKey = songLyricsObject.getSongKey();
         String newKey = getKey();
-        Logger.trace("Orig key: " + origKey + " New key: " + newKey);
+        //Logger.trace("Orig key: " + origKey + " New key: " + newKey);
         if (!origKey.equals(newKey)) {
             songLyrics = ChordLineTransposer.transposeLyrics(origKey, newKey, songLyrics);
         }
         if (excludeChords) {
-            Logger.trace("Removing chords");
+            //Logger.trace("Removing chords");
             songLyrics = LineTypeChecker.removeChordLines(songLyrics);
         }
 

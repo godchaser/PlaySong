@@ -18,6 +18,8 @@ GET      /suggestions                    controllers.Songs.songsuggestions
 POST     /songs                          controllers.Songs.updateorcreatesong
 DELETE   /songs/:id                      controllers.Songs.deletesong(id: String)
 
+# print single song pdf
+GET      /song/print/:id                controllers.Songs.printSong(id: String)
 # Authentication routes
 GET      /login                          controllers.Application.login
 POST     /login                          controllers.Application.authenticate
