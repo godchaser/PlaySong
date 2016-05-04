@@ -1,7 +1,6 @@
 @(id: String, songForm: Form[Song], user: UserAccount, songsModified : List[SongSuggestion], songsCreated : List[SongSuggestion], songBooks : List [SongBook])
 
 @songeditor_wrapper = {
-    <div id="songEditor">
         <h2>Edit or create song</h2>
         @helper.form(action = routes.Songs.updateorcreatesong()) {
         	<div class="row">
@@ -46,12 +45,11 @@
 			</div>
             </div>          
         }
-        </div>
-
+        
     <script src="@routes.Assets.at("lib/jquery/dist/jquery.min.js")" ></script>
     <script src="@routes.Application.javascriptRoutes()"  ></script>
 
-    <script >
+    <script>
     $ ( document ).ready ( function ( ) {
         //$('#dynamiccontent').html($('#songEditor' ).html());
         //$('#songEditor' ).remove();
