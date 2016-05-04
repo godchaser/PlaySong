@@ -9,7 +9,6 @@
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/datatables.net-bs/css/dataTables.bootstrap.css")">
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jquery.transposer.css")">
 
-<div id="song_table_wrapper" class="panel panel-default hover" cellspacing="0" width="100%">
    <h2>
       Songs 
       <select id="select-songbooks" class="selectpicker">
@@ -82,7 +81,6 @@
          </div>
       </div>
    </div>
-</div>
 </div>
 
 <!---->
@@ -336,6 +334,7 @@
 				"drawCallback": function( settings ) {
 			        selectRow();
 			    },
+                //"bAutoWidth": false,
 				"columns" : [{
 					"data" : "songName"
 				}, {
