@@ -3,7 +3,10 @@ package document.tools;
 /**
  * Created by samuel on 4/6/15.
  */
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -21,12 +24,10 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageSz;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STPageOrientation;
 
-import com.itextpdf.text.Paragraph;
-
-import chord.tools.ChordLineTransposer;
-import chord.tools.LineTypeChecker;
 import play.Logger;
 import play.Play;
+import chord.tools.ChordLineTransposer;
+import chord.tools.LineTypeChecker;
 
 public class DocxGenerator {
 
@@ -88,6 +89,7 @@ public class DocxGenerator {
 		// copy styles from template to new doc
 		XWPFStyles newStyles = document.createStyles();
 		newStyles.setStyles(template.getStyle());
+		template.close();
 
 		CTBody body = document.getDocument().getBody();
 		if (!body.isSetSectPr()) {
