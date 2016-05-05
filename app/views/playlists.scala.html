@@ -34,10 +34,10 @@
 							<li><i class="fa fa-music"></i>  @song.songName</li>
 						}
 						</ol>				
-						<a href="@routes.Playlists.downloadPlaylist(playlist.id.toString())" download><i class="fa fa-download"></i> Download playlist </a>					
-						<a href='@routes.Playlists.downloadPlaylist(playlist.id.toString()+"_x0")' download><i class="fa fa-download"></i> No chords</a>			
-					    <a href='@routes.Playlists.downloadPlaylist(playlist.id.toString()+"_0c")' download><i class="fa fa-download"></i> No columns</a>							
-					    <a href='@routes.Playlists.downloadPlaylist(playlist.id.toString()+"_xc")' download><i class="fa fa-download"></i> No chords&columns</a>
+						<a href='@routes.Playlists.downloadPlaylist(playlist.id.toString())?excludeChords=false&useColumns=true' download><i class="fa fa-download"></i> Download playlist </a>					
+						<a href='@routes.Playlists.downloadPlaylist(playlist.id.toString())?excludeChords=true&useColumns=true' download><i class="fa fa-download"></i> No chords</a>			
+					    <a href='@routes.Playlists.downloadPlaylist(playlist.id.toString())?excludeChords=false&useColumns=false' download><i class="fa fa-download"></i> No columns</a>							
+					    <a href='@routes.Playlists.downloadPlaylist(playlist.id.toString())?excludeChords=true&useColumns=false' download><i class="fa fa-download"></i> No chords&columns</a>
 					</li>
 					}
 				</ul>

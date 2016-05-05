@@ -200,40 +200,14 @@ public class Playlists extends Controller {
     public Result downloadPlaylist(String id) {
         boolean useColumns = true;
         boolean excludeChords = false;
-        String playlist_id = null;
-        boolean defaultPlayListOptions = true;
         boolean excludePageOfContent = false;
 
-        // TODO: use URL encoding params
-        //Map<String, String[]> params = request().queryString();
-        //excludeChords = Boolean.parseBoolean(params.get("excludeChords")[0].toLowerCase());
+        Map<String, String[]> params = request().queryString();
+        useColumns = Boolean.parseBoolean(params.get("useColumns")[0].toLowerCase());
+        excludeChords = Boolean.parseBoolean(params.get("excludeChords")[0].toLowerCase());
         
-        // Skip this if id is shorter than 3 digits while it is default case
-        if (id.length() > 3) {
-            switch (id.substring(id.length() - 3)) {
-            case "_x0":
-                excludeChords = true;
-                defaultPlayListOptions = false;
-                break;
-            case "_0c":
-                useColumns = false;
-                defaultPlayListOptions = false;
-                break;
-            case "_xc":
-                excludeChords = true;
-                useColumns = false;
-                defaultPlayListOptions = false;
-                break;
-            default:
-            }
-        }
-        if (!defaultPlayListOptions) {
-            playlist_id = id.substring(0, id.length() - 3);
-        } else {
-            playlist_id = id;
-        }
-
-        Playlist playlist = Playlist.get(playlist_id);
+        
+        Playlist playlist = Playlist.get(id);
 
         ArrayList<PdfPrintable> songPrintList = new ArrayList<PdfPrintable>();
 
