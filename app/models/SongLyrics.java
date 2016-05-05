@@ -9,7 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
-import models.helpers.AndroidLyricsHtmlBuilder;
+import models.helpers.HtmlBuilder;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -125,7 +125,7 @@ public class SongLyrics extends Model {
 
     // used for android html generation
     public String getSongLyricsAndroidHtml() {
-        return AndroidLyricsHtmlBuilder.buildHtmlFromSongLyrics(LineTypeChecker.removeChordLines(songLyrics));
+        return HtmlBuilder.buildHtmlFromSongLyrics(LineTypeChecker.removeChordLines(songLyrics));
     }
 
     public void setSongLyricsAndroidHtml(String songLyricsAndroidHtml) {
@@ -133,7 +133,7 @@ public class SongLyrics extends Model {
     }
 
     public String getSongLyricsAndroidChordsHtml() {
-        return AndroidLyricsHtmlBuilder.buildHtmlFromSongLyrics(songLyrics);
+        return HtmlBuilder.buildHtmlFromSongLyrics(songLyrics);
 
     }
 

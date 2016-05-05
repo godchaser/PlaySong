@@ -4,6 +4,8 @@ import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by samuel on 4/7/15.
@@ -73,6 +75,12 @@ public class URLParamEncoder {
         if (ch > 128 || ch < 0)
             return true;
         return " %$&+,/:;=?@<>#%".indexOf(ch) >= 0;
+    }
+    
+    public static boolean isUrl(String testUrl){
+    	Pattern p = Pattern.compile("(ftp|http|https):\\/\\/(\\w+:{0,1}\\w*)?(\\S+)(:[0-9]+)?(\\/|\\/([\\w#!:.?+=&%!\\-\\/]))?");
+        Matcher m = p.matcher(testUrl);
+        return (m.find())? true : false;
     }
 
 }
