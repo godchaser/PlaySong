@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import models.SongBook;
 import models.UserAccount;
+import models.helpers.HtmlBuilder;
 import models.helpers.SongTableData;
 import models.helpers.SongToJsonConverter;
 import play.libs.Json;
@@ -226,7 +227,7 @@ public class Datatable extends Controller {
                 for (Entry<String, SongTableData> inneritem : smallMap.entrySet()) {
                     String songId = inneritem.getKey();
                     SongTableData ts = inneritem.getValue();
-                    ObjectNode songJson = SongToJsonConverter.convert(ts.getSong_name(), ts.getSong_link(), ts.getSong_original_title(), ts.getSong_author(), songId, ts.getSong_importer(),
+                    ObjectNode songJson = SongToJsonConverter.convert(HtmlBuilder.buildHtmlSongButtonLinks(ts.getLyrics_id(), ts.getSong_name()), HtmlBuilder.buildHtmlVideoButtonLink(ts.getSong_link()), ts.getSong_original_title(), ts.getSong_author(), songId, ts.getSong_importer(),
                             ts.getLyrics_id());
                     an.add(songJson);
                 }
