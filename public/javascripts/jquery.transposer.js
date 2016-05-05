@@ -215,8 +215,8 @@
         
         return $(this).each(function() {
             var output = [];
-            console.log($(this));
-            console.log("transposer received: " + $(this).text());
+            //console.log($(this));
+            //console.log("transposer received: " + $(this).text());
             var lines = $(this).text().split("\n");
             var line = "";
             var initialChordSet = false;
@@ -310,7 +310,7 @@
 
             $(this).before(keysHtml);
             $(this).html(output.join("\n"));
-            console.log("transposer output: " + output);
+            //console.log("transposer output: " + output);
             
             $('#hideChordsButton').click(function(event) {
             	// hide
@@ -336,7 +336,13 @@
             });
             
             $('#printSongButton').click(function(event) {
-            	//check if I should print with chords or without chords
+            	console.log("Print song!");
+            	var link = "/song/print/";
+            	var songId = $('.selected-row').attr('id');
+				link = link.concat(songId);
+				var excludeChords = ("Unhide Chords" == $('#hideChordsButton').text());
+				link = link.concat("?excludeChords=" + excludeChords);
+				window.open(link, '_self');
             });
             
         });

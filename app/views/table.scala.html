@@ -358,26 +358,6 @@
 					"sRowSelect" : "single"
 				},
 				"fnRowCallback" : function(nRow, aData, iDisplayIndex) {
-					var sLinks = '<div class="paginationBar"> <button type="button" class="btn btn-link lyrics-link" id=' + aData.songLyricsIDs[0] + '>' + aData.songName + '</button>';
-					var songLyricsIdsCount = Object.keys(aData.songLyricsIDs).length;
-					if (songLyricsIdsCount > 1) {
-						$.each(aData.songLyricsIDs, function(i, s) {
-							//this it to skip zeroth iteration
-							if (i > 0) {
-								var idx = i + 1;
-								sLinks = sLinks.concat('<button class="lyrics-link" id=' + aData.songLyricsIDs[i] + '>' + idx + '</button>');
-							}
-						});
-					}
-					sLinks = sLinks.concat('</div>');
-					$('td:eq(0)', nRow).html(sLinks);
-					if (aData.songLink && isUrl(aData.songLink)) {
-						var sYTLink = '<button type="button" class="ytlinkbutton" id='+aData.songLink+' onclick="openYtLink(this.id)"><i class="fa fa-play-circle fa-lg"></i></button>';
-						$('td:eq(1)', nRow).html(sYTLink);
-					} else {
-						$('td:eq(1)', nRow).html("");
-					}
-	
 					$(nRow).attr('id', aData.songId);
 					$(nRow).attr('class', "songRow");
 					return nRow;
