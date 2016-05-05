@@ -228,7 +228,7 @@ public class IntegrationTest {
         Logger.warn("<-- TESTING SONG LYRICS CREATION -->");
         Logger.trace("updating existing song with lyrics");
         SongLyrics newSongLyrics = new SongLyrics();
-        newSongLyrics.setsongLyrics("Example song lyrics");
+        newSongLyrics.setSongLyrics("Example song lyrics");
         newSongLyrics.setSongKey("C");
         List <SongLyrics> songLyrics = new ArrayList<SongLyrics>();
         songLyrics.add(newSongLyrics);
@@ -264,7 +264,7 @@ public class IntegrationTest {
         Logger.warn("<-- TESTING SONG LYRICS UPDATE -->");
         Logger.trace("updating existing song with lyrics");
         SongLyrics updatedSongLyrics = new SongLyrics();
-        updatedSongLyrics.setsongLyrics("Updated Example song lyrics");
+        updatedSongLyrics.setSongLyrics("Updated Example song lyrics");
         updatedSongLyrics.setSongKey("D");
         songLyrics = new ArrayList<SongLyrics>();
         songLyrics.add(updatedSongLyrics);
