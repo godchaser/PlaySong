@@ -32,11 +32,14 @@ import chord.tools.LineTypeChecker;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
 
 import document.tools.DocxGenerator;
 import document.tools.PdfGenerator;
 
 public class Playlists extends Controller {
+    
+    @Inject DocxGenerator docxGenerator;
 
     public Result downloadAndDeleteFile() {
         final Set<Map.Entry<String, String[]>> entries = request().queryString().entrySet();
@@ -86,7 +89,7 @@ public class Playlists extends Controller {
 
         JsonNode jsonNode = request().body().asJson();
         List<SongPrint> songsForPrint = new ArrayList<>();
-        DocxGenerator docWriter = null;
+        
         Logger.trace("Playlist generator json string: " + jsonNode);
         ObjectMapper mapper = new ObjectMapper();
         String format = "word";
@@ -120,10 +123,9 @@ public class Playlists extends Controller {
                 songsForPrint.add(new SongPrint(Song.get(songJson.getSong().getId()), songJson.getSong().getLyricsID(), songJson.getSong().getKey(), excludeChords));
             }
             if ("word".equals(format)) {
-                docWriter = new DocxGenerator();
                 try {
-                    docWriter.setSongLyricsFont(jsonPlaylist.getFonts().getLyricsFont());
-                    docWriter.setSongTitleFont(jsonPlaylist.getFonts().getTitleFont());
+                    docxGenerator.setSongLyricsFont(jsonPlaylist.getFonts().getLyricsFont());
+                    docxGenerator.setSongTitleFont(jsonPlaylist.getFonts().getTitleFont());
                 } catch (NullPointerException e) {
                 } finally {
                 }
@@ -134,6 +136,10 @@ public class Playlists extends Controller {
 
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_hhmmss");
         Date date = new Date();
+        
+        if (playListName == null || playListName.length()<1){
+            playListName = "Playlist";
+        }
 
         // use playlist name as file hash if available
         String playlistHash = (new URLParamEncoder(playListName)).encode() + "_" + dateFormat.format(date);
@@ -143,7 +149,7 @@ public class Playlists extends Controller {
 
         try {
             if ("word".equals(format)) {
-                docWriter.newSongbookWordDoc(playlistHash, songsForPrint);
+                docxGenerator.newSongbookWordDoc(playlistHash, songsForPrint);
             } else if ("pdf".equals(format)) {
                 String outputPdfPath = "resources/pdf/" + playlistHash + ".pdf";
                 try {
@@ -198,6 +204,10 @@ public class Playlists extends Controller {
         boolean defaultPlayListOptions = true;
         boolean excludePageOfContent = false;
 
+        // TODO: use URL encoding params
+        //Map<String, String[]> params = request().queryString();
+        //excludeChords = Boolean.parseBoolean(params.get("excludeChords")[0].toLowerCase());
+        
         // Skip this if id is shorter than 3 digits while it is default case
         if (id.length() > 3) {
             switch (id.substring(id.length() - 3)) {
