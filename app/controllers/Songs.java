@@ -31,7 +31,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import database.SqlQueries;
 import document.tools.PdfGenerator;
-
 import views.html.songs;;
 
 public class Songs extends Controller {
@@ -148,20 +147,10 @@ public class Songs extends Controller {
 		boolean excludeChords = false;
 		boolean useColumns = true;
 		boolean excludePageOfContent = true;
-
-		// Skip this if id is shorter than 3 digits while it is default case
-		if (id.length() > 3) {
-			switch (id.substring(id.length() - 3)) {
-			case "_x0":
-				excludeChords = true;
-				break;
-			default:
-				break;
-			}
-		}
-
-		String songId = id.substring(0, id.length() - 3);	
-		Song song = Song.get(songId);
+		
+        Map<String, String[]> params = request().queryString();
+        excludeChords = Boolean.parseBoolean(params.get("excludeChords")[0].toLowerCase());
+		Song song = Song.get(id);
 		
 		if (song == null){
 			return notFound("<h1>Song not found</h1>").as("text/html");
