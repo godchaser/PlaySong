@@ -24,13 +24,16 @@ import play.data.format.Formats;
 import play.data.validation.Constraints.Required;
 
 import com.avaje.ebean.Model;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 /**
  * Created by samuel on 19.02.15..
  */
 @Entity
+@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 public class Song extends Model implements Comparator<Song> {
 
     @Id
@@ -57,7 +60,7 @@ public class Song extends Model implements Comparator<Song> {
     public boolean privateSong = false;
 
     @ManyToMany(mappedBy = "songs")
-    @JsonManagedReference
+    //@JsonManagedReference(value="song-songbook")
     public List<SongBook> songbooks = new ArrayList<SongBook>();
 
     @Column(updatable = false)
@@ -68,7 +71,7 @@ public class Song extends Model implements Comparator<Song> {
     public Date dateModified = new Date();
 
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
-    @JsonManagedReference
+    //@JsonManagedReference(value="song-songlyrics")
     public List<SongLyrics> songLyrics = new ArrayList<>();
 
     // this fields are only for form validation
@@ -78,6 +81,10 @@ public class Song extends Model implements Comparator<Song> {
     @Transient
     @JsonIgnore
     public String songBookId;
+    
+    @Transient
+    @JsonIgnore
+    public Song next;
 
     @Transient
     public boolean isPrivateSongBook;
@@ -211,17 +218,17 @@ public class Song extends Model implements Comparator<Song> {
         if (createNewSong) {
             // check if song with same name already exists
             song.setId(IdHelper.getNextAvailableSongId(song.songName));
-            Logger.debug("Saving song - by ID: " + song.id);
+            Logger.trace("Saving song - by ID: " + song.id);
             song.setSyncId(IdHelper.getNextAvailableSyncId());
             //Logger.debug("Saving song - by ID: " + song.id);
             song.setDateCreated(date);
             song.setDateModified(date);
-            song.save();
-            Logger.debug("Saving song: " + song.toString());
+            //Logger.debug("Saving song: " + song.toString());
+            song.save();    
         }
         // update existing song
         else {
-            Logger.debug("Updating song - by ID: " + song.id);
+            Logger.trace("Updating song - by ID: " + song.id);
             song.setDateModified(date);
             song.update();
         }

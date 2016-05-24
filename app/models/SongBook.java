@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.Transient;
 
 import models.helpers.IdHelper;
 
@@ -16,8 +17,12 @@ import play.db.ebean.Transactional;
 
 import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
+@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 public class SongBook extends Model {
 
     public static final String DEFAULT_SONGBOOK_ID = "00000000";
@@ -31,12 +36,18 @@ public class SongBook extends Model {
     public boolean privateSongbook = false;
 
     @ManyToMany
-    @JsonBackReference
+    //@JsonBackReference(value="song-songbook")
+    @JsonIgnore
     public List<Song> songs = new ArrayList<>();
 
     @ManyToMany
-    @JsonBackReference
+    //@JsonBackReference(value="songbook-user")
+    @JsonIgnore
     public List<UserAccount> users = new ArrayList<>();
+    
+    @Transient
+    @JsonIgnore
+    public SongBook next;
 
     public static SongBook getDefaultSongbook(UserAccount user) {
         SongBook defaultSongbook = SongBook.get(DEFAULT_SONGBOOK_ID);

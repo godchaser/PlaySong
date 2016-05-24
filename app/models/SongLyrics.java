@@ -18,18 +18,23 @@ import chord.tools.SongSanitizer;
 
 import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 /**
  * Created by samuel on 3/31/15.
  */
 @Entity
+@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 public class SongLyrics extends Model {
 
     @Id
     public String id;
 
     @ManyToOne
-    @JsonBackReference
+    //@JsonBackReference(value="song-songlyrics")
+    @JsonIgnore
     public Song song;
 
     @Column(columnDefinition = "TEXT")
@@ -42,6 +47,15 @@ public class SongLyrics extends Model {
 
     @Transient
     public String songLyricsAndroidChordsHtml;
+    
+    @Transient
+    @JsonIgnore
+    public SongLyrics next;
+    
+    //TODO: see why is this needed
+    @Transient
+    @JsonIgnore
+    public String songLyricsId;
 
     public static SongLyrics get(String id) {
         return find.where().eq("id", id).findUnique();

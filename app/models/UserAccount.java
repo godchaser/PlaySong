@@ -16,10 +16,14 @@ import play.data.validation.Constraints.Required;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Model;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import database.SqlQueries;
 
 @Entity
+@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 public class UserAccount extends Model {
 
     @Id
@@ -36,6 +40,10 @@ public class UserAccount extends Model {
     public static String defaultUserName = "test";
     @Transient
     public static String defaultUserPassword = "test";
+    
+    @Transient
+    @JsonIgnore
+    public UserAccount next;
     
     @ManyToMany(cascade = CascadeType.ALL)
     public List<SongBook> songbooks = new ArrayList<SongBook>();

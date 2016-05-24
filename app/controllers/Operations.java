@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 
 import models.Song;
 import models.UserAccount;
+import models.helpers.JsonToSongConverter;
 import models.helpers.URLParamEncoder;
 import play.Logger;
 import play.db.ebean.Transactional;
@@ -22,11 +23,16 @@ import songimporters.SongImporter;
 
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.inject.Inject;
 
+import document.tools.DocxGenerator;
 import document.tools.XlsHelper;
 import document.tools.XmlSongsParser;
 
 public class Operations extends Controller {
+    
+    @Inject JsonToSongConverter jsonToSongConverter;
+    
     @Security.Authenticated(Secured.class)
     @Transactional
     public Result syncDb() {
@@ -80,13 +86,11 @@ public class Operations extends Controller {
     }
     
     public Result test() {
-        //Logger.debug("TEST! " + java.util.UUID.randomUUID().toString().substring(0, 8));
-        String name = "Tko' je kao ti, što tamo radiš, Đurđice! .";
-        Logger.debug("Encoded URL: " + (new URLParamEncoder(name)).encode());
-        return redirect(controllers.routes.Application.table());
+        jsonToSongConverter.run();
+        return ok();
     }
-
     
+
     public UserAccount getUserFromCookie() {
         UserAccount user = null;
         if (request().cookies().get("PLAY_SESSION") != null) {
