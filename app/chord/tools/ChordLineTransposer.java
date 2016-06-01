@@ -157,7 +157,7 @@ public class ChordLineTransposer {
 				updatedSongLine = clt.transpose2(origKey, newKey);
 				Logger.trace(updatedSongLine);
 			}
-			transposedSong.append(updatedSongLine + "\r\n");
+			transposedSong.append(updatedSongLine + "\n");
 		}
 		Logger.trace(transposedSong.toString());
 		return transposedSong.toString();
