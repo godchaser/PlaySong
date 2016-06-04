@@ -29,14 +29,14 @@ public class UserAccount extends Model {
     public String name;
     @Required
     public String password;
-    
+
     @Transient
-    public static String defaultUserEmail = "test@test.com"; 
+    public static String defaultUserEmail = "test@test.com";
     @Transient
     public static String defaultUserName = "test";
     @Transient
     public static String defaultUserPassword = "test";
-    
+
     @ManyToMany(cascade = CascadeType.ALL)
     public List<SongBook> songbooks = new ArrayList<SongBook>();
 
@@ -90,17 +90,22 @@ public class UserAccount extends Model {
     }
 
     public static void initDefaultUser() {
-        try {
-            Ebean.createSqlUpdate(SqlQueries.sqlDeleteAllUserAccounts).execute();
-            UserAccount test = new UserAccount(defaultUserEmail, defaultUserName, defaultUserPassword);
-            test.save();
-            test.setDefaultSongbook();
-            test.update();
-        } catch (Exception e) {
-            Logger.error("Exception occured during init" + e.getStackTrace());
-            e.printStackTrace();
-            System.out.print(e.getStackTrace());
-            System.out.print(e.getMessage());
+        if (UserAccount.getByEmail(defaultUserEmail) != null) {
+            Logger.info("Default test user already provisioned");
+        } else {
+            Logger.info("Trying to provision default user");
+            try {
+                Ebean.createSqlUpdate(SqlQueries.sqlDeleteAllUserAccounts).execute();
+                UserAccount test = new UserAccount(defaultUserEmail, defaultUserName, defaultUserPassword);
+                test.save();
+                test.setDefaultSongbook();
+                test.update();
+            } catch (Exception e) {
+                Logger.error("Exception occured during init" + e.getStackTrace());
+                e.printStackTrace();
+                System.out.print(e.getStackTrace());
+                System.out.print(e.getMessage());
+            }
         }
     }
 

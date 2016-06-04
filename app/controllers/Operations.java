@@ -57,7 +57,7 @@ public class Operations extends Controller {
 
     @Transactional
     public Result inituser() {
-        Logger.debug("Initializing default user!");
+        Logger.debug("Trying to provision default user");
         UserAccount.initDefaultUser();
         return redirect(controllers.routes.Application.index());
     }
