@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class Rest extends Controller {
     private DynamicForm dynamicForm;
-    
+
     @Inject
     public Rest(FormFactory formFactory) {
         this.dynamicForm = formFactory.form();
@@ -71,12 +71,15 @@ public class Rest extends Controller {
 
     public Result getsonglyricsjson(String id) {
         SongLyrics lyricsObject = SongLyrics.get(id);
-        String lyrics = lyricsObject.getSongLyrics();
-        ObjectNode lyricsResult = Json.newObject();
-        lyricsResult.put("songLyrics", lyrics);
-        return ok(Json.toJson(lyricsResult));
+        if (lyricsObject != null) {
+            String lyrics = lyricsObject.getSongLyrics();
+            ObjectNode lyricsResult = Json.newObject();
+            lyricsResult.put("songLyrics", lyrics);
+            return ok(Json.toJson(lyricsResult));
+        }
+        return ok(Json.toJson(""));
     }
-    
+
     @Transactional
     @Security.Authenticated(Secured.class)
     public Result updatesonglyricsjson(String id) {
