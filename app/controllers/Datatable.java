@@ -5,27 +5,39 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.SqlRow;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.inject.Inject;
+
+import database.SqlQueries;
 import models.SongBook;
 import models.UserAccount;
 import models.helpers.HtmlBuilder;
 import models.helpers.SongTableData;
 import models.helpers.SongToJsonConverter;
+import play.Configuration;
+import play.Logger;
+import play.cache.CacheApi;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.SqlRow;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import database.SqlQueries;
-
 public class Datatable extends Controller {
+    
+    boolean cachingFeature;
+    @Inject
+    CacheApi cache;
+    
+    @Inject
+    public Datatable(Configuration configuration) {
+        cachingFeature = configuration.underlying().getBoolean("playsong.songtable.caching.enabled");
+    }
 
     public Result getsongsdatatable(String songBookId) {
         UserAccount user = getUserFromCookie();
-
+        
         String songBookIdFilter = SongBook.DEFAULT_SONGBOOK_ID;
         // Logger.debug("Looking for songbook by ID: " + songBookId);
 
@@ -67,7 +79,7 @@ public class Datatable extends Controller {
             break;
         }
 
-        List<SqlRow> queryResult;
+        List<SqlRow> queryResult = null;
 
         String sqlQuery = null;
 
@@ -92,7 +104,22 @@ public class Datatable extends Controller {
                             + "order by " + sortBy + " " + order;
                 // @formatter:on
             }
-            queryResult = Ebean.createSqlQuery(sqlQuery).findList();
+
+            // caching is turned on
+            if (cachingFeature) {
+                queryResult = cache.get(songBookIdFilter.toString() + SongBook.SONGBOOK_TABLE_CACHE_NAME);
+                // cache available
+                if (queryResult != null) {
+                    Logger.debug("Cache available, now using it for songbook: " + songBookIdFilter);
+                } else {
+                    queryResult = Ebean.createSqlQuery(sqlQuery).findList();
+                    cache.set(songBookIdFilter.toString() + SongBook.SONGBOOK_TABLE_CACHE_NAME, queryResult);
+                    Logger.debug("Cache not available, creating it for songbook: " + songBookIdFilter);
+                }
+            } else {
+                // caching is off
+                queryResult = Ebean.createSqlQuery(sqlQuery).findList();
+            }
         }
         // this is scenario with string filter
         else {
@@ -227,8 +254,8 @@ public class Datatable extends Controller {
                 for (Entry<String, SongTableData> inneritem : smallMap.entrySet()) {
                     String songId = inneritem.getKey();
                     SongTableData ts = inneritem.getValue();
-                    ObjectNode songJson = SongToJsonConverter.convert(HtmlBuilder.buildHtmlSongButtonLinks(ts.getLyrics_id(), ts.getSong_name()), HtmlBuilder.buildHtmlVideoButtonLink(ts.getSong_link()), ts.getSong_original_title(), ts.getSong_author(), songId, ts.getSong_importer(),
-                            ts.getLyrics_id());
+                    ObjectNode songJson = SongToJsonConverter.convert(HtmlBuilder.buildHtmlSongButtonLinks(ts.getLyrics_id(), ts.getSong_name()),
+                            HtmlBuilder.buildHtmlVideoButtonLink(ts.getSong_link()), ts.getSong_original_title(), ts.getSong_author(), songId, ts.getSong_importer(), ts.getLyrics_id());
                     an.add(songJson);
                 }
                 break;
@@ -243,7 +270,7 @@ public class Datatable extends Controller {
 
         return ok(result);
     }
-    
+
     public UserAccount getUserFromCookie() {
         UserAccount user = null;
         if (request().cookies().get("PLAY_SESSION") != null) {

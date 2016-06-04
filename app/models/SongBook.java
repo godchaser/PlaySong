@@ -2,6 +2,7 @@ package models;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -22,6 +23,7 @@ public class SongBook extends Model {
 
     public static final String DEFAULT_SONGBOOK_ID = "00000000";
     public static final String DEFAULT_SONGBOOK_NAME = "default";
+    public static final String SONGBOOK_TABLE_CACHE_NAME = ".songbook.table.data";
 
     @Id
     public String id;
@@ -180,6 +182,10 @@ public class SongBook extends Model {
 
     public static List<SongBook> all() {
         return find.all();
+    }
+    
+    public static List<String> getAllSongbookIds(){
+        return all().stream().map(songBookId -> songBookId.getId()).collect(Collectors.toList());
     }
 
     public static void addSong(Song song, SongBook activeSongbook) {
