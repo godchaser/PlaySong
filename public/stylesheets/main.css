@@ -24,6 +24,12 @@
 	float: right!important;
 }
 
+.scrollable-menu {
+    height: auto;
+    max-height: 300px;
+    overflow-x: hidden;
+}
+
 /* tablets and upwards */
 @media (min-width: 768px) {
     .pull-dropdown {
