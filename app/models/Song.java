@@ -217,13 +217,14 @@ public class Song extends Model implements Comparator<Song> {
             song.setDateCreated(date);
             song.setDateModified(date);
             song.save();
-            Logger.debug("Saving song: " + song.toString());
+            Logger.debug("Song saved: " + song.toString(song.id));
         }
         // update existing song
         else {
             Logger.debug("Updating song - by ID: " + song.id);
             song.setDateModified(date);
             song.update();
+            Logger.debug("Song updated: " + song.toString(song.id));
         }
         Logger.debug("Song last modified by user: " + song.songLastModifiedBy);
         Logger.debug("Song updated on: " + song.getDateModified().toString());
@@ -446,9 +447,8 @@ public class Song extends Model implements Comparator<Song> {
         return getId().hashCode();
     }
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+    public String toString(String id) {
+        return ToStringBuilder.reflectionToString(Song.get(id));
     }
 
     public String getTmpId() {
