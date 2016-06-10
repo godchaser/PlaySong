@@ -97,9 +97,11 @@ public class LineTypeChecker {
 					Logger.debug("removing all full stops (.) with blanks");
 					songLine = songLine.replace(".", "");
 				}
-				key = songLine.trim().substring(0, 1);
-				Logger.trace("Song key:" + key);
-				break;
+				songLine = songLine.trim();
+                char secondSongLineCharacter = songLine.charAt(1);
+                key = (secondSongLineCharacter == '#' || secondSongLineCharacter == 'b') ? songLine.substring(0, 2) : songLine.substring(0, 1);
+                Logger.trace("Song key:" + key);
+                break;
 			}
 		}
 		// Now checkin if this is valid Chord
