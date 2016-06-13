@@ -24,6 +24,8 @@ public class URLParamEncoder {
         searchAndReplaceMap.put("!", "");
         searchAndReplaceMap.put("?", "");
         searchAndReplaceMap.put(" ", "-");
+        searchAndReplaceMap.put("(", "");
+        searchAndReplaceMap.put(")", "");
         searchAndReplaceMap.put("--", "-");
     }
 
