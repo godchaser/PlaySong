@@ -217,14 +217,14 @@ public class Song extends Model implements Comparator<Song> {
             song.setDateCreated(date);
             song.setDateModified(date);
             song.save();
-            Logger.debug("Song saved: " + song.toString());
+            //Logger.debug("Song saved: " + song.toString());
         }
         // update existing song
         else {
             Logger.debug("Updating song - by ID: " + song.id);
             song.setDateModified(date);
             song.update();
-            Logger.debug("Song updated: " + song.toString());
+            //Logger.debug("Song updated: " + song.toString());
         }
         Logger.debug("Song last modified by user: " + song.songLastModifiedBy);
         Logger.debug("Song updated on: " + song.getDateModified().toString());
