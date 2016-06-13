@@ -266,7 +266,7 @@ public class SongBook extends Model {
 
     @Override
     public String toString() {
-        return ReflectionToStringBuilder.toStringExclude(this, "song");
+        return ReflectionToStringBuilder.toStringExclude(this, "songs");
     }
 
 }
