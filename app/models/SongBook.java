@@ -10,6 +10,7 @@ import javax.persistence.ManyToMany;
 
 import models.helpers.IdHelper;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import play.Logger;
@@ -265,7 +266,7 @@ public class SongBook extends Model {
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        return ReflectionToStringBuilder.toStringExclude(this, "song");
     }
 
 }

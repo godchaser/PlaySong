@@ -11,6 +11,7 @@ import javax.persistence.Transient;
 import models.helpers.HtmlBuilder;
 import models.helpers.PdfPrintable;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import play.data.validation.Constraints.Required;
@@ -162,7 +163,7 @@ public class PlaylistSong extends Model implements PdfPrintable, Comparable<Play
     
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        return ReflectionToStringBuilder.toStringExclude(this, "playlist");
     }
 
 }

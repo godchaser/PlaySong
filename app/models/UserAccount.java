@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import play.Logger;
@@ -157,7 +158,7 @@ public class UserAccount extends Model {
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        return ReflectionToStringBuilder.toStringExclude(this, "songbooks");
     }
 
 }
