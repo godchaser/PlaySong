@@ -120,7 +120,7 @@ public class SongLyrics extends Model {
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        return ToStringBuilder.reflectionToString(SongLyrics.get(id));
     }
 
     // used for android html generation

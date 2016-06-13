@@ -217,14 +217,14 @@ public class Song extends Model implements Comparator<Song> {
             song.setDateCreated(date);
             song.setDateModified(date);
             song.save();
-            Logger.debug("Song saved: " + song.toString(song.id));
+            Logger.debug("Song saved: " + song.toString());
         }
         // update existing song
         else {
             Logger.debug("Updating song - by ID: " + song.id);
             song.setDateModified(date);
             song.update();
-            Logger.debug("Song updated: " + song.toString(song.id));
+            Logger.debug("Song updated: " + song.toString());
         }
         Logger.debug("Song last modified by user: " + song.songLastModifiedBy);
         Logger.debug("Song updated on: " + song.getDateModified().toString());
@@ -304,7 +304,7 @@ public class Song extends Model implements Comparator<Song> {
 
         Date dateNow = Calendar.getInstance().getTime();
 
-        List<Song> songsCreatedInLastMonth = Song.find.where().between("date_created", dateBeforeAMonth, dateNow).orderBy("date_created desc").setMaxRows(10).findList();
+        List<Song> songsCreatedInLastMonth = Song.find.where().between("date_created", dateBeforeAMonth, dateNow).orderBy("date_created desc").findList();
 
         List<SongSuggestion> songCreatedList = new ArrayList<>();
         for (Song song : songsCreatedInLastMonth) {
@@ -447,8 +447,9 @@ public class Song extends Model implements Comparator<Song> {
         return getId().hashCode();
     }
 
-    public String toString(String id) {
-        return ToStringBuilder.reflectionToString(Song.get(id));
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(Song.get(this.id));
     }
 
     public String getTmpId() {
