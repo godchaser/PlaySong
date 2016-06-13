@@ -11,6 +11,7 @@ import javax.persistence.Transient;
 
 import models.helpers.HtmlBuilder;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import chord.tools.LineTypeChecker;
@@ -118,11 +119,13 @@ public class SongLyrics extends Model {
         this.song = song;
     }
 
+    
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(SongLyrics.get(id));
+        return ReflectionToStringBuilder.toStringExclude(this, "song");
     }
-
+    
+    
     // used for android html generation
     public String getSongLyricsAndroidHtml() {
         return HtmlBuilder.buildHtmlFromSongLyrics(LineTypeChecker.removeChordLines(songLyrics));
