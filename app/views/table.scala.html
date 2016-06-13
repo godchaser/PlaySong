@@ -71,6 +71,11 @@
                <i class="glyphicon glyphicon-plus"></i> Add New
                </button>
             </p>
+            <p class="inline-buttons">
+               <button id="fullscreensongbutton" class="songbuttons btn btn-success" onClick="songManipulationButtonClick(this)">
+               <i class="fa fa-arrows-alt" aria-hidden="true"></i>
+               </button>
+            </p>
             <div class="alert alert-block alert-error fade in" id="cert-error" style="display:none;">
                <button type="button" class="close" data-dismiss="alert"></button>
                <h4 class="alert-heading">Delete success</h4>
@@ -176,6 +181,10 @@
 						deleteSong(selectedSongID);
 			        }
 				}
+		        break;
+		    case "fullscreensongbutton":
+		        var songViewUrl = jsRoutes.controllers.Application.songview(selectedSongID).url;
+				window.location.href = songViewUrl;
 		        break;
 		    default:
 		        var text = "Unknown button action!";
