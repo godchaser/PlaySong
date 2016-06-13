@@ -135,7 +135,7 @@
 	function songManipulationButtonClick(button) {
 		var buttonId =	button.attributes.id.value;
 		//console.log("Clicked button: " + buttonId);
-		//console.log("Selected songId: " + selectedSongID);
+		console.log("Selected songId: " + selectedSongID);
 		
 		switch (buttonId) {
 		    case "editsongbutton":
@@ -307,7 +307,6 @@
 			  		selectedSongID = $(selectFirstRow).attr('id');
 			  		selectedSongLyricsID = $(selectFirstRow).find('.lyrics-link' )[0].id;
 				  	selectFirstRow.addClass("selected-row");
-				  	//console.log("selecting row by id: " + selectedSongLyricsID);
 			  		updateLyricsPanel(selectedSongLyricsID);
 		  		}
 		  		else {
@@ -421,7 +420,7 @@
 				        	var row = $(currentRow).closest('tr');
 				        	if (row.next().length){
 					        	var next = row.next();
-					        	selectedSongID = $(next).attr('songId');
+					        	selectedSongID = $(next).attr('id');
 								selectedSongLyricsID = $(next).find('.lyrics-link' )[0].id;
 								updateLyricsPanel(selectedSongLyricsID);
 						        $(next).addClass("selected-row");
@@ -436,7 +435,7 @@
 				        	var row = $(currentRow).closest('tr');
 				        	if (row.prev().length){
 				        		var prev = row.prev();
-					        	selectedSongID = $(prev).attr('songId');
+					        	selectedSongID = $(prev).attr('id');
 					        	selectedSongLyricsID = $(prev).find('.lyrics-link' )[0].id;
 					        	updateLyricsPanel(selectedSongLyricsID);
 					            $(prev).addClass("selected-row");
