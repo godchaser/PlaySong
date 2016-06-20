@@ -23,7 +23,10 @@ import models.helpers.PdfPrintable;
 import models.helpers.SongPrint;
 import models.helpers.URLParamEncoder;
 import models.json.JsonPlaylist;
+import play.Configuration;
 import play.Logger;
+import play.cache.CacheApi;
+import play.data.FormFactory;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
@@ -39,7 +42,16 @@ import document.tools.PdfGenerator;
 
 public class Playlists extends Controller {
     
+    boolean cachingFeature;
+    @Inject
+    CacheApi cache;
+
     @Inject DocxGenerator docxGenerator;
+    
+    @Inject
+    public Playlists(Configuration configuration) {
+        cachingFeature = configuration.underlying().getBoolean("playsong.songtable.caching.enabled");
+    }
 
     public Result downloadAndDeleteFile() {
         final Set<Map.Entry<String, String[]>> entries = request().queryString().entrySet();
@@ -189,6 +201,7 @@ public class Playlists extends Controller {
                 }
                 playlist.save();
                 Logger.debug("Publishing playlist: " + playlist.getDateCreated());
+                clearPlaylistsJsonCache();
             } catch (Exception e) {
                 Logger.error("Failed to publish playlist");
                 e.printStackTrace();
@@ -272,7 +285,15 @@ public class Playlists extends Controller {
     @Security.Authenticated(Secured.class)
     public Result deletePlayList(String id) {
         Playlist.deleteById(id);
+        clearPlaylistsJsonCache();
         return ok();
+    }
+    
+    private void clearPlaylistsJsonCache() {
+        if (cachingFeature) {
+            Logger.debug("Clearing playlists json data cache");
+            cache.set(Rest.PLAYLISTS_JSON_CACHE_NAME, null, 0);
+        }
     }
 
 }

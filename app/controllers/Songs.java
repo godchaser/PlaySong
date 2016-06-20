@@ -11,7 +11,6 @@ import javax.inject.Inject;
 
 import models.Song;
 import models.SongBook;
-import models.SongLyrics;
 import models.UserAccount;
 import models.helpers.ArrayHelper;
 import models.helpers.PdfPrintable;
@@ -37,7 +36,7 @@ import document.tools.PdfGenerator;
 import views.html.songs;;
 
 public class Songs extends Controller {
-    
+
     boolean cachingFeature;
     @Inject
     CacheApi cache;
@@ -62,6 +61,7 @@ public class Songs extends Controller {
         deleteSong(id);
         SongBook.staleSongbookCleanup(user.getEmail());
         clearSongTableCache();
+        clearSongJsonCache();
         return redirect(controllers.routes.Application.table());
     }
 
@@ -87,6 +87,7 @@ public class Songs extends Controller {
             Logger.debug("Removing stale songbook references, if they exist");
             SongBook.staleSongbookCleanup(user.getEmail());
             clearSongTableCache();
+            clearSongJsonCache();
             return redirect(controllers.routes.Application.table());
         }
     }
@@ -213,8 +214,8 @@ public class Songs extends Controller {
         }
         return user;
     }
-    
-    private void clearSongTableCache(){
+
+    private void clearSongTableCache() {
         if (cachingFeature) {
             Logger.debug("Clearing songbooks table data cache");
             for (String songbookId : SongBook.getAllSongbookIds()) {
@@ -223,5 +224,11 @@ public class Songs extends Controller {
             }
         }
     }
-    
+
+    private void clearSongJsonCache() {
+        if (cachingFeature) {
+            Logger.debug("Clearing song json data cache");
+            cache.set(Rest.SONGS_JSON_CACHE_NAME, null, 0);
+        }
+    }
 }
