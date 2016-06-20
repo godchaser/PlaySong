@@ -11,6 +11,7 @@ import javax.inject.Inject;
 
 import models.Song;
 import models.SongBook;
+import models.SongLyrics;
 import models.UserAccount;
 import models.helpers.ArrayHelper;
 import models.helpers.PdfPrintable;
@@ -82,7 +83,7 @@ public class Songs extends Controller {
             Song updatedSong = filledForm.get();
             updatedSong.setSongLastModifiedBy(userName);
             Logger.debug("Update or create song");
-            updateOrCreateSong(updatedSong, user);
+            String songId = updateOrCreateSong(updatedSong, user);
             Logger.debug("Removing stale songbook references, if they exist");
             SongBook.staleSongbookCleanup(user.getEmail());
             clearSongTableCache();
@@ -92,8 +93,8 @@ public class Songs extends Controller {
 
     // Helper method to execute transaction
     @Transactional
-    private void updateOrCreateSong(Song updatedSong, UserAccount user) {
-        Song.updateOrCreateSong(updatedSong, user.getEmail());
+    private String updateOrCreateSong(Song updatedSong, UserAccount user) {
+        return Song.updateOrCreateSong(updatedSong, user.getEmail());
     }
 
     public Result songs() {
@@ -222,4 +223,5 @@ public class Songs extends Controller {
             }
         }
     }
+    
 }

@@ -32,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
  */
 @Entity
 public class Song extends Model implements Comparator<Song> {
-
+    
     @Id
     public String id;
 
@@ -112,7 +112,7 @@ public class Song extends Model implements Comparator<Song> {
         return find.where().ilike("tmp_id", tmpId).findUnique();
     }
 
-    public static void updateOrCreateSong(Song song, String userEmail) {
+    public static String updateOrCreateSong(Song song, String userEmail) {
 
         // TODO: Fix bug when song has empty lyrics
         Logger.debug("Received song with name: " + song.getSongName());
@@ -230,6 +230,7 @@ public class Song extends Model implements Comparator<Song> {
         Logger.debug("Song updated on: " + song.getDateModified().toString());
         Logger.debug("Adding song to songbook");
         SongBook.addSong(song, activeSongbook);
+        return song.id;
     }
 
     public void setSongBook(SongBook activeSongbook, String userEmail) {

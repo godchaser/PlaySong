@@ -25,7 +25,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
  */
 @Entity
 public class SongLyrics extends Model {
-
     @Id
     public String id;
 
@@ -119,16 +118,14 @@ public class SongLyrics extends Model {
         this.song = song;
     }
 
-    
     @Override
     public String toString() {
         return ReflectionToStringBuilder.toStringExclude(this, "song");
     }
-    
-    
+
     // used for android html generation
     public String getSongLyricsAndroidHtml() {
-        return HtmlBuilder.buildHtmlFromSongLyrics(LineTypeChecker.removeChordLines(songLyrics));
+        return generateLyricsAndroidHtml(songLyrics);
     }
 
     public void setSongLyricsAndroidHtml(String songLyricsAndroidHtml) {
@@ -136,14 +133,20 @@ public class SongLyrics extends Model {
     }
 
     public String getSongLyricsAndroidChordsHtml() {
-        return HtmlBuilder.buildHtmlFromSongLyrics(songLyrics);
-
+        return generateLyricsAndroidChordsHtml(songLyrics);
     }
 
     public void setSongLyricsAndroidChordsHtml(String songLyricsAndroidChordsHtml) {
         this.songLyricsAndroidChordsHtml = songLyricsAndroidChordsHtml;
     }
 
+    public static String generateLyricsAndroidHtml(String songLyrics) {
+        return HtmlBuilder.buildHtmlFromSongLyrics(LineTypeChecker.removeChordLines(songLyrics));
+    }
+
+    public static String generateLyricsAndroidChordsHtml(String songLyrics) {
+        return HtmlBuilder.buildHtmlFromSongLyrics(songLyrics);
+    }
     /*
      * // used only for removal of empty lyrics by Collection remove all
      * 

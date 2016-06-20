@@ -11,6 +11,7 @@ import models.SongBook;
 import models.SongLyrics;
 import models.helpers.SongToJsonConverter;
 import play.Logger;
+import play.cache.CacheApi;
 import play.data.DynamicForm;
 import play.data.FormFactory;
 import play.db.ebean.Transactional;
@@ -18,26 +19,54 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import play.Configuration;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class Rest extends Controller {
+
+    public static final String SONGS_JSON_CACHE_NAME = ".songs.json.cache.data";
+
+    boolean cachingFeature;
+    @Inject
+    CacheApi cache;
+
     private DynamicForm dynamicForm;
 
     @Inject
-    public Rest(FormFactory formFactory) {
+    public Rest(FormFactory formFactory, Configuration configuration) {
         this.dynamicForm = formFactory.form();
+        cachingFeature = configuration.underlying().getBoolean("playsong.songtable.caching.enabled");
     }
 
     // @Security.Authenticated(Secured.class)
     public Result getsongdata() {
-        List<Song> songs = Song.all();
-        ArrayList<ObjectNode> songsJson = new ArrayList<>();
+        List<Song> songs = null;
+        ArrayList<ObjectNode> songsJson = null;
 
-        for (Song s : songs) {
-            ObjectNode songJson = SongToJsonConverter.convert(s);
-            songsJson.add(songJson);
+        // caching is turned on
+        if (cachingFeature) {
+            songsJson = cache.get(SONGS_JSON_CACHE_NAME);
         }
+
+        // if song lyrics json still null - while cache is off, or empty - refetch cache
+        if (songsJson == null) {
+            songs = Song.all();
+            songsJson = new ArrayList<>();
+
+            for (Song s : songs) {
+                ObjectNode songJson = SongToJsonConverter.convert(s);
+                songsJson.add(songJson);
+            }
+
+            if (cachingFeature) {
+                cache.set(SONGS_JSON_CACHE_NAME, songsJson);
+                Logger.debug("Cache not available, creating songs json cache");
+            }
+        } else {
+            Logger.debug("Cache available, using songs json cache");
+        }
+
         return ok(Json.toJson(songsJson));
     }
 
@@ -91,5 +120,4 @@ public class Rest extends Controller {
         lyricsObject.updateSongLyrics();
         return ok();
     }
-
 }
