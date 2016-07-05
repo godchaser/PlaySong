@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import database.SqlQueries;
 import document.tools.PdfGenerator;
+import mail.NoticationMailerConfig;
 import views.html.songs;;
 
 public class Songs extends Controller {
@@ -41,12 +42,22 @@ public class Songs extends Controller {
     @Inject
     CacheApi cache;
 
+    boolean notificationMailerFeature = false;
+
     private Form<Song> songForm;
 
     @Inject
     public Songs(FormFactory formFactory, Configuration configuration) {
         this.songForm = formFactory.form(Song.class);
         cachingFeature = configuration.underlying().getBoolean("playsong.songtable.caching.enabled");
+        notificationMailerFeature = configuration.underlying().getBoolean("playsong.notification-mailer.enabled");
+        if (notificationMailerFeature) {
+            NoticationMailerConfig.setNotification_mailer_username(configuration.underlying().getString(("playsong.notification-mailer.username")));
+            NoticationMailerConfig.setNotification_mailer_password(configuration.underlying().getString(("playsong.notification-mailer.password")));
+            NoticationMailerConfig.setNotification_mailer_smtp(configuration.underlying().getString(("playsong.notification-mailer.smtp")));
+            NoticationMailerConfig.setNotification_mailer_port(configuration.underlying().getString(("playsong.notification-mailer.port")));
+            NoticationMailerConfig.setNotification_mailer_recipient(configuration.underlying().getString(("playsong.notification-mailer.recipient")));
+        }
     }
 
     @Security.Authenticated(Secured.class)

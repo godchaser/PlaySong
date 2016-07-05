@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -27,18 +28,21 @@ import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import mail.NoticationMailerConfig;
+import mail.NotificationMailer;
+
 /**
  * Created by samuel on 19.02.15..
  */
 @Entity
 public class Song extends Model implements Comparator<Song> {
-    
+
     @Id
     public String id;
 
     // used during db migration
     public String tmpId;
-    
+
     public String syncId;
 
     @Required
@@ -99,7 +103,7 @@ public class Song extends Model implements Comparator<Song> {
     public static Song getByMasterId(Long masterId) {
         return find.where().eq("master_id", masterId).findUnique();
     }
-    
+
     public static Song getBySyncId(String syncId) {
         return find.where().eq("sync_id", syncId).findUnique();
     }
@@ -113,123 +117,140 @@ public class Song extends Model implements Comparator<Song> {
     }
 
     public static String updateOrCreateSong(Song song, String userEmail) {
+        String songManipulationOperationStatus = "OK";
+        String exceptionMessage = null;
+        // flag which could be used to prevent email notifying of song update
+        boolean createdNewSong = false;
+        try {
+            // TODO: Fix bug when song has empty lyrics
+            Logger.debug("Received song with name: " + song.getSongName());
+            // LYRICS HANDLING
+            boolean songHasSongLyrics = (song.getSongLyrics() != null && (song.getSongLyrics().size() > 0) && !(song.getSongLyrics().get(0).getSongLyrics().isEmpty())) ? true : false;
 
-        // TODO: Fix bug when song has empty lyrics
-        Logger.debug("Received song with name: " + song.getSongName());
-        // LYRICS HANDLING
-        boolean songHasSongLyrics = (song.getSongLyrics() != null && (song.getSongLyrics().size() > 0) && !(song.getSongLyrics().get(0).getSongLyrics().isEmpty())) ? true : false;
+            if (songHasSongLyrics) {
+                Logger.debug("Song contains lyrics");
 
-        if (songHasSongLyrics) {
-            Logger.debug("Song contains lyrics");
+                // delete empty lyrics
+                List<Integer> removedIdxList = new ArrayList<Integer>();
+                int i = 0;
 
-            // delete empty lyrics
-            List<Integer> removedIdxList = new ArrayList<Integer>();
-            int i = 0;
-
-            for (SongLyrics singleSongLyrics : song.songLyrics) {
-                // Logger.debug("Song for check content: " + singleSongLyrics.getsongLyrics());
-                if (singleSongLyrics.getSongLyrics().length() < 2) {
-                    removedIdxList.add(i);
-                    // Logger.debug("Removed song content: " + singleSongLyrics.getsongLyrics());
-                    // Logger.debug("Index for removal: " + i);
+                for (SongLyrics singleSongLyrics : song.songLyrics) {
+                    // Logger.debug("Song for check content: " + singleSongLyrics.getsongLyrics());
+                    if (singleSongLyrics.getSongLyrics().length() < 2) {
+                        removedIdxList.add(i);
+                        // Logger.debug("Removed song content: " + singleSongLyrics.getsongLyrics());
+                        // Logger.debug("Index for removal: " + i);
+                    }
+                    i++;
                 }
-                i++;
-            }
 
-            // remove from list backwards so the list won't shrink automatically
-            // and changed indexes
-            for (int idx = removedIdxList.size() - 1; idx >= 0; idx--) {
-                // check if current iteration index is in removal list
-                // Logger.debug("check iteration: " + idx);
-                // 3 2 1 0
-                // if this index is in list, then remove it from song lyrics
-                if (removedIdxList.get(idx) != null) {
-                    song.songLyrics.remove(idx + 1);
-                    // Logger.debug("Removing empty lyrics from lyrics by index: " + (idx + 1));
+                // remove from list backwards so the list won't shrink automatically
+                // and changed indexes
+                for (int idx = removedIdxList.size() - 1; idx >= 0; idx--) {
+                    // check if current iteration index is in removal list
+                    // Logger.debug("check iteration: " + idx);
+                    // 3 2 1 0
+                    // if this index is in list, then remove it from song lyrics
+                    if (removedIdxList.get(idx) != null) {
+                        song.songLyrics.remove(idx + 1);
+                        // Logger.debug("Removing empty lyrics from lyrics by index: " + (idx + 1));
+                    }
+                }
+
+                // sanitize song lyrics
+                for (SongLyrics singleSongLyrics : song.songLyrics) {
+                    singleSongLyrics.updateSongKeys();
+                    singleSongLyrics.sanitizeLyrics();
+                    // create new song lyrics id if not present
+                    if (singleSongLyrics.getId() == null || singleSongLyrics.getId().isEmpty()) {
+                        singleSongLyrics.setId(IdHelper.getNextAvailableSongLyricsId(song.songName));
+                        Logger.debug("Creating new song lyrics with Id: " + singleSongLyrics.getId());
+                    } else {
+                        Logger.debug("Trying to reuse song lyrics Id: " + singleSongLyrics.getId());
+                    }
                 }
             }
+            /*
+             * // checking again for if song now does not have any lyrics songHasSongLyrics = (song.getSongLyrics() != null && (song.getSongLyrics().size() > 0)) ? true : false; if
+             * (!songHasSongLyrics) { Logger.debug( "Song does not have lyrics - creating empty lyrics"); SongLyrics emptySongLyrics = new SongLyrics();
+             * emptySongLyrics.setId(IdHelper.getRandomId()); emptySongLyrics.setsongLyrics(""); emptySongLyrics.setSong(song); emptySongLyrics.save();
+             * song.getSongLyrics().add(emptySongLyrics); }
+             */
 
-            // sanitize song lyrics
-            for (SongLyrics singleSongLyrics : song.songLyrics) {
-                singleSongLyrics.updateSongKeys();
-                singleSongLyrics.sanitizeLyrics();
-                // create new song lyrics id if not present
-                if (singleSongLyrics.getId() == null || singleSongLyrics.getId().isEmpty()) {
-                    singleSongLyrics.setId(IdHelper.getNextAvailableSongLyricsId(song.songName));
-                    Logger.debug("Creating new song lyrics with Id: " + singleSongLyrics.getId());
-                } else {
-                    Logger.debug("Trying to reuse song lyrics Id: " + singleSongLyrics.getId());
-                }
-            }
-        }
-        /*
-         * // checking again for if song now does not have any lyrics songHasSongLyrics = (song.getSongLyrics() != null && (song.getSongLyrics().size() > 0)) ? true : false; if
-         * (!songHasSongLyrics) { Logger.debug( "Song does not have lyrics - creating empty lyrics"); SongLyrics emptySongLyrics = new SongLyrics();
-         * emptySongLyrics.setId(IdHelper.getRandomId()); emptySongLyrics.setsongLyrics(""); emptySongLyrics.setSong(song); emptySongLyrics.save(); song.getSongLyrics().add(emptySongLyrics);
-         * }
-         */
+            // SONG HANDLING
+            boolean createNewSong = false;
+            Song foundExistingSong = null;
 
-        // SONG HANDLING
-        boolean createNewSong = false;
-        Song foundExistingSong = null;
-
-        if (song.id == null) {
-            // create new song
-            createNewSong = true;
-        } else if (song.id != null) {
-            // looking for song - if not found create new
-            foundExistingSong = Song.get(song.id);
-            if (foundExistingSong == null) {
+            if (song.id == null) {
+                // create new song
                 createNewSong = true;
+            } else if (song.id != null) {
+                // looking for song - if not found create new
+                foundExistingSong = Song.get(song.id);
+                if (foundExistingSong == null) {
+                    createNewSong = true;
+                }
             }
-        }
 
-        // SONGBOOK HANDLING
-        // preparing songbook
-        SongBook activeSongbook = null;
-        // first handle if songbooks is empty - create default songbook
-        if (song.getSongBookName() == null || song.getSongBookName().isEmpty() || "default".equals(song.getSongBookName())) {
-            // don't set songbook if song already exists while I can reuse its existing default songbook association
+            // SONGBOOK HANDLING
+            // preparing songbook
+            SongBook activeSongbook = null;
+            // first handle if songbooks is empty - create default songbook
+            if (song.getSongBookName() == null || song.getSongBookName().isEmpty() || "default".equals(song.getSongBookName())) {
+                // don't set songbook if song already exists while I can reuse its existing default songbook association
+                if (createNewSong) {
+                    Logger.debug("Using default songbook while song does not have any songbooks");
+                    activeSongbook = SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail));
+                    song.setSongBook(activeSongbook, userEmail);
+                    // TODO: remove this temporary workaround for song migration
+                } else if (song.getTmpId() != null) {
+                    Logger.debug("Tmp workaround: Using default songbook while song does not have any songbooks");
+                    activeSongbook = SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail));
+                    song.setSongBook(activeSongbook, userEmail);
+                }
+            } else {
+                Logger.debug("Updating or creating new songbook");
+                activeSongbook = SongBook.updateOrCreate(song.getSongBookId(), song.getSongBookName(), userEmail, song.getPrivateSongBook());
+                song.setSongBook(activeSongbook, userEmail);
+            }
+
+            Date date = new Date();
+            // create new song
             if (createNewSong) {
-                Logger.debug("Using default songbook while song does not have any songbooks");
-                activeSongbook = SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail));
-                song.setSongBook(activeSongbook, userEmail);
-                // TODO: remove this temporary workaround for song migration
-            } else if (song.getTmpId() != null) {
-                Logger.debug("Tmp workaround: Using default songbook while song does not have any songbooks");
-                activeSongbook = SongBook.getDefaultSongbook(UserAccount.getByEmail(userEmail));
-                song.setSongBook(activeSongbook, userEmail);
+                // check if song with same name already exists
+                song.setId(IdHelper.getNextAvailableSongId(song.songName));
+                Logger.debug("Saving song - by ID: " + song.id);
+                song.setSyncId(IdHelper.getNextAvailableSyncId());
+                Logger.debug("Saving song - by ID: " + song.id);
+                song.setDateCreated(date);
+                song.setDateModified(date);
+                song.save();
+                Logger.debug("Song saved: " + song.toString());
+                createdNewSong = true;
             }
-        } else {
-            Logger.debug("Updating or creating new songbook");
-            activeSongbook = SongBook.updateOrCreate(song.getSongBookId(), song.getSongBookName(), userEmail, song.getPrivateSongBook());
-            song.setSongBook(activeSongbook, userEmail);
+            // update existing song
+            else {
+                Logger.debug("Updating song - by ID: " + song.id);
+                song.setDateModified(date);
+                song.update();
+                Logger.debug("Song updated: " + song.toString());
+            }
+            Logger.debug("Song last modified by user: " + song.songLastModifiedBy);
+            Logger.debug("Song updated on: " + song.getDateModified().toString());
+            Logger.debug("Adding song to songbook");
+            SongBook.addSong(song, activeSongbook);
+        } catch (Exception e) {
+            exceptionMessage = e.getLocalizedMessage();
+            Logger.error("Song update or create error occured: " + exceptionMessage);
+            songManipulationOperationStatus = "FAILED";
+        } finally {
+            String result = songManipulationOperationStatus;
+            String exceptionMailMessage = exceptionMessage;
+            new Thread(() -> {
+                Logger.debug("Started song notifier thread");
+                NotificationMailer.generateAndSendEmail(userEmail + ": " + result, song.toString() + "\n\n" + exceptionMailMessage);
+            }).start();
         }
-
-        Date date = new Date();
-        // create new song
-        if (createNewSong) {
-            // check if song with same name already exists
-            song.setId(IdHelper.getNextAvailableSongId(song.songName));
-            Logger.debug("Saving song - by ID: " + song.id);
-            song.setSyncId(IdHelper.getNextAvailableSyncId());
-            Logger.debug("Saving song - by ID: " + song.id);
-            song.setDateCreated(date);
-            song.setDateModified(date);
-            song.save();
-            Logger.debug("Song saved: " + song.toString());
-        }
-        // update existing song
-        else {
-            Logger.debug("Updating song - by ID: " + song.id);
-            song.setDateModified(date);
-            song.update();
-            Logger.debug("Song updated: " + song.toString());
-        }
-        Logger.debug("Song last modified by user: " + song.songLastModifiedBy);
-        Logger.debug("Song updated on: " + song.getDateModified().toString());
-        Logger.debug("Adding song to songbook");
-        SongBook.addSong(song, activeSongbook);
         return song.id;
     }
 
@@ -468,7 +489,5 @@ public class Song extends Model implements Comparator<Song> {
     public void setSyncId(String syncId) {
         this.syncId = syncId;
     }
-
-    
 
 }

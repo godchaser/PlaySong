@@ -35,7 +35,9 @@ libraryDependencies ++= Seq( javaJdbc , cache , javaWs , filters, evolutions,
   "org.webjars" % "handsontable" % "0.15.0-beta2",
   "org.yaml" % "snakeyaml" % "1.15",
   "com.squareup.retrofit2" % "retrofit" % "2.0.0-beta3",
-  "com.squareup.retrofit2" % "converter-gson" % "2.0.0-beta3"
+  "com.squareup.retrofit2" % "converter-gson" % "2.0.0-beta3",
+  "javax.mail" % "mail" % "1.4.7",
+  "javax.mail" % "javax.mail-api" % "1.5.5"
   )
 
 dependencyOverrides += "org.webjars.bower" % "jquery" % "2.2.0"
