@@ -50,13 +50,13 @@ public class Songs extends Controller {
     public Songs(FormFactory formFactory, Configuration configuration) {
         this.songForm = formFactory.form(Song.class);
         cachingFeature = configuration.underlying().getBoolean("playsong.songtable.caching.enabled");
-        notificationMailerFeature = configuration.underlying().getBoolean("playsong.notification-mailer.enabled");
+        notificationMailerFeature = configuration.underlying().getBoolean("playsong.notification.mailer.enabled");
         if (notificationMailerFeature) {
-            NoticationMailerConfig.setNotification_mailer_username(configuration.underlying().getString(("playsong.notification-mailer.username")));
-            NoticationMailerConfig.setNotification_mailer_password(configuration.underlying().getString(("playsong.notification-mailer.password")));
-            NoticationMailerConfig.setNotification_mailer_smtp(configuration.underlying().getString(("playsong.notification-mailer.smtp")));
-            NoticationMailerConfig.setNotification_mailer_port(configuration.underlying().getString(("playsong.notification-mailer.port")));
-            NoticationMailerConfig.setNotification_mailer_recipient(configuration.underlying().getString(("playsong.notification-mailer.recipient")));
+            NoticationMailerConfig.setNotification_mailer_username(configuration.underlying().getString(("playsong.notification.mailer.username")));
+            NoticationMailerConfig.setNotification_mailer_password(configuration.underlying().getString(("playsong.notification.mailer.password")));
+            NoticationMailerConfig.setNotification_mailer_smtp(configuration.underlying().getString(("playsong.notification.mailer.smtp")));
+            NoticationMailerConfig.setNotification_mailer_port(configuration.underlying().getString(("playsong.notification.mailer.port")));
+            NoticationMailerConfig.setNotification_mailer_recipient(configuration.underlying().getString(("playsong.notification.mailer.recipient")));
         }
     }
 
