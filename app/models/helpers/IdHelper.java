@@ -26,15 +26,16 @@ public class IdHelper {
     }
 
     public static String getNextAvailableSongId(String songName) {
+    	String songNameId = getIdFromName(songName);
         // check if song with same name already exists
-        if (Song.getBySongName(songName) == null) {
-            return getIdFromName(songName);
+        if (Song.get(songNameId) == null) {
+            return songNameId;
         } else {
             for (int i = 2; i < 100; i++) {
                 // iterate through song-name-1, song-name-2 and use the first free one
-                String searchForSong = songName + "-" + i;
-                if (Song.getBySongName(searchForSong) == null) {
-                    return getIdFromName(searchForSong);
+                String searchForSong = songNameId + "-" + i;
+                if (Song.get(searchForSong) == null) {
+                    return searchForSong;
                 }
             }
         }
@@ -42,15 +43,16 @@ public class IdHelper {
     }
 
     public static String getNextAvailableSongLyricsId(String songName) {
+    	String songNameId = getIdFromName(songName);
         // check if song with same name already exists
-        if (SongLyrics.get(songName) == null) {
-            return getIdFromName(songName);
+        if (SongLyrics.get(songNameId) == null) {
+            return songNameId;
         } else {
             for (int i = 2; i < 100; i++) {
                 // iterate through song-name-1, song-name-2 and use the first free one
-                String searchForSong = songName + "-" + i;
+                String searchForSong = songNameId + "-" + i;
                 if (SongLyrics.get(searchForSong) == null) {
-                    return getIdFromName(searchForSong);
+                    return searchForSong;
                 }
             }
         }
@@ -58,15 +60,16 @@ public class IdHelper {
     }
 
     public static String getNextAvailablePlayListId(String playListName) {
+    	String playListNameId = getIdFromName(playListName);
         // check if song with same name already exists
-        if (Playlist.get(playListName) == null) {
-            return getIdFromName(playListName);
+        if (Playlist.get(playListNameId) == null) {
+            return playListNameId;
         } else {
             for (int i = 2; i < 100; i++) {
                 // iterate through playlist-name-1, playlist-name-2 and use the first free one
-                String searchForPlaylist = playListName + "-" + i;
+                String searchForPlaylist = playListNameId + "-" + i;
                 if (Playlist.get(searchForPlaylist) == null) {
-                    return getIdFromName(searchForPlaylist);
+                    return searchForPlaylist;
                 }
             }
         }
@@ -74,15 +77,16 @@ public class IdHelper {
     }
     
     public static String getNextAvailablePlayListSongId(String songName) {
+    	String songNameId = getIdFromName(songName);
         // check if song with same name already exists
-        if (PlaylistSong.get(songName) == null) {
-            return getIdFromName(songName);
+        if (PlaylistSong.get(songNameId) == null) {
+            return songNameId;
         } else {
             for (int i = 2; i < 100; i++) {
                 // iterate through song-name-1, song-name-2 and use the first free one
-                String searchForServiceSong = songName + "-" + i;
+                String searchForServiceSong = songNameId + "-" + i;
                 if (PlaylistSong.get(searchForServiceSong) == null) {
-                    return getIdFromName(searchForServiceSong);
+                    return searchForServiceSong;
                 }
             }
         }
