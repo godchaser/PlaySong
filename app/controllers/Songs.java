@@ -52,6 +52,7 @@ public class Songs extends Controller {
         cachingFeature = configuration.underlying().getBoolean("playsong.songtable.caching.enabled");
         notificationMailerFeature = configuration.underlying().getBoolean("playsong.notification.mailer.enabled");
         if (notificationMailerFeature) {
+        	NoticationMailerConfig.setNotification_mailer_enabled(notificationMailerFeature);
             NoticationMailerConfig.setNotification_mailer_username(configuration.underlying().getString(("playsong.notification.mailer.username")));
             NoticationMailerConfig.setNotification_mailer_password(configuration.underlying().getString(("playsong.notification.mailer.password")));
             NoticationMailerConfig.setNotification_mailer_smtp(configuration.underlying().getString(("playsong.notification.mailer.smtp")));
