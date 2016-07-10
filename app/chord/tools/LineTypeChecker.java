@@ -34,8 +34,8 @@ import play.Logger;
  */
 public class LineTypeChecker {
 
-	public static String[] validKeys = new String[] { "C", "C#", "Db", "D",
-			"D#", "Eb", "E", "F", "F#", "Gb", "G", "G#", "Ab", "A", "A#", "B" };
+	public static String[] validKeys = new String[] { "C", "C#", "Db", "D", "D#", "Eb", "E", "F", "F#", "Gb", "G",
+			"G#", "Ab", "A", "A#", "B" };
 
 	/**
 	 * Check whether this line is a line containing only chords.
@@ -59,7 +59,7 @@ public class LineTypeChecker {
 		}
 		// First check if this is possibly a verse marker - (C) (V)
 		if (line.trim().startsWith("(") || line.trim().startsWith("[")) {
-			//Logger.debug("Not chord - most likely verse marker - " + line);
+			// Logger.debug("Not chord - most likely verse marker - " + line);
 			return false;
 		}
 
@@ -77,7 +77,7 @@ public class LineTypeChecker {
 				continue;
 			}
 			if (!s.matches("([a-gA-G](#|b)?[0-9]*((sus|dim|maj|dom|min|m|aug|add)?[0-9]*){3}(#|b)?[0-9]*)(/([a-gA-G](#|b)?[0-9]*((sus|dim|maj|dom|min|m|aug|add)?[0-9]*){3}(#|b)?[0-9]*))?")) {
-				//Logger.debug("This prevents this string to be chord: " + s);
+				// Logger.debug("This prevents this string to be chord: " + s);
 				return false;
 			}
 		}
@@ -98,10 +98,12 @@ public class LineTypeChecker {
 					songLine = songLine.replace(".", "");
 				}
 				songLine = songLine.trim();
-                char secondSongLineCharacter = songLine.charAt(1);
-                key = (secondSongLineCharacter == '#' || secondSongLineCharacter == 'b') ? songLine.substring(0, 2) : songLine.substring(0, 1);
-                Logger.trace("Song key:" + key);
-                break;
+
+				char secondSongLineCharacter = (songLine.length() > 1) ? songLine.charAt(1) : ' ';
+				key = (secondSongLineCharacter == '#' || secondSongLineCharacter == 'b') ? songLine.substring(0, 2)
+						: songLine.substring(0, 1);
+				Logger.trace("Song key:" + key);
+				break;
 			}
 		}
 		// Now checkin if this is valid Chord
@@ -111,8 +113,8 @@ public class LineTypeChecker {
 			return defaultKey;
 		}
 	}
-	
-	public static String removeChordLines (String lyrics){
+
+	public static String removeChordLines(String lyrics) {
 		StringBuilder lyricsWithoutChords = new StringBuilder();
 		String[] songLines = lyrics.split("[\r\n]+");
 		for (String songLine : songLines) {
@@ -125,12 +127,9 @@ public class LineTypeChecker {
 	}
 
 	public static void main(String[] args) {
-		String[] testChords = { "C         D          G   -/F#   Em",
-				"E H/D# C#m   E/H   A     E/H H E  H",
-				".Am          D         G  Dm – G", ".(E,A,E,B7,E)",
-				".     Bm7    G#dimg  G    A   D",
-				".F   Em7        Asus  C/D   Dm7 C/E  F    Gm7    F/A  ",
-				"(C1)" };
+		String[] testChords = { "C         D          G   -/F#   Em", "E H/D# C#m   E/H   A     E/H H E  H",
+				".Am          D         G  Dm – G", ".(E,A,E,B7,E)", ".     Bm7    G#dimg  G    A   D",
+				".F   Em7        Asus  C/D   Dm7 C/E  F    Gm7    F/A  ", "(C1)" };
 		for (String chordLine : testChords) {
 			Logger.trace("now evaluaing this line: " + chordLine);
 			boolean isValidChordLine = LineTypeChecker.isChordLine(chordLine);
