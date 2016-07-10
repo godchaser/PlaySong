@@ -2,12 +2,20 @@ package mail;
 
 public class NoticationMailerConfig {
     
-    private static String notification_mailer_username =  null;
+	private static boolean notification_mailer_enabled = false;
+	private static String notification_mailer_username =  null;
     private static String notification_mailer_password = null;
     private static String notification_mailer_smtp = null;
     private static String notification_mailer_port = null;
     private static String notification_mailer_recipient = null;
     
+    public static boolean isNotification_mailer_enabled() {
+		return notification_mailer_enabled;
+	}
+	public static void setNotification_mailer_enabled(boolean notification_mailer_enabled) {
+		NoticationMailerConfig.notification_mailer_enabled = notification_mailer_enabled;
+	}
+   
     public static String getNotification_mailer_username() {
         return notification_mailer_username;
     }
@@ -38,5 +46,5 @@ public class NoticationMailerConfig {
     public static void setNotification_mailer_recipient(String notification_mailer_recipient) {
         NoticationMailerConfig.notification_mailer_recipient = notification_mailer_recipient;
     }
-   
+    
 }
