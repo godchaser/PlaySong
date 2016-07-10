@@ -35,7 +35,7 @@ public class Playlist extends Model {
 	public String playListName;
 
 	public static Playlist get(String id) {
-        return find.where().eq("id", id).findUnique();
+        return find.where().ilike("id", id).findUnique();
         // TODO: try this after compilation
         // return find.byId(id);
     }

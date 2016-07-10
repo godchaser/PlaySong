@@ -44,7 +44,7 @@ public class SongLyrics extends Model {
     public String songLyricsAndroidChordsHtml;
 
     public static SongLyrics get(String id) {
-        return find.where().eq("id", id).findUnique();
+        return find.where().ilike("id", id).findUnique();
         // TODO: try this after compilation
         // return find.byId(id);
     }

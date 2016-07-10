@@ -63,7 +63,7 @@ public class PlaylistSong extends Model implements PdfPrintable, Comparable<Play
     
     
     public static PlaylistSong get(String id) {
-        return find.where().eq("id", id).findUnique();
+        return find.where().ilike("id", id).findUnique();
         // TODO: try this after compilation
         // return find.byId(id);
     }
