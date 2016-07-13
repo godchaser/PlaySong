@@ -25,6 +25,7 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import results.ResultCodes;
 import chord.tools.LineTypeChecker;
 
 import com.avaje.ebean.Ebean;
@@ -52,7 +53,7 @@ public class Songs extends Controller {
         cachingFeature = configuration.underlying().getBoolean("playsong.songtable.caching.enabled");
         notificationMailerFeature = configuration.underlying().getBoolean("playsong.notification.mailer.enabled");
         if (notificationMailerFeature) {
-        	NoticationMailerConfig.setNotification_mailer_enabled(notificationMailerFeature);
+            NoticationMailerConfig.setNotification_mailer_enabled(notificationMailerFeature);
             NoticationMailerConfig.setNotification_mailer_username(configuration.underlying().getString(("playsong.notification.mailer.username")));
             NoticationMailerConfig.setNotification_mailer_password(configuration.underlying().getString(("playsong.notification.mailer.password")));
             NoticationMailerConfig.setNotification_mailer_smtp(configuration.underlying().getString(("playsong.notification.mailer.smtp")));
@@ -95,11 +96,13 @@ public class Songs extends Controller {
             Song updatedSong = filledForm.get();
             updatedSong.setSongLastModifiedBy(userName);
             Logger.debug("Update or create song");
-            String songId = updateOrCreateSong(updatedSong, user);
-            Logger.debug("Removing stale songbook references, if they exist");
-            SongBook.staleSongbookCleanup(user.getEmail());
-            clearSongTableCache();
-            clearSongJsonCache();
+            String operationStatus = updateOrCreateSong(updatedSong, user);
+            if (ResultCodes.SUCCESS.equals(operationStatus)) {
+                Logger.debug("Removing stale songbook references, if they exist");
+                SongBook.staleSongbookCleanup(user.getEmail());
+                clearSongTableCache();
+                clearSongJsonCache();
+            }
             return redirect(controllers.routes.Application.table());
         }
     }

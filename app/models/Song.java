@@ -23,6 +23,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import play.Logger;
 import play.data.format.Formats;
 import play.data.validation.Constraints.Required;
+import results.ResultCodes;
 
 import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -117,7 +118,7 @@ public class Song extends Model implements Comparator<Song> {
 	}
 
 	public static String updateOrCreateSong(Song song, String userEmail) {
-		String songManipulationOperationStatus = "OK";
+		String songManipulationOperationStatus = ResultCodes.SUCCESS;
 		String exceptionMessage = null;
 		// flag which could be used to prevent email notifying of song update
 		boolean createdNewSong = false;
@@ -246,12 +247,12 @@ public class Song extends Model implements Comparator<Song> {
 		} catch (Exception e) {
 			exceptionMessage = e.getLocalizedMessage();
 			Logger.error("Song update or create error occured: " + exceptionMessage);
-			songManipulationOperationStatus = "FAILED";
+			songManipulationOperationStatus = ResultCodes.ERROR;
 		} finally {
 			NotificationMailer.generateAndSendEmail(userEmail + ": " + songManipulationOperationStatus, song.toString()
 					+ "\n\n" + exceptionMessage);
 		}
-		return song.id;
+		return songManipulationOperationStatus;
 	}
 
 	public void setSongBook(SongBook activeSongbook, String userEmail) {
