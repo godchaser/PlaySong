@@ -30,6 +30,7 @@ import play.data.FormFactory;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import chord.tools.ChordLineTransposer;
 import chord.tools.LineTypeChecker;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -41,13 +42,14 @@ import document.tools.DocxGenerator;
 import document.tools.PdfGenerator;
 
 public class Playlists extends Controller {
-    
+
     boolean cachingFeature;
     @Inject
     CacheApi cache;
 
-    @Inject DocxGenerator docxGenerator;
-    
+    @Inject
+    DocxGenerator docxGenerator;
+
     @Inject
     public Playlists(Configuration configuration) {
         cachingFeature = configuration.underlying().getBoolean("playsong.songtable.caching.enabled");
@@ -101,7 +103,7 @@ public class Playlists extends Controller {
 
         JsonNode jsonNode = request().body().asJson();
         List<SongPrint> songsForPrint = new ArrayList<>();
-        
+
         Logger.trace("Playlist generator json string: " + jsonNode);
         ObjectMapper mapper = new ObjectMapper();
         String format = "word";
@@ -148,8 +150,8 @@ public class Playlists extends Controller {
 
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_hhmmss");
         Date date = new Date();
-        
-        if (playListName == null || playListName.length()<1){
+
+        if (playListName == null || playListName.length() < 1) {
             playListName = "Playlist";
         }
 
@@ -218,8 +220,7 @@ public class Playlists extends Controller {
         Map<String, String[]> params = request().queryString();
         useColumns = Boolean.parseBoolean(params.get("useColumns")[0].toLowerCase());
         excludeChords = Boolean.parseBoolean(params.get("excludeChords")[0].toLowerCase());
-        
-        
+
         Playlist playlist = Playlist.get(id);
 
         ArrayList<PdfPrintable> songPrintList = new ArrayList<PdfPrintable>();
@@ -229,10 +230,17 @@ public class Playlists extends Controller {
         Collections.sort(playlist.getSongs());
 
         for (PlaylistSong playListSong : playlist.getSongs()) {
+            String lyrics = playListSong.getContent();
             if (excludeChords) {
-                String lyricsWithoutChords = playListSong.getContent();
-                lyricsWithoutChords = LineTypeChecker.removeChordLines(lyricsWithoutChords);
-                playListSong.setSongLyrics(lyricsWithoutChords);
+                playListSong.setSongLyrics(LineTypeChecker.removeChordLines(lyrics));
+            } else {
+                // transpose song if necessary
+                String origKey = LineTypeChecker.getSongKey(lyrics);
+                String newKey = playListSong.getSongKey();
+                if (!origKey.equals(newKey)) {
+                    lyrics = ChordLineTransposer.transposeLyrics(origKey, newKey, lyrics);
+                    playListSong.setSongLyrics(lyrics);
+                }
             }
             songPrintList.add(playListSong);
         }
@@ -281,14 +289,14 @@ public class Playlists extends Controller {
         }
         return user;
     }
-    
+
     @Security.Authenticated(Secured.class)
     public Result deletePlayList(String id) {
         Playlist.deleteById(id);
         clearPlaylistsJsonCache();
         return ok();
     }
-    
+
     private void clearPlaylistsJsonCache() {
         if (cachingFeature) {
             Logger.debug("Clearing playlists json data cache");
