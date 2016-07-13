@@ -11,4 +11,4 @@ env:
 install:
   - wget http://downloads.typesafe.com/typesafe-activator/1.3.10/typesafe-activator-1.3.10-minimal.zip
   - unzip -q typesafe-activator-1.3.10-minimal.zip
-script: activator-1.3.10-minimal/activator test
+script: activator-1.3.10-minimal/bin/activator test
