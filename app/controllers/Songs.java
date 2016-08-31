@@ -187,7 +187,12 @@ public class Songs extends Controller {
         }
 
         ArrayList<PdfPrintable> songPrintList = new ArrayList<PdfPrintable>();
-        songPrintList.add(new SongPrint(Song.get(song.getId()), song.getSongLyrics().get(0).getId(), song.getSongLyrics().get(0).getSongKey(), excludeChords));
+
+        // transpose song if necessary
+        String songKey = params.get("currentChord")[0].toUpperCase();
+        String lyrics = song.getSongLyrics().get(0).getId();
+        
+        songPrintList.add(new SongPrint(Song.get(song.getId()), lyrics, songKey, excludeChords));
 
         String outputPdfPath = "resources/pdf/" + song.getId() + ".pdf";
         try {

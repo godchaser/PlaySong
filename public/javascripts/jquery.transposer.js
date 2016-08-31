@@ -19,6 +19,8 @@
         
         var backupHtml = null;
         
+        var currentMasterChord = null;
+        
         var keys = [
             { name: 'Ab',  value: 0,   type: 'F' },
             { name: 'A',   value: 1,   type: 'N' },
@@ -230,6 +232,8 @@
                     if (!initialChordSet) {
                         currentKey=getFirstChordInLine(line);
                         initialChordSet = true;
+                        currentMasterChord = currentKey.name;
+                        //console.log("Current master chord: " + currentMasterChord);
                     }
                     output.push("<span class='chordLine'>" + wrapChords(line) + "</span>");
                     lineRecognized = true;
@@ -304,6 +308,8 @@
                 transposeSong($this, $(this).text());
                 $(".transpose-keys a").removeClass("selected");
                 $(this).addClass("selected");
+                currentMasterChord = $(this).text();
+                //console.log("Current master chord: " + currentMasterChord);
                 return false;
             });
 
@@ -336,12 +342,13 @@
             });
             
             $('#printSongButton').click(function(event) {
-            	console.log("Print song!");
+            	//console.log("Print song!");
             	var link = "/song/print/";
             	var songId = $('.selected-row').attr('id');
 				link = link.concat(songId);
 				var excludeChords = ("Unhide Chords" == $('#hideChordsButton').text());
 				link = link.concat("?excludeChords=" + excludeChords);
+				link = link.concat("&currentChord=" + currentMasterChord);
 				window.open(link, '_self');
             });
             
