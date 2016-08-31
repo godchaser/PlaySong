@@ -152,7 +152,7 @@ public class ChordTransposerEngine1 {
             chord = chord.substring(1, chord.length() - 1);
             // Case when multiple chords in brackets (A...
         } else if (chord.startsWith("(") && !chord.endsWith(")")) {
-            chord = chord.substring(1, chord.length() - 1);
+            chord = chord.substring(1, chord.length());
         } // Case when multiple chords in brackets ...C)
         else if (!chord.startsWith("(") && chord.endsWith(")")) {
             chord = chord.substring(0, chord.length() - 1);
