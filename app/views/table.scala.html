@@ -385,6 +385,7 @@
 		   var songBookDefaultUrl = "@routes.Datatable.getsongsdatatable()";
 		   var songBookUrl = songBookDefaultUrl +"?songbookid=" + selectedSongbookId;
 		   oTable.DataTable().ajax.url(songBookUrl).load();
+		   oTable.DataTable().responsive.recalc();
 		});
 		
 		//for static row selection events - marking selected/deselected rows
