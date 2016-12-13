@@ -34,7 +34,7 @@ public class Operations extends Controller {
 
         PlaySongRestService psrs = new PlaySongRestService();
         psrs.downloadSongsData(user.getEmail());
-        psrs.downloadFavoritesSongsData();
+        //psrs.downloadFavoritesSongsData();
         return redirect(controllers.routes.Application.table());
     }
     

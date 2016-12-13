@@ -32,84 +32,103 @@ public class DatabaseHelper {
         }
         return instance;
     }
-
+    
     @Transactional
-    public List<String> writeJsonSongsToDb(List<SongsJson> songsJson, String userEmail) {
-        List<String> updatedSongs = new ArrayList<>();
-        for (SongsJson song : songsJson) {
-            Song songdb = new Song();
-            Song foundSong = null;
-            // don't set local ids, but only master ids
-            // songdb.setId(song.getSongId());
-            if (song.getMasterId() != null) {
-                songdb.setId(IdHelper.getNextAvailableSongId(song.getSongName()));
-                foundSong = Song.getByTmpId(song.getMasterId());
-            }
-            boolean shouldUpdateSong = false;
-            Logger.trace("PlaySongDatabase : Checking if songs is already in db: " + song.getSongId() + " : " + song.getSongName());
-
-            if (foundSong != null) {
-                if (foundSong.getDateModified().getTime() < song.getDateModified()) {
-                    // UPDATE SONG
-                    shouldUpdateSong = true;
+    public void writeJsonSongsToDb2(List<SongsJson> songsJson, String userEmail) {
+        int currentSongNumber = 0;
+        int numberOfSongs = songsJson.size();
+        long startTime = System.currentTimeMillis();
+       
+        try {
+            for (SongsJson song : songsJson) {
+                currentSongNumber++;
+                Logger.trace("Saving  song: " + currentSongNumber + "/" + numberOfSongs);
+                boolean shouldUpdateSong = false;
+                Song foundSong = Song.get(song.getId());
+                if (foundSong != null) {
+                    if (foundSong.getDateModified().getTime() < song.getDateModified()) {
+                        // UPDATE SONG
+                        shouldUpdateSong = true;
+                    } else {
+                      Logger.trace("Song in db already up to date: " + song.getId() + " : " +
+                                song.getSongName());
+                        continue;
+                    }
                 } else {
-                    Logger.trace("PlaySongDatabase : Song in db already up to date: " + song.getSongId() + " : " + song.getSongName());
-                    continue;
+                    // NEW SONG SCENARIO
                 }
-            } else {
-                // THIS IS NEW SONG SCENARIO
-                Logger.trace("PlaySongDatabase : Adding new song to db = " + song.getSongId() + " : " + song.getSongName());
+                // TODO: CHECK FOR NULLS FIRST
+                Song songdb = new Song();
+                songdb.setId(song.getId());
+                songdb.setSongName(song.getSongName());
+                songdb.setSongOriginalTitle(song.getSongOriginalTitle());
+                songdb.setSongLink(song.getSongLink());
+                songdb.setSongImporter(song.getSongImporter());
+                songdb.setSongAuthor(song.getSongAuthor());
+                //songdb.setDateCreated(song.getDateCreated());
+                //songdb.setDateModified(song.getDateModified());
+
+                SongBook existingSongBook = SongBook.get(song.getSongbooks().get
+                        (0).getId());
+                // if songbook already exists add new song to songbook - later I should check if
+                // maybe the private flag is changed?
+                //TODO: private flag update check!
+                if (existingSongBook != null) {
+                    // songbook found
+                    //songdb.associateSongDb(existingSongBook);
+                    songdb.setSongBook(existingSongBook, userEmail);
+                } else {
+                    // new songbook
+                    Logger.trace("Creating new songbook: " + song.getSongbooks().get(0)
+                            .getSongBookName());
+                    existingSongBook = new SongBook();
+                    existingSongBook.setId(song.getSongbooks().get(0).getId());
+                    existingSongBook.setSongBookName(song.getSongbooks().get(0).getSongBookName());
+                    existingSongBook.setPrivateSongbook(song.getSongbooks().get(0)
+                            .getPrivateSongbook());
+                    existingSongBook.save();
+                }
+
+               // songdb.associateSongDb(existingSongBook);
+
+                if (shouldUpdateSong) {
+                    songdb.update();
+                } else {
+                    songdb.save();
+                }
+
+                for (SongLyricsJson songlyrics : song.getSongLyrics()) {
+                    // TODO: CHECK FOR NULLS FIRST
+                    SongLyrics songlyricsdb = new SongLyrics();
+                    songlyricsdb.setId(songlyrics.getSongLyricsId());
+                    songlyricsdb.setSongKey(songlyrics.getSongKey());
+                    songlyricsdb.setSongLyrics(songlyrics.getSongLyrics());
+                    songlyricsdb.setSongLyrics(songlyrics
+                            .getSongLyricsAndroidChordsHtml());
+                //    songlyricsdb.setSongLyricsHtml(songlyrics.getSongLyricsAndroidHtml());
+                    songlyricsdb.setSong(songdb);
+                   // songlyricsdb.associateSongDb(songdb);
+                    if (shouldUpdateSong) {
+                        songlyricsdb.update();
+                    } else {
+                        songlyricsdb.save();
+                    }
+                }
             }
-
-            // songdb.setId(song.getSongId());
-            songdb.setSongName(song.getSongName());
-            songdb.setSongOriginalTitle(song.getSongOriginalTitle());
-            songdb.setSongLink(song.getSongLink());
-            songdb.setSongImporter(song.getSongImporter());
-            songdb.setSongAuthor(song.getSongAuthor());
-            songdb.setSongLink(song.getSongLink());
-            songdb.setDateCreated(new Date(song.getDateCreated()));
-            songdb.setDateModified(new Date(song.getDateModified()));
-            songdb.setPrivateSong(song.getPrivateSong());
-
-            // temp id used during song migration
-            songdb.setTmpId(song.getMasterId());
-
-            // song
-            if (shouldUpdateSong) {
-                songdb.update();
-            } else {
-                songdb.setSyncId(IdHelper.getNextAvailableSyncId());
-                songdb.save();
-            }
-
-            // now updating songbook
-            if (!song.getSongBooks().isEmpty()) {
-                Logger.trace("PlaySongDatabase : updating songbook");
-                // TODO: later implement multiple songbooks
-                // TODO: workaround to support currently writing only to default songbook
-                // songdb.setSongBookName(song.getSongBooks().get(0).getSongBookName());
-                // songdb.setSongBookId(song.getSongBooks().get(0).getId());
-                songdb.setSongBookName(SongBook.DEFAULT_SONGBOOK_NAME);
-                songdb.setSongBookId(SongBook.DEFAULT_SONGBOOK_ID);
-                songdb.setPrivateSongBook(song.getSongBooks().get(0).getPrivateSongbook());
-            }
-
-            // I have to create dummy song lyrics
-            // songdb.setSongLyrics(new ArrayList <SongLyrics>());
-
-            Song.updateOrCreateSong(songdb, userEmail);
-
-            updatedSongs.add(song.getSongId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Logger.trace("Error during song database import: " + e.getMessage());
+        } finally {
+            Logger.trace("Closing db transaction");
         }
-        return updatedSongs;
+        long difference = System.currentTimeMillis() - startTime;
     }
 
     public void writeJsonSongLyricsToDb(List<SongLyricsJson> songLyricsJson, List<String> updatedSongs) {
         // TODO: IMPLEMENT OPTIONAL DELETION OF MISSING REMOTE SONGS
         for (SongLyricsJson songlyrics : songLyricsJson) {
             SongLyrics songlyricsdb = new SongLyrics();
-            Logger.trace("PlaySongDatabase : Checking if song lyrics is already in db: " + songlyrics.getSongLyricsId() + " : " + songlyrics.getSongId());
+            Logger.trace("PlaySongDatabase : Checking if song lyrics is already in db: " + songlyrics.getSongLyricsId() + " : " + songlyrics.getId());
 
             boolean shouldUpdateSong = false;
             /*
@@ -121,7 +140,8 @@ public class DatabaseHelper {
             // SONG IS MODIFIED BUT DID NOT FIND ASSOCIATED LYRICS
             Logger.trace("PlaySongDatabase : Adding new songlyrics (id) to db = " + songlyrics.getSongLyricsId());
 
-            Song song = Song.getByTmpId(songlyrics.getSongId());
+            //Song song = Song.getByTmpId(songlyrics.getSongId());
+            Song song = Song.get(songlyrics.getSongLyricsId());
             // DELETE PREVIOUS LOCAL SONG LYRICS IF REMOTE SONG HAS ONLY 1 SONG
             // LYRICS - THIS I SFOR SAVE
             if (!shouldUpdateSong && song != null && song.getSongLyrics().size() < 2) {
@@ -143,15 +163,8 @@ public class DatabaseHelper {
                     songlyricsdb.save();
                 }
             } else {
-                Logger.trace("PlaySongDatabase : Could not find song for songlyrics!!! Song ID: " + songlyrics.getSongId());
+                Logger.trace("PlaySongDatabase : Could not find song for songlyrics!!! Song ID: " + songlyrics.getId());
             }
-        }
-    }
-
-    public void writeJsonSongbooksToDb(List<SongBookJson> SongbookJson) {
-        for (SongBookJson songbook : SongbookJson) {
-            Logger.trace("PlaySongDatabase : Trying to writes json songbook to db: " + songbook.getSongBookName());
-            SongBook.updateOrCreate(songbook.getId(), songbook.getSongBookName(), songbook.getSongbookOwner(), songbook.getPrivateSongbook());
         }
     }
 

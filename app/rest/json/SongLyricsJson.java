@@ -6,39 +6,48 @@ import com.google.gson.annotations.SerializedName;
 
 public class SongLyricsJson {
 
-    @SerializedName("songLyricsId")
+
+    @SerializedName("id")
     @Expose
-    private String songLyricsId;
+    private String id;
     @SerializedName("songLyrics")
     @Expose
     private String songLyrics;
     @SerializedName("songKey")
     @Expose
     private String songKey;
-    @SerializedName("songId")
+    @SerializedName("songLyricsId")
     @Expose
-    private String songId;
+    private String songLyricsId;
+    @SerializedName("songLyricsAndroidHtml")
+    @Expose
+    private String songLyricsAndroidHtml;
+    @SerializedName("songLyricsAndroidChordsHtml")
+    @Expose
+    private String songLyricsAndroidChordsHtml;
 
     /**
      * 
-     * @return The songLyricsId
+     * @return
+     *     The id
      */
-    public String getSongLyricsId() {
-        return songLyricsId;
+    public String getId() {
+        return id;
     }
 
     /**
      * 
-     * @param songLyricsId
-     *            The songLyricsId
+     * @param id
+     *     The id
      */
-    public void setSongLyricsId(String songLyricsId) {
-        this.songLyricsId = songLyricsId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
      * 
-     * @return The songLyrics
+     * @return
+     *     The songLyrics
      */
     public String getSongLyrics() {
         return songLyrics;
@@ -47,7 +56,7 @@ public class SongLyricsJson {
     /**
      * 
      * @param songLyrics
-     *            The songLyrics
+     *     The songLyrics
      */
     public void setSongLyrics(String songLyrics) {
         this.songLyrics = songLyrics;
@@ -55,7 +64,8 @@ public class SongLyricsJson {
 
     /**
      * 
-     * @return The songKey
+     * @return
+     *     The songKey
      */
     public String getSongKey() {
         return songKey;
@@ -64,7 +74,7 @@ public class SongLyricsJson {
     /**
      * 
      * @param songKey
-     *            The songKey
+     *     The songKey
      */
     public void setSongKey(String songKey) {
         this.songKey = songKey;
@@ -72,19 +82,36 @@ public class SongLyricsJson {
 
     /**
      * 
-     * @return The songId
+     * @return
+     *     The songLyricsId
      */
-    public String getSongId() {
-        return songId;
+    public String getSongLyricsId() {
+        return songLyricsId;
     }
 
     /**
      * 
-     * @param songId
-     *            The songId
+     * @param songLyricsId
+     *     The songLyricsId
      */
-    public void setSongId(String songId) {
-        this.songId = songId;
+    public void setSongLyricsId(String songLyricsId) {
+        this.songLyricsId = songLyricsId;
+    }
+
+    public String getSongLyricsAndroidHtml() {
+        return songLyricsAndroidHtml;
+    }
+
+    public void setSongLyricsAndroidHtml(String songLyricsAndroidHtml) {
+        this.songLyricsAndroidHtml = songLyricsAndroidHtml;
+    }
+
+    public String getSongLyricsAndroidChordsHtml() {
+        return songLyricsAndroidChordsHtml;
+    }
+
+    public void setSongLyricsAndroidChordsHtml(String songLyricsAndroidChordsHtml) {
+        this.songLyricsAndroidChordsHtml = songLyricsAndroidChordsHtml;
     }
 
 }

@@ -9,16 +9,16 @@ import retrofit2.http.GET;
 
 
 public interface PlaySongService {
-    @GET("/assets/json/songs")
-    //@GET("/json/songs")
+    //@GET("/assets/json/songs")
+    @GET("/json/songs")
     Call<SongsJson[]> getSongs();
 
-    @GET("/assets/json/songlyrics")
-    //@GET("/json/songlyrics")
+    //@GET("/assets/json/songlyrics")
+    @GET("/json/songlyrics")
     Call<SongLyricsJson[]> getSongLyrics();
 
-    @GET("/assets/json/playlists")
-    //@GET("/json/favoritesongs")
+    //@GET("/assets/json/playlists")
+    @GET("/json/favoritesongs")
     Call<PlaylistJson[]> getFavoritesSongs();
     
     @GET("/json/songbooks")

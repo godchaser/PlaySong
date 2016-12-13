@@ -26,10 +26,10 @@ import database.DatabaseHelper;
  */
 public class PlaySongRestService extends Observable {
 
-    //private final String PLAY_SONG_REST_ADDR = "http://playsong.herokuapp.com";
+    private final String PLAY_SONG_REST_ADDR = "http://playsong.herokuapp.com";
     //private final String PLAY_SONG_REST_ADDR = "http://localhost:9000";
     // private final String PLAY_SONG_REST_ADDR = "http://10.0.2.2:9000";
-    private final String PLAY_SONG_REST_ADDR = "http://playsong.duckdns.org:9000";
+    //private final String PLAY_SONG_REST_ADDR = "http://playsong.duckdns.org:9000";
     public static final String KEY_SONGS_FETCHED = "Songs Fetched";
     public static final String KEY_LYRICS_FETCHED = "Song Lyrics Fetched";
     public static final String KEY_FAVORITES_FETCHED = "Song Favorites Fetched";
@@ -75,49 +75,11 @@ public class PlaySongRestService extends Observable {
                     // 200
                     Logger.trace("PlaySongRestService", "Song Data successfully fetched");
                     Logger.trace("PlaySongRestService", "Writing song data to db");
-                    List<String> updatedSongs = db.writeJsonSongsToDb(Arrays.asList((SongsJson[]) model), userEmail);
+                    db.writeJsonSongsToDb2(Arrays.asList((SongsJson[]) model), userEmail);
                     Logger.trace("PlaySongRestService", "Notifying observer that songs are fetched");
                     setChanged();
                     // notifyObservers(updatedSongs);
-                    getSongLyrics(updatedSongs);
-                }
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                Logger.trace("PlaySongRestService", "Failure = " + t.getMessage());
-            }
-        });
-    }
-
-    private void getSongLyrics(final List<String> updatedSongs) {
-        // Fetching song lyrics json data
-        Call<SongLyricsJson[]> getsonglyricscall = playsong.getSongLyrics();
-        getsonglyricscall.enqueue(new Callback<SongLyricsJson[]>() {
-            @Override
-            public void onResponse(Response<SongLyricsJson[]> response) {
-                SongLyricsJson[] model = response.body();
-
-                if (model == null) {
-                    // 404 or the response cannot be converted to Model.
-                    ResponseBody responseBody = response.errorBody();
-                    if (responseBody != null) {
-                        try {
-                            Logger.trace("PlaySongRestService", "responseBody = " + responseBody.string());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        Logger.trace("PlaySongRestService", "responseBody = null");
-                    }
-                } else {
-                    // 200
-                    Logger.trace("PlaySongRestService", "Song Lyrics successfully fetched");
-                    Logger.trace("PlaySongRestService", "Writing song lyrics data to db");
-                    db.writeJsonSongLyricsToDb(Arrays.asList((SongLyricsJson[]) model), updatedSongs);
-                    Logger.trace("PlaySongRestService", "Notifying observer that song lyrics are fetched");
-                    setChanged();
-                    notifyObservers(KEY_LYRICS_FETCHED);
+                    //getSongLyrics(updatedSongs);
                 }
             }
 
@@ -166,58 +128,9 @@ public class PlaySongRestService extends Observable {
         });
     }
 
-    private void getSongbooks() {
-        // Fetching song json data
-        Call<SongBookJson[]> getsongbookscall = playsong.getSongbooks();
-        getsongbookscall.enqueue(new Callback<SongBookJson[]>() {
-            @Override
-            public void onResponse(Response<SongBookJson[]> response) {
-                SongBookJson[] model = response.body();
-
-                if (model == null) {
-                    // 404 or the response cannot be converted to Model.
-                    ResponseBody responseBody = response.errorBody();
-                    if (responseBody != null) {
-                        try {
-                            Logger.trace("PlaySongRestService", "responseBody = " + responseBody.string());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        Logger.trace("PlaySongRestService", "responseBody = null");
-                    }
-                } else {
-                    // 200
-                    Logger.trace("PlaySongRestService", "Songbooks Data successfully fetched");
-                    Logger.trace("PlaySongRestService", "Writing songbooks data to db");
-                    db.writeJsonSongbooksToDb(Arrays.asList((SongBookJson[]) model));
-                    Logger.trace("PlaySongRestService", "Notifying observer that songs are fetched");
-                }
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                Logger.trace("PlaySongRestService", "Failure = " + t.getMessage());
-            }
-        });
-    }
 
     public void downloadSongsData(String userEmail) {
         getSongsData(userEmail);
-    }
-    
-    public void downloadFavoritesSongsData() {
-        getFavoritesSongsData();
-    }
-
-    // NOT USED CURRENTLY
-    public void downloadSongLyricsData(List<String> updatedSongs) {
-        getSongLyrics(updatedSongs);
-    }
-
-    // NOT USED CURRENTLY
-    public void downloadSongbooks() {
-        getSongbooks();
     }
 
 }

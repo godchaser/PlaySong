@@ -9,49 +9,113 @@ import com.google.gson.annotations.SerializedName;
 
 public class SongsJson {
 
+    @SerializedName("id")
+    @Expose
+    private String id;
+    @SerializedName("tmpId")
+    @Expose
+    private String tmpId;
+    @SerializedName("syncId")
+    @Expose
+    private String syncId;
     @SerializedName("songName")
     @Expose
     private String songName;
-    @SerializedName("songLink")
-    @Expose
-    private String songLink;
     @SerializedName("songOriginalTitle")
     @Expose
     private String songOriginalTitle;
     @SerializedName("songAuthor")
     @Expose
     private String songAuthor;
-    @SerializedName("songId")
+    @SerializedName("songLink")
     @Expose
-    private String songId;
-    
-    //TODO: remove this tmp migration field
-    @SerializedName("masterId")
-    @Expose
-    private String masterId;
-    
+    private String songLink;
     @SerializedName("songImporter")
     @Expose
     private String songImporter;
+    @SerializedName("songLastModifiedBy")
+    @Expose
+    private String songLastModifiedBy;
+    @SerializedName("privateSong")
+    @Expose
+    private Boolean privateSong;
+    @SerializedName("songbooks")
+    @Expose
+    private List<SongBookJson> songbooks = new ArrayList<SongBookJson>();
     @SerializedName("dateCreated")
     @Expose
     private Long dateCreated;
     @SerializedName("dateModified")
     @Expose
     private Long dateModified;
-    @SerializedName("privateSong")
+    @SerializedName("songLyrics")
     @Expose
-    private Boolean privateSong;
-    @SerializedName("songBooks")
+    private List<SongLyricsJson> songLyrics = new ArrayList<SongLyricsJson>();
+    @SerializedName("isPrivateSongBook")
     @Expose
-    private List<SongBookJson> songBooks = new ArrayList<SongBookJson>();
-    @SerializedName("songLyricsIDs")
+    private Boolean isPrivateSongBook;
+    @SerializedName("privateSongBook")
     @Expose
-    private List<Integer> songLyricsIDs = new ArrayList<Integer>();
+    private Boolean privateSongBook;
 
     /**
      * 
-     * @return The songName
+     * @return
+     *     The id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * 
+     * @param id
+     *     The id
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * 
+     * @return
+     *     The tmpId
+     */
+    public String getTmpId() {
+        return tmpId;
+    }
+
+    /**
+     * 
+     * @param tmpId
+     *     The tmpId
+     */
+    public void setTmpId(String tmpId) {
+        this.tmpId = tmpId;
+    }
+
+    /**
+     * 
+     * @return
+     *     The syncId
+     */
+    public String getSyncId() {
+        return syncId;
+    }
+
+    /**
+     * 
+     * @param syncId
+     *     The syncId
+     */
+    public void setSyncId(String syncId) {
+        this.syncId = syncId;
+    }
+
+    /**
+     * 
+     * @return
+     *     The songName
      */
     public String getSongName() {
         return songName;
@@ -60,7 +124,7 @@ public class SongsJson {
     /**
      * 
      * @param songName
-     *            The songName
+     *     The songName
      */
     public void setSongName(String songName) {
         this.songName = songName;
@@ -68,24 +132,8 @@ public class SongsJson {
 
     /**
      * 
-     * @return The songLink
-     */
-    public String getSongLink() {
-        return songLink;
-    }
-
-    /**
-     * 
-     * @param songLink
-     *            The songLink
-     */
-    public void setSongLink(String songLink) {
-        this.songLink = songLink;
-    }
-
-    /**
-     * 
-     * @return The songOriginalTitle
+     * @return
+     *     The songOriginalTitle
      */
     public String getSongOriginalTitle() {
         return songOriginalTitle;
@@ -94,7 +142,7 @@ public class SongsJson {
     /**
      * 
      * @param songOriginalTitle
-     *            The songOriginalTitle
+     *     The songOriginalTitle
      */
     public void setSongOriginalTitle(String songOriginalTitle) {
         this.songOriginalTitle = songOriginalTitle;
@@ -102,7 +150,8 @@ public class SongsJson {
 
     /**
      * 
-     * @return The songAuthor
+     * @return
+     *     The songAuthor
      */
     public String getSongAuthor() {
         return songAuthor;
@@ -111,7 +160,7 @@ public class SongsJson {
     /**
      * 
      * @param songAuthor
-     *            The songAuthor
+     *     The songAuthor
      */
     public void setSongAuthor(String songAuthor) {
         this.songAuthor = songAuthor;
@@ -119,24 +168,26 @@ public class SongsJson {
 
     /**
      * 
-     * @return The songId
+     * @return
+     *     The songLink
      */
-    public String getSongId() {
-        return songId;
+    public String getSongLink() {
+        return songLink;
     }
 
     /**
      * 
-     * @param songId
-     *            The songId
+     * @param songLink
+     *     The songLink
      */
-    public void setSongId(String songId) {
-        this.songId = songId;
+    public void setSongLink(String songLink) {
+        this.songLink = songLink;
     }
 
     /**
      * 
-     * @return The songImporter
+     * @return
+     *     The songImporter
      */
     public String getSongImporter() {
         return songImporter;
@@ -145,7 +196,7 @@ public class SongsJson {
     /**
      * 
      * @param songImporter
-     *            The songImporter
+     *     The songImporter
      */
     public void setSongImporter(String songImporter) {
         this.songImporter = songImporter;
@@ -153,41 +204,26 @@ public class SongsJson {
 
     /**
      * 
-     * @return The dateCreated
+     * @return
+     *     The songLastModifiedBy
      */
-    public Long getDateCreated() {
-        return dateCreated;
+    public String getSongLastModifiedBy() {
+        return songLastModifiedBy;
     }
 
     /**
      * 
-     * @param dateCreated
-     *            The dateCreated
+     * @param songLastModifiedBy
+     *     The songLastModifiedBy
      */
-    public void setDateCreated(Long dateCreated) {
-        this.dateCreated = dateCreated;
+    public void setSongLastModifiedBy(String songLastModifiedBy) {
+        this.songLastModifiedBy = songLastModifiedBy;
     }
 
     /**
      * 
-     * @return The dateModified
-     */
-    public Long getDateModified() {
-        return dateModified;
-    }
-
-    /**
-     * 
-     * @param dateModified
-     *            The dateModified
-     */
-    public void setDateModified(Long dateModified) {
-        this.dateModified = dateModified;
-    }
-
-    /**
-     * 
-     * @return The privateSong
+     * @return
+     *     The privateSong
      */
     public Boolean getPrivateSong() {
         return privateSong;
@@ -196,7 +232,7 @@ public class SongsJson {
     /**
      * 
      * @param privateSong
-     *            The privateSong
+     *     The privateSong
      */
     public void setPrivateSong(Boolean privateSong) {
         this.privateSong = privateSong;
@@ -204,43 +240,111 @@ public class SongsJson {
 
     /**
      * 
-     * @return The songBooks
+     * @return
+     *     The songbooks
      */
-    public List<SongBookJson> getSongBooks() {
-        return songBooks;
+    public List<SongBookJson> getSongbooks() {
+        return songbooks;
     }
 
     /**
      * 
-     * @param songBooks
-     *            The songBooks
+     * @param songbooks
+     *     The songbooks
      */
-    public void setSongBooks(List<SongBookJson> songBooks) {
-        this.songBooks = songBooks;
+    public void setSongbooks(List<SongBookJson> songbooks) {
+        this.songbooks = songbooks;
     }
 
     /**
      * 
-     * @return The songLyricsIDs
+     * @return
+     *     The dateCreated
      */
-    public List<Integer> getSongLyricsIDs() {
-        return songLyricsIDs;
+    public Long getDateCreated() {
+        return dateCreated;
     }
 
     /**
      * 
-     * @param songLyricsIDs
-     *            The songLyricsIDs
+     * @param dateCreated
+     *     The dateCreated
      */
-    public void setSongLyricsIDs(List<Integer> songLyricsIDs) {
-        this.songLyricsIDs = songLyricsIDs;
+    public void setDateCreated(Long dateCreated) {
+        this.dateCreated = dateCreated;
     }
 
-    public String getMasterId() {
-        return masterId;
+    /**
+     * 
+     * @return
+     *     The dateModified
+     */
+    public Long getDateModified() {
+        return dateModified;
     }
 
-    public void setMasterId(String masterId) {
-        this.masterId = masterId;
+    /**
+     * 
+     * @param dateModified
+     *     The dateModified
+     */
+    public void setDateModified(Long dateModified) {
+        this.dateModified = dateModified;
     }
+
+    /**
+     * 
+     * @return
+     *     The songLyrics
+     */
+    public List<SongLyricsJson> getSongLyrics() {
+        return songLyrics;
+    }
+
+    /**
+     * 
+     * @param songLyrics
+     *     The songLyrics
+     */
+    public void setSongLyrics(List<SongLyricsJson> songLyrics) {
+        this.songLyrics = songLyrics;
+    }
+
+    /**
+     * 
+     * @return
+     *     The isPrivateSongBook
+     */
+    public Boolean getIsPrivateSongBook() {
+        return isPrivateSongBook;
+    }
+
+    /**
+     * 
+     * @param isPrivateSongBook
+     *     The isPrivateSongBook
+     */
+    public void setIsPrivateSongBook(Boolean isPrivateSongBook) {
+        this.isPrivateSongBook = isPrivateSongBook;
+    }
+
+    /**
+     * 
+     * @return
+     *     The privateSongBook
+     */
+    public Boolean getPrivateSongBook() {
+        return privateSongBook;
+    }
+
+    /**
+     * 
+     * @param privateSongBook
+     *     The privateSongBook
+     */
+    public void setPrivateSongBook(Boolean privateSongBook) {
+        this.privateSongBook = privateSongBook;
+    }
+
+
 }

@@ -16,52 +16,61 @@ public class SongBookJson {
     private String songBookName;
     @SerializedName("privateSongbook")
     @Expose
-    private boolean privateSongbook;
-    @SerializedName("songbookOwner")
-    @Expose
-    private String songbookOwner;
-    @SerializedName("songIDs")
-    @Expose
-    private List<Long> songIDs = new ArrayList<Long>();
+    private Boolean privateSongbook;
 
+    /**
+     * 
+     * @return
+     *     The id
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * 
+     * @param id
+     *     The id
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * 
+     * @return
+     *     The songBookName
+     */
     public String getSongBookName() {
         return songBookName;
     }
 
+    /**
+     * 
+     * @param songBookName
+     *     The songBookName
+     */
     public void setSongBookName(String songBookName) {
         this.songBookName = songBookName;
     }
 
-    public boolean getPrivateSongbook() {
+    /**
+     * 
+     * @return
+     *     The privateSongbook
+     */
+    public Boolean getPrivateSongbook() {
         return privateSongbook;
     }
 
-    public void setPrivateSongbook(boolean privateSongbook) {
+    /**
+     * 
+     * @param privateSongbook
+     *     The privateSongbook
+     */
+    public void setPrivateSongbook(Boolean privateSongbook) {
         this.privateSongbook = privateSongbook;
     }
 
-    public String getSongbookOwner() {
-        return songbookOwner;
-    }
-
-    public void setSongbookOwner(String songbookOwner) {
-        this.songbookOwner = songbookOwner;
-    }
-
-    public List<Long> getSongIDs() {
-        return songIDs;
-    }
-
-    public void setSongIDs(List<Long> songIDs) {
-        this.songIDs = songIDs;
-    }
 
 }
