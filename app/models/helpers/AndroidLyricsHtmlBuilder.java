@@ -1,6 +1,7 @@
 package models.helpers;
 
 import chord.tools.LineTypeChecker;
+import play.Logger;
 
 
 /**
@@ -18,6 +19,8 @@ public class AndroidLyricsHtmlBuilder {
     private static String verseTypeCloseTag = "</small></font>";
     private static String verseOpenTag = "<font face=\"monospace\"><small>";
     private static String verseCloseTag = "</small></font>";
+    private static String verseOpenChorusTag = "<font face=\"monospace\"><b><small>";
+    private static String verseCloseChorusTag = "</b></small></font>";
 
     /*
     <font color="#c5c5c5">" + "Competitor ID: " +
@@ -37,7 +40,8 @@ public class AndroidLyricsHtmlBuilder {
     public static String buildHtmlFromSongLyrics(String songlyrics) {
         StringBuilder songLyricsHtml = new StringBuilder();
         songLyricsHtml.append(startMonospaceOpenTag);
-
+        
+        boolean isChorus = false; 
         for (String line : songlyrics.split("\\r?\\n")) {
             // verse recognition
             boolean lineStartsWithBrace = line.startsWith("[");
@@ -69,6 +73,7 @@ public class AndroidLyricsHtmlBuilder {
                 // VERSETYPE STYLING
                 //fonts.MONOSPACE.setColor(BaseColor.WHITE);
                 //trim line
+                isChorus = line.contains("Chorus")? true : false;
                 songLyricsHtml.append(htmlDecorator(verseTypeOpenTag, line.trim(), verseTypeCloseTag));
             } else if (LineTypeChecker.isChordLine(line)) {
                 // CHORD STYLING
@@ -77,7 +82,13 @@ public class AndroidLyricsHtmlBuilder {
             } else {
                 // STANDARD STYLING
                 // line
-                songLyricsHtml.append(htmlDecorator(verseOpenTag, line, verseCloseTag));
+                // chorus verses are bold
+                if (isChorus){
+                    songLyricsHtml.append(htmlDecorator(verseOpenChorusTag, line, verseCloseChorusTag));
+                }
+                else {
+                    songLyricsHtml.append(htmlDecorator(verseOpenTag, line, verseCloseTag));
+                }
             }
         }
         songLyricsHtml.append(startMonospaceCloseTag);
