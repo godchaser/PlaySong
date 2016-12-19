@@ -330,6 +330,7 @@
 		
 		var songbookID = 0;
 		var songbookChanged = false;
+		var pageChanged = false;
 		
 		/* Table initialisation */
 		$('#song_table')
@@ -345,10 +346,11 @@
 				//"dom": 'T<"clear">lfrtip',
 				"dom": '<f<t>lip>',
 				"drawCallback": function( settings ) {
-				if (songbookChanged){
-					//console.log("Songbook changed");
+				if (songbookChanged || pageChanged){
+					//console.log("Songbook or page changed");
 					oTable.DataTable().responsive.recalc();
 					songbookChanged = false;
+					pageChanged = false;
 				}
 			    selectRow();
 			    },
@@ -383,6 +385,12 @@
 		});
 		
 		oTable = $('#song_table').dataTable();
+		
+		// listen for page change events
+		$('#song_table').on( 'page.dt', function () {
+		    pageChanged = true;
+		} );
+		
 		// change songbook event handling	
 		$("#select-songbooks").change(function(){
 		   var selectedSongbookId = this.value;
