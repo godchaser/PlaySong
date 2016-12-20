@@ -38,10 +38,9 @@
                <thead>
                   <tr>
                      <th>Name</th>
-                     <th class="datatable-nosort">Link</th>
+                     <th class="datatable-nosort">Video</th>
                      <th>Title</th>
                      <th>Author</th>
-                     <th class="datatable-nosort">Id</th>
                   </tr>
                </thead>
             </table>
@@ -358,13 +357,12 @@
 				"columns" : [{
 					"data" : "songName"
 				}, {
-					"data" : "songLink"
+					"data" : "songLink",
+					className: "dt-center"
 				}, {
 					"data" : "songOriginalTitle"
 				}, {
 					"data" : "songAuthor"
-				}, {
-					"data" : "songId"
 				}],
 				"columnDefs" : [{
 					targets : "datatable-nosort",
@@ -493,3 +491,4 @@
 }
 
 @admintheme("", user, songsModified, songsCreated)(song_table_wrapper)
+
