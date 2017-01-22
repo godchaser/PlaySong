@@ -21,7 +21,7 @@ public class IdHelper {
     }
 
     public static String getIdFromName(String name) { 
-        name = name.replace(" ", "-").replace(",", "-").replace("'", "").toLowerCase();
+        name = name.replace(" ", "-").replace(",", "-").replace("'", "").replace("’", "").replace(":", ",").toLowerCase();
         return (new URLParamEncoder(name)).encode();
     }
 
