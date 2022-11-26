@@ -18,7 +18,7 @@ Please have in mind that this whole project is still under development and has l
 of bugs, discrepancies and possible/mandatory improvements. So I will continue to work on 
 it as time allows me.
 
-**Heroku test deployment** http://playsong.herokuapp.com/
+**Heroku test deployment** https://playsong.duckdns.org
 
 ## Features:
 * Chord manipulation - chord transposition
